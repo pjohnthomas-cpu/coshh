@@ -1,0 +1,4276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COSHH Assessment Form</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --ink: #0f1923;
+    --paper: #f5f2eb;
+    --stripe: #e8e4db;
+    --accent: #c8392b;
+    --accent2: #1a4a6b;
+    --rule: #c4bdb0;
+    --highlight: #f5e642;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--stripe);
+    font-family: var(--sans);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── header ── */
+  .site-header {
+    background: var(--ink);
+    color: #fff;
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--accent);
+  }
+  .site-header h1 {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .site-header .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--highlight);
+    opacity: 0.85;
+  }
+  .site-header-logos {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .header-logo {
+    display: block;
+    object-fit: contain;
+  }
+  .header-logo-bangor {
+    height: 44px;
+    width: auto;
+    /* white background pill so the crest shows on dark header */
+    background: #fff;
+    border-radius: 3px;
+    padding: 4px 8px;
+  }
+  .header-logo-nfi {
+    height: 44px;
+    width: auto;
+    background: #fff;
+    border-radius: 3px;
+    padding: 3px 6px;
+  }
+  .header-divider {
+    width: 1px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+  .header-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: left;
+  }
+
+  /* Title-strip logos (printed form header) */
+  .title-strip-logos {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .strip-logo {
+    display: block;
+    object-fit: contain;
+  }
+  .strip-logo-bangor {
+    height: 52px;
+    width: auto;
+  }
+  .strip-logo-nfi {
+    height: 48px;
+    width: auto;
+  }
+
+  /* ── main layout ── */
+  .shell {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .form-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-top: 4px solid var(--accent);
+    padding: 40px 44px;
+    position: relative;
+  }
+  .form-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--accent) 0 8px, var(--accent2) 8px 16px);
+  }
+
+  /* ── section headers ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 600;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .section-block {
+    margin-bottom: 36px;
+  }
+
+  /* ── form title strip ── */
+  .title-strip {
+    background: var(--highlight);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 10px 16px;
+    margin-bottom: 28px;
+    border: 1px solid #d4c800;
+  }
+  .title-strip span {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+  }
+  .title-strip input[type="date"] {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+    outline: none;
+    padding: 2px 4px;
+    width: 140px;
+  }
+
+  /* ── field groups ── */
+  .field-row {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .field-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .field-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field-row.cols-1 { grid-template-columns: 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5a6673;
+    font-family: var(--mono);
+  }
+  input[type="text"], input[type="date"], input[type="email"], input[type="tel"], textarea, select {
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-bottom: 2px solid var(--rule);
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent2);
+    background: #fafcff;
+  }
+  textarea { resize: vertical; line-height: 1.55; min-height: 70px; }
+
+  /* ── row delete button ── */
+  .row-del {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: #bbb;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 2px;
+    opacity: 0;
+    transition: all 0.12s;
+    z-index: 2;
+    padding: 0;
+  }
+  tr:hover .row-del { opacity: 0.7; }
+  .row-del:hover { opacity: 1 !important; background: var(--accent); color: #fff; }
+
+  /* ── substances table ── */
+  .cas-hint {
+    font-size: 12px;
+    color: #555;
+    background: #fffbea;
+    border: 1px solid #e0d08a;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 4px 0 10px 0;
+  }
+    .substance-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 8px;
+  }
+  .substance-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .substance-table th {
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 10px;
+    border: 1px solid #333;
+    font-weight: 600;
+    white-space: nowrap;
+    text-align: left;
+  }
+  .substance-table td {
+    border: 1px solid var(--rule);
+    padding: 2px;
+    vertical-align: top;
+  }
+  .substance-table td input, .substance-table td textarea {
+    border: none;
+    border-bottom: none;
+    padding: 6px 7px;
+    font-size: 12px;
+    min-height: 0;
+    background: transparent;
+    width: 100%;
+  }
+  .substance-table td input:focus, .substance-table td textarea:focus {
+    background: #f0f5ff;
+  }
+  .substance-table tr:nth-child(even) td { background: #faf9f6; }
+  .add-row-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px dashed var(--rule);
+    color: var(--accent2);
+    padding: 7px 14px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: all 0.15s;
+  }
+  .add-row-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* ── yes/no questions ── */
+  .yn-list { list-style: none; }
+  .yn-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .yn-list li:last-child { border-bottom: none; }
+  .yn-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 20px;
+    margin-top: 1px;
+  }
+  .yn-text { flex: 1; }
+  .yn-radios {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .yn-radios label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .yn-radios input[type="radio"] { accent-color: var(--accent2); width: 14px; height: 14px; }
+  .yn-confirm label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .yn-confirm input[type="checkbox"] { accent-color: var(--accent2); width: 14px; height: 14px; }
+
+  /* ── checkbox grid (controls/PPE) ── */
+  .controls-grid {
+    display: grid;
+    gap: 0;
+  }
+  .controls-section {
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border: 1px solid var(--rule);
+    border-top: none;
+  }
+  .ctrl-check {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 14px;
+    font-size: 12px;
+    border-right: 1px solid var(--rule);
+    flex: 1;
+    min-width: 140px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s;
+  }
+  .ctrl-check:hover { background: #eee9e0; }
+  .ctrl-check:last-child { border-right: none; }
+  .ctrl-check input[type="checkbox"] { accent-color: var(--accent2); width: 14px; height: 14px; flex-shrink: 0; }
+  .ctrl-check.full-width { flex: 0 0 100%; }
+  .ctrl-check.has-input { flex: 1; }
+  .ctrl-check.has-input input[type="text"] {
+    flex: 1; border: none; border-bottom: 1px solid var(--rule);
+    padding: 0 4px; font-size: 12px; background: transparent; outline: none; min-height: 0; margin-left: 4px;
+  }
+
+  /* ── emergency table ── */
+  .emergency-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .emergency-table th {
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 8px;
+    border: 1px solid #333;
+    text-align: center;
+  }
+  .emergency-table th.sub { background: #2d3a46; font-size: 8px; }
+  .emergency-table td {
+    border: 1px solid var(--rule);
+    padding: 5px 7px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .emergency-table td.substance-col {
+    text-align: left;
+  }
+  .emergency-table td input[type="text"] {
+    border: none; border-bottom: 1px solid var(--rule);
+    font-size: 11px; padding: 3px 4px; width: 100%; background: transparent; outline: none; min-height: 0;
+  }
+  .emergency-table td input[type="checkbox"] { accent-color: var(--accent2); width: 13px; height: 13px; }
+  .emergency-table tr:nth-child(even) td { background: #faf9f6; }
+  .emergency-table td.note-cell { text-align: left; font-size: 11px; }
+  .emergency-table td.note-cell input[type="text"] { width: 100%; }
+
+  /* ── fire/explosion grid ── */
+  .fire-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--rule);
+    margin-bottom: 2px;
+  }
+  .fire-cell {
+    padding: 10px 14px;
+    border-right: 1px solid var(--rule);
+    font-size: 12px;
+  }
+  .fire-cell:last-child { border-right: none; }
+  .fire-cell label {
+    display: flex; align-items: center; gap: 6px; font-size: 12px;
+    font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink); cursor: pointer;
+    margin-left: 10px;
+  }
+  .fire-cell .fire-q { font-weight: 600; font-size: 12px; margin-bottom: 6px; }
+  .fire-cell label input[type="radio"] { accent-color: var(--accent2); }
+  .fire-detail {
+    border: 1px solid var(--rule);
+    border-top: none;
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* ── spillage ── */
+  .spill-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--rule);
+  }
+  .spill-cell {
+    padding: 10px 14px;
+    border-right: 1px solid var(--rule);
+  }
+  .spill-cell:last-child { border-right: none; }
+  .spill-cell label { margin-bottom: 6px; display: block; }
+
+  /* ── waste table ── */
+  .waste-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .waste-table th {
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 10px;
+    border: 1px solid #333;
+    text-align: left;
+  }
+  .waste-table td {
+    border: 1px solid var(--rule);
+    padding: 2px;
+    vertical-align: top;
+  }
+  .waste-table td input, .waste-table td textarea {
+    border: none; padding: 6px 7px; font-size: 12px; min-height: 0; background: transparent; width: 100%;
+  }
+  .waste-table tr:nth-child(even) td { background: #faf9f6; }
+
+  /* ── generate button ── */
+  .btn-generate {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 18px 32px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 40px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-generate::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    transition: left 0.4s;
+  }
+  .btn-generate:hover::before { left: 100%; }
+  .btn-generate:hover { background: #a52b1f; }
+  .btn-generate:active { transform: scale(0.99); }
+  .btn-generate:disabled { background: #aaa; cursor: not-allowed; }
+
+  .status-bar {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  /* ── materials retained ── */
+  .retained-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .retained-table th {
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 10px;
+    border: 1px solid #333;
+    text-align: left;
+  }
+  .retained-table td {
+    border: 1px solid var(--rule);
+    padding: 2px;
+    vertical-align: top;
+  }
+  .retained-table td input, .retained-table td textarea {
+    border: none; padding: 6px 7px; font-size: 12px; min-height: 0; background: transparent; width: 100%;
+  }
+  .retained-table tr:nth-child(even) td { background: #faf9f6; }
+
+  @media (max-width: 640px) {
+    .form-card { padding: 24px 18px; }
+    .field-row.cols-2, .field-row.cols-3 { grid-template-columns: 1fr; }
+    .fire-grid { grid-template-columns: 1fr; }
+    .spill-row { grid-template-columns: 1fr; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MOBILE / TABLET RESPONSIVE IMPROVEMENTS
+     Targets: tablets (≤900px) and phones (≤640px / ≤480px)
+  ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* ── Tables without a scroll wrapper get horizontal scroll on all small
+        screens so they don't break the layout or become unreadably squashed ── */
+  @media (max-width: 900px) {
+    .emergency-table,
+    .waste-table,
+    .retained-table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  @media (max-width: 768px) {
+
+    /* ── Site header ──────────────────────────────────────────────────────── */
+    .site-header       { padding: 10px 16px; }
+    .header-logo-bangor,
+    .header-logo-nfi   { height: 34px; }
+    .site-header h1    { font-size: 11px; letter-spacing: 0.12em; }
+    .site-header .badge { display: none; }         /* subtitle hidden — saves height */
+    .header-title-block { text-align: left; }
+
+    /* ── Save bar ─────────────────────────────────────────────────────────── */
+    .save-bar          { padding: 10px 14px; gap: 8px; }
+    .save-divider      { display: none; }          /* thin separators not needed on mobile */
+    .save-btn {
+      padding: 10px 13px;
+      font-size: 11px;
+      min-height: 40px;                            /* 40 px minimum touch target height */
+    }
+    .save-btn svg      { width: 15px; height: 15px; }
+
+    /* ── Shell / form card ────────────────────────────────────────────────── */
+    .shell             { padding: 20px 10px 60px; }
+    .form-card         { padding: 24px 16px; }
+
+    /* ── Labels & section headings ────────────────────────────────────────── */
+    label {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+    }
+    .section-label     { font-size: 12px; letter-spacing: 0.14em; }
+    .export-label      { font-size: 11px; }
+
+    /* ── All inputs — 16 px prevents iOS Safari auto-zoom on focus ────────── */
+    input[type="text"],
+    input[type="date"],
+    input[type="email"],
+    input[type="tel"],
+    textarea,
+    select {
+      font-size: 16px;
+      padding: 10px 12px;
+    }
+    /* Table cell inputs share the same rule but keep a slightly tighter size
+       because they live inside dense table cells */
+    .substance-table td input,
+    .substance-table td textarea,
+    .waste-table td input,
+    .waste-table td textarea,
+    .retained-table td input,
+    .retained-table td textarea,
+    .emergency-table td input[type="text"] {
+      font-size: 14px;
+    }
+
+    /* ── Table header text — slightly larger for readability ─────────────── */
+    .substance-table th,
+    .emergency-table th,
+    .waste-table th,
+    .retained-table th  { font-size: 10px; letter-spacing: 0.05em; }
+    .emergency-table th.sub { font-size: 9px; }
+
+    /* ── Checkboxes & radios — larger touch targets ───────────────────────── */
+    .yn-radios input[type="radio"],
+    .ctrl-check input[type="checkbox"],
+    .yn-confirm input[type="checkbox"],
+    .emergency-table td input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ── Yes/No list rows — more breathing room ──────────────────────────── */
+    .yn-list li        { padding: 14px 0; gap: 12px; font-size: 14px; }
+    .yn-radios label   { font-size: 14px; gap: 8px; }
+
+    /* ── Controls / PPE checkboxes ────────────────────────────────────────── */
+    .ctrl-check        { padding: 12px 14px; min-width: 160px; font-size: 13px; }
+
+    /* ── Add-row buttons — full width for easy tapping ───────────────────── */
+    .add-row-btn       { padding: 13px 18px; font-size: 12px; width: 100%; text-align: center; }
+
+    /* ── Export bar ───────────────────────────────────────────────────────── */
+    .export-bar        { padding: 18px 14px; }
+    .export-btn        { padding: 12px 14px; }
+    .fmt-desc          { display: none; }          /* sub-labels dropped; icon+name is enough */
+
+    /* ── Generate button ──────────────────────────────────────────────────── */
+    .btn-generate      { font-size: 12px; padding: 16px 24px; }
+
+    /* ── Fire detail grid collapses to single column ─────────────────────── */
+    .fire-detail       { grid-template-columns: 1fr; }
+
+    /* ── Title strip inside the form ─────────────────────────────────────── */
+    .title-strip       { flex-wrap: wrap; gap: 8px; }
+    .strip-logo-bangor,
+    .strip-logo-nfi    { height: 36px; }
+  }
+
+  /* ── Very small phones (< 480 px) ──────────────────────────────────────── */
+  @media (max-width: 480px) {
+    .header-logo-bangor,
+    .header-logo-nfi   { height: 28px; }
+    .save-bar-label    { display: none; }          /* "Draft" label dropped at tiny widths */
+    .export-options    { grid-template-columns: 1fr 1fr; }
+    .title-strip-logos { display: none; }          /* logos already in header; save space */
+  }
+
+  /* ── export bar ── */
+  .export-bar {
+    margin-top: 40px;
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--accent2);
+    padding: 24px;
+    background: #fff;
+  }
+  .export-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .export-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .export-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 14px 16px;
+    border: 2px solid var(--rule);
+    background: var(--paper);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .export-btn:hover { border-color: var(--accent2); background: #f0f5ff; }
+  .export-btn.active { border-color: var(--accent2); background: #e8f0fb; box-shadow: inset 0 0 0 1px var(--accent2); }
+  .fmt-icon { font-size: 16px; line-height: 1; }
+  .fmt-name { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--ink); }
+  .fmt-desc { font-family: var(--sans); font-size: 10px; color: #7a8490; }
+  @media (max-width: 640px) { .export-options { grid-template-columns: 1fr 1fr; } }
+
+
+  /* ── save/load bar ── */
+  .save-bar {
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 44px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--accent2);
+  }
+  .save-bar-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8899aa;
+    flex-shrink: 0;
+    margin-right: 4px;
+  }
+  .save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    background: transparent;
+    color: #ccd5df;
+    border-color: #3a4a58;
+  }
+  .save-btn:hover { background: #1e2d3d; color: #fff; border-color: var(--accent2); }
+  .save-btn.primary { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+  .save-btn.primary:hover { background: #1e5e8a; }
+  .save-btn.danger { color: #e07070; border-color: #6b3030; }
+  .save-btn.danger:hover { background: #3d1515; border-color: #e07070; color: #fff; }
+  .save-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .save-divider { width: 1px; height: 24px; background: #2d3d4d; margin: 0 4px; flex-shrink: 0; }
+  .autosave-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4a9a5a; flex-shrink: 0;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  .autosave-dot.stale { background: #a06020; animation: none; }
+  .autosave-dot.off { background: #555; animation: none; }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .autosave-txt {
+    font-family: var(--mono); font-size: 9px; color: #7a9ab0; letter-spacing: 0.08em;
+  }
+  .save-spacer { flex: 1; }
+
+
+  /* modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 1000; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--paper); border-top: 4px solid var(--accent2);
+    padding: 32px 36px; max-width: 480px; width: 90%;
+    transform: translateY(16px); transition: transform 0.2s;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0); }
+  .modal-title {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent2); font-weight: 700; margin-bottom: 16px;
+  }
+  .modal-body { font-size: 13px; line-height: 1.6; color: var(--ink); margin-bottom: 20px; }
+  .modal-body p { margin-bottom: 10px; }
+  .modal-body .hint { font-size: 11px; color: #7a8490; font-family: var(--mono); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+  .modal-btn {
+    padding: 8px 18px; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
+    border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
+    transition: all 0.15s;
+  }
+  .modal-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .modal-btn.confirm { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+  .modal-btn.confirm:hover { background: #1e5e8a; }
+
+  /* draft list */
+  .draft-list { list-style: none; margin: 12px 0; }
+  .draft-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border: 1px solid var(--rule);
+    margin-bottom: 6px; cursor: pointer; transition: background 0.1s; font-size: 12px;
+  }
+  .draft-item:hover { background: #e8f0fb; border-color: var(--accent2); }
+  .draft-item .draft-name { flex: 1; font-weight: 600; }
+  .draft-item .draft-date { font-family: var(--mono); font-size: 10px; color: #7a8490; }
+  .draft-item .draft-del { color: #c87070; font-size: 16px; line-height: 1; padding: 2px 6px; cursor: pointer; }
+  .draft-item .draft-del:hover { color: var(--accent); }
+
+  /* toast */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 2000;
+    background: var(--ink); color: #fff; padding: 10px 18px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+    border-left: 3px solid var(--accent2); max-width: 320px;
+    transform: translateY(20px); opacity: 0; transition: all 0.25s;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left-color: #4a9a5a; }
+  .toast.error { border-left-color: var(--accent); }
+
+  /* ── AI Autofill ── */
+  .autofill-wrap {
+    position: relative;
+  }
+  .autofill-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--accent2);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .autofill-btn:hover { background: #1e5e8a; }
+  .autofill-btn.visible { opacity: 1; }
+  .autofill-btn.loading { background: #666; cursor: wait; }
+  .autofill-btn svg { width: 9px; height: 9px; animation: none; flex-shrink: 0; }
+  .autofill-btn.loading svg { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .autofill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    color: #2e7d32;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    margin-left: 6px;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .autofill-badge:hover { background: #c8e6c9; }
+  .autofill-badge.error { background: #fdecea; border-color: #ef9a9a; color: #c62828; }
+
+  /* EH40 auto-filled WEL badge */
+  .eh40-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 7px;
+    letter-spacing: 0.08em;
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    color: #2e7d32;
+    padding: 1px 4px;
+    margin-left: 4px;
+    vertical-align: middle;
+    cursor: help;
+    border-radius: 1px;
+  }
+
+  .autofill-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    z-index: 3000;
+    background: var(--paper);
+    border-top: 3px solid var(--accent2);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+    width: min(640px, 95vw);
+    max-height: 80vh;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s;
+  }
+  .autofill-panel.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .autofill-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 2999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .autofill-scrim.open { opacity: 1; pointer-events: all; }
+
+  .af-header {
+    background: var(--ink);
+    color: #fff;
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .af-header-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--highlight);
+  }
+  .af-header-sub {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: #8899aa;
+    margin-top: 3px;
+    letter-spacing: 0.08em;
+  }
+  .af-close {
+    background: none;
+    border: 1px solid #3a4a58;
+    color: #8899aa;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .af-close:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .af-body { padding: 22px; }
+
+  .af-field-group { margin-bottom: 18px; }
+  .af-field-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .af-field-label .af-tag {
+    background: var(--accent2);
+    color: #fff;
+    font-size: 7px;
+    padding: 1px 5px;
+    letter-spacing: 0.08em;
+  }
+  .af-field-val {
+    font-size: 13px;
+    line-height: 1.55;
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 10px 12px;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .af-field-val.highlight { border-color: var(--accent2); background: #f0f5ff; }
+
+  .af-ghs-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .af-ghs-chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 9px;
+    border: 1px solid var(--rule);
+    background: #fff;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+  }
+  .af-ghs-chip.danger { background: #fdecea; border-color: #ef9a9a; color: #b71c1c; }
+  .af-ghs-chip.warn { background: #fff8e1; border-color: #ffe082; color: #e65100; }
+  .af-ghs-chip.env { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+
+  .af-disclaimer {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: #9aabb8;
+    letter-spacing: 0.06em;
+    padding: 10px 22px 16px;
+    border-top: 1px solid var(--rule);
+    line-height: 1.5;
+  }
+
+  .af-actions {
+    padding: 14px 22px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    border-top: 1px solid var(--rule);
+    background: #f5f2eb;
+  }
+  .af-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 9px 18px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .af-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .af-btn.primary { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+  .af-btn.primary:hover { background: #1e5e8a; }
+
+  /* ── Standalone CAS Lookup Widget ───────────────────────────────────────── */
+  .cas-lookup-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 4000;
+    background: var(--accent2);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    padding: 11px 18px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .cas-lookup-btn:hover { background: #1e5e8a; box-shadow: 0 6px 24px rgba(0,0,0,0.45); }
+  .cas-lookup-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  .cas-lookup-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    z-index: 4500;
+    background: var(--paper);
+    border-top: 3px solid var(--accent2);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    width: min(680px, 95vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s;
+  }
+  .cas-lookup-panel.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .cas-lookup-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 4499;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .cas-lookup-scrim.open { opacity: 1; pointer-events: all; }
+
+  .cl-header {
+    background: var(--ink);
+    color: #fff;
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .cl-header-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--highlight);
+  }
+  .cl-header-sub {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: #8899aa;
+    margin-top: 3px;
+    letter-spacing: 0.06em;
+  }
+  .cl-close {
+    background: none;
+    border: 1px solid #3a4a58;
+    color: #8899aa;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .cl-close:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .cl-search-row {
+    display: flex;
+    gap: 8px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--rule);
+    background: #fff;
+    flex-wrap: wrap;
+  }
+  .cl-input {
+    flex: 1;
+    min-width: 160px;
+    padding: 9px 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    border: 1px solid var(--rule);
+    border-bottom: 2px solid var(--rule);
+    outline: none;
+    transition: border-color 0.15s;
+    background: #fafcff;
+  }
+  .cl-input:focus { border-color: var(--accent2); }
+  .cl-search-btn {
+    background: var(--accent2);
+    color: #fff;
+    border: none;
+    padding: 9px 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .cl-search-btn:hover { background: #1e5e8a; }
+  .cl-search-btn:disabled { background: #aaa; cursor: wait; }
+
+  .cl-body { padding: 20px 22px; min-height: 80px; }
+
+  .cl-eh40-box {
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+  .cl-eh40-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2e7d32;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .cl-eh40-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .cl-eh40-wel  { font-family: var(--mono); font-size: 11px; color: #1b5e20; }
+  .cl-eh40-notes { font-size: 11px; color: #555; margin-top: 3px; }
+  .cl-no-eh40 {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #795548;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .cl-disclaimer {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: #9aabb8;
+    letter-spacing: 0.05em;
+    padding: 10px 22px 14px;
+    border-top: 1px solid var(--rule);
+    line-height: 1.5;
+  }
+
+  /* ── Chemistry Toolbar ───────────────────────────────────────────────────── */
+  .chem-toolbar {
+    position: fixed;
+    z-index: 5000;
+    background: var(--ink);
+    border: 1px solid #2d3a46;
+    border-top: 2px solid var(--accent2);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+    min-width: 300px;
+    max-width: 500px;
+    pointer-events: all;
+    user-select: none;
+    transition: opacity 0.12s, transform 0.12s;
+  }
+  .chem-toolbar.ct-entering {
+    opacity: 0; transform: translateY(4px);
+  }
+  .ct-header {
+    display: flex;
+    align-items: stretch;
+    background: #131e28;
+    border-bottom: 1px solid #2d3a46;
+  }
+  .ct-tab {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7a9ab0;
+    background: transparent;
+    border: none;
+    border-right: 1px solid #2d3a46;
+    padding: 7px 13px;
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .ct-tab:hover { color: #fff; background: #1e2d3d; }
+  .ct-tab.active { color: var(--highlight); background: var(--ink); }
+  .ct-hint {
+    font-family: var(--mono);
+    font-size: 8px;
+    color: #3a5060;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.08em;
+    flex: 1;
+  }
+  .ct-close {
+    margin-left: auto;
+    font-size: 11px;
+    color: #445566;
+    background: transparent;
+    border: none;
+    border-left: 1px solid #2d3a46;
+    padding: 0 11px;
+    cursor: pointer;
+    transition: all 0.12s;
+    line-height: 1;
+  }
+  .ct-close:hover { color: #fff; background: #3d1515; }
+  .ct-section {
+    display: none;
+    padding: 8px 10px;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .ct-section.active { display: flex; }
+  .ct-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-wrap: wrap;
+  }
+  .ct-row-label {
+    font-family: var(--mono);
+    font-size: 7.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #445566;
+    min-width: 30px;
+    flex-shrink: 0;
+    text-align: right;
+    padding-right: 5px;
+  }
+  .ct-char {
+    font-family: var(--sans);
+    font-size: 13px;
+    width: 27px;
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a2835;
+    border: 1px solid #2d3a46;
+    color: #b0c8da;
+    cursor: pointer;
+    transition: all 0.1s;
+    flex-shrink: 0;
+    line-height: 1;
+    padding: 0;
+  }
+  .ct-char:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .ct-char:active { background: #1e5e8a; transform: scale(0.93); }
+  .ct-char.wide { width: auto; padding: 0 8px; font-size: 11px; }
+  .ct-sep { width: 1px; height: 20px; background: #2d3a46; margin: 0 3px; flex-shrink: 0; }
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-title-block">
+    <h1>COSHH Assessment Form</h1>
+    <span class="badge">Control of Substances Hazardous to Health Regulations 2002</span>
+  </div>
+</header>
+
+<!-- Save / Load bar -->
+<div class="save-bar" id="save-bar">
+  <span class="save-bar-label">Draft</span>
+
+  <button class="save-btn primary" onclick="saveLocal()" title="Save draft as JSON file to your computer">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14V9h12v5M10 2v4M2 2h9l3 3v9"/></svg>
+    Save to file
+  </button>
+
+  <button class="save-btn" onclick="openLoadModal()" title="Load a previously saved draft file">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h5l2 2h5v8H2zM8 8v5M5 11l3-3 3 3"/></svg>
+    Load file
+  </button>
+
+  <input type="file" id="load-file-input" accept=".coshh,.json" style="display:none" onchange="loadFromFile(this)">
+
+  <div class="save-divider"></div>
+
+  <button class="save-btn" onclick="saveBrowser()" title="Save a named draft in this browser">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M5 9h6M5 12h4M8 2v5"/></svg>
+    Save in browser
+  </button>
+
+  <button class="save-btn" onclick="openBrowserDrafts()" title="Browse drafts saved in this browser">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12v10H2zM2 4l3-2h6l1 2"/><path d="M6 8h4M6 11h2"/></svg>
+    Browser drafts
+  </button>
+
+
+  <div class="save-spacer"></div>
+
+  <span class="autosave-dot" id="autosave-dot" title="Autosave status"></span>
+  <span class="autosave-txt" id="autosave-txt">autosave on</span>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-title" id="modal-title">Modal</div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Chemistry Toolbar (sub/superscript + Greek) -->
+<div id="chem-toolbar" class="chem-toolbar" style="display:none" role="toolbar" aria-label="Chemistry notation">
+  <div class="ct-header">
+    <button class="ct-tab active" id="ct-tab-script" onmousedown="return false" onclick="ctSetTab('script')">X₂  Sub / Sup</button>
+    <button class="ct-tab" id="ct-tab-greek" onmousedown="return false" onclick="ctSetTab('greek')">α  Greek</button>
+    <span class="ct-hint">click to insert at cursor</span>
+    <button class="ct-close" onmousedown="return false" onclick="ctForceHide()" title="Close toolbar">✕</button>
+  </div>
+  <div class="ct-section active" id="ct-section-script"></div>
+  <div class="ct-section" id="ct-section-greek"></div>
+</div>
+
+
+<div class="shell">
+<div class="form-card">
+
+  <!-- Title strip -->
+  <div class="title-strip">
+    <span style="flex:1; font-weight:700;">COSHH Assessment Form</span>
+    <span style="white-space:nowrap;">Date: <input type="date" id="assessment-date"></span>
+  </div>
+
+  <!-- Header fields -->
+  <div class="section-block">
+    <div class="section-label">Assessment Details</div>
+    <div class="field-row cols-1">
+      <div class="field"><label>Procedure Title</label><input type="text" id="proc-title" placeholder="e.g. Synthesis and Storage of 2% Nital Solution"></div>
+    </div>
+    <div class="field-row cols-1">
+      <div class="field"><label>Location(s)</label><input type="text" id="location" placeholder="Lab room numbers / all rooms involved"></div>
+    </div>
+    <div class="field-row cols-3">
+      <div class="field"><label>Prepared By</label><input type="text" id="prep-name" placeholder="Full name"></div>
+      <div class="field"><label>Email</label><input type="email" id="prep-email" placeholder="name@organisation.ac.uk"></div>
+      <div class="field"><label>Phone</label><input type="tel" id="prep-phone" placeholder="+44 ..."></div>
+    </div>
+    <div class="field-row cols-3">
+      <div class="field"><label>Checked By</label><input type="text" id="check-name" placeholder="Supervisor / qualified nominee"></div>
+      <div class="field"><label>Email</label><input type="email" id="check-email" placeholder="name@organisation.ac.uk"></div>
+      <div class="field"><label>Phone</label><input type="tel" id="check-phone" placeholder="+44 ..."></div>
+    </div>
+  </div>
+
+  <!-- Substances table -->
+  <div class="section-block">
+    <div class="section-label">Hazardous Substances (include all byproducts)</div>
+    <p class="cas-hint">💡 <strong>Tip:</strong> The PubChem lookup works best with <strong>CAS registry numbers</strong> (e.g. 67-64-1). If a name search returns no data or poor results, try entering the CAS number instead.</p>
+    <div class="substance-table-wrap">
+      <table class="substance-table" id="substances-table">
+        <thead>
+          <tr>
+            <th style="width:16%">Hazardous Substance</th>
+            <th style="width:9%">CAS Number</th>
+            <th style="width:9%">Qty Used</th>
+            <th style="width:9%">Qty Handled</th>
+            <th style="width:10%">Concentration</th>
+            <th style="width:16%">Workplace Exposure Limit</th>
+            <th>Hazards (GHS / Annex 3)</th>
+          </tr>
+        </thead>
+        <tbody id="substances-body">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+    <button class="add-row-btn" onclick="addSubstanceRow()">+ Add substance</button>
+  </div>
+
+  <!-- Yes/No questions -->
+  <div class="section-block">
+    <div class="section-label">Risk Questions</div>
+    <ul class="yn-list">
+      <li>
+        <span class="yn-num">1.</span>
+        <span class="yn-text">Can a less hazardous substance be used?</span>
+        <span class="yn-radios">
+          <label><input type="radio" name="q1" value="yes"> Yes</label>
+          <label><input type="radio" name="q1" value="no"> No</label>
+        </span>
+      </li>
+      <li>
+        <span class="yn-num">2.</span>
+        <span class="yn-text">Can this procedure enhance hazards or create harmful by-products?</span>
+        <span class="yn-radios">
+          <label><input type="radio" name="q2" value="yes"> Yes</label>
+          <label><input type="radio" name="q2" value="no"> No</label>
+        </span>
+      </li>
+      <li>
+        <span class="yn-num">3.</span>
+        <span class="yn-text">Is the substance a known mutagen, carcinogen, or teratogen?</span>
+        <span class="yn-radios">
+          <label><input type="radio" name="q3" value="yes"> Yes</label>
+          <label><input type="radio" name="q3" value="no"> No</label>
+        </span>
+      </li>
+      <li>
+        <span class="yn-num">4.</span>
+        <span class="yn-text">Can this procedure cause build-up of pressure or an exothermic reaction?</span>
+        <span class="yn-radios">
+          <label><input type="radio" name="q4" value="yes"> Yes</label>
+          <label><input type="radio" name="q4" value="no"> No</label>
+        </span>
+      </li>
+      <li>
+        <span class="yn-num">5.</span>
+        <span class="yn-text">
+          <span class="yn-confirm">
+            <label>
+              <input type="checkbox" id="q5-confirm">
+              Confirm materials are not on the <a href="https://www.bangor.ac.uk/hss/inflink/statutory.php.en" target="_blank">prescribed list</a>
+            </label>
+          </span>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Engineering Controls / PPE / Utilities -->
+  <div class="section-block">
+    <div class="section-label">Controls &amp; PPE</div>
+    <div class="controls-grid">
+      <div class="controls-section">Engineering Controls</div>
+      <div class="controls-row">
+        <label class="ctrl-check"><input type="checkbox" id="ec-fume"> Fume Cupboard</label>
+        <label class="ctrl-check"><input type="checkbox" id="ec-particle"> Particle Containment Booth</label>
+        <label class="ctrl-check"><input type="checkbox" id="ec-gas"> Gas Alarms</label>
+        <label class="ctrl-check"><input type="checkbox" id="ec-glove"> Glove Box</label>
+        <label class="ctrl-check"><input type="checkbox" id="ec-extract"> Extraction</label>
+      </div>
+
+      <div class="controls-section">Utilities Needed</div>
+      <div class="controls-row">
+        <label class="ctrl-check"><input type="checkbox" id="ut-tap"> Tap Water (running)</label>
+        <label class="ctrl-check"><input type="checkbox" id="ut-chilled"> Chilled Water (recirculating)</label>
+        <div class="ctrl-check has-input"><span>Gases:</span><input type="text" id="ut-gases" placeholder="specify..."></div>
+      </div>
+
+      <div class="controls-section">Personal Protective Equipment (Lab Coat &amp; Nitrile Gloves are standard)</div>
+      <div class="controls-row">
+        <label class="ctrl-check"><input type="checkbox" id="ppe-nitrile"> Nitrile Gloves</label>
+        <label class="ctrl-check"><input type="checkbox" id="ppe-coat"> Lab Coat</label>
+        <label class="ctrl-check"><input type="checkbox" id="ppe-glasses"> Safety Glasses</label>
+        <label class="ctrl-check"><input type="checkbox" id="ppe-ffp3"> Fitted FFP3 Mask</label>
+      </div>
+      <div class="controls-row">
+        <label class="ctrl-check"><input type="checkbox" id="ppe-othergloves"> Other Gloves</label>
+        <label class="ctrl-check"><input type="checkbox" id="ppe-othereye"> Other Eye Protection</label>
+        <label class="ctrl-check"><input type="checkbox" id="ppe-otherppe"> Other PPE</label>
+        <div class="ctrl-check has-input"><span>Specify:</span><input type="text" id="ppe-specify" placeholder="describe other PPE..."></div>
+      </div>
+
+      <div class="controls-section">Required Control Checks</div>
+      <div class="controls-row">
+        <div style="flex:1; padding:10px 14px;">
+          <textarea id="control-checks" rows="3" placeholder="Describe required checks before starting the procedure..." style="width:100%; border:none; background:transparent; font-size:12px; font-family:var(--sans); resize:vertical; outline:none;"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materials to be retained -->
+  <div class="section-block">
+    <div class="section-label">Materials to be Retained</div>
+    <table class="retained-table" id="retained-table">
+      <thead>
+        <tr>
+          <th>Materials</th>
+          <th>Hazards (if known)</th>
+          <th>Cleaning (reagents and materials)</th>
+          <th>Storage and Location</th>
+        </tr>
+      </thead>
+      <tbody id="retained-body">
+      </tbody>
+    </table>
+    <button class="add-row-btn" onclick="addRetainedRow()">+ Add material</button>
+  </div>
+
+  <!-- Procedure -->
+  <div class="section-block">
+    <div class="section-label">Procedure</div>
+    <div class="field">
+      <label>Procedure steps (numbered, identify SOPs, RAs, operational controls and PPE for pertinent steps)</label>
+      <textarea id="procedure" rows="8" placeholder="1. ...&#10;2. ...&#10;3. ..." data-chem-toolbar></textarea>
+    </div>
+    <div class="field" style="margin-top:12px;">
+      <label>Relevant Literature (peer-reviewed references)</label>
+      <textarea id="literature" rows="3" placeholder="Author (year). Title. Journal/Publisher." data-chem-toolbar></textarea>
+    </div>
+  </div>
+
+  <!-- Waste disposal -->
+  <div class="section-block">
+    <div class="section-label">Waste Disposal</div>
+    <table class="waste-table" id="waste-table">
+      <thead>
+        <tr>
+          <th>Chemicals and Quantity</th>
+          <th>Hazards</th>
+          <th>Containers Needed</th>
+          <th>Storage / Labelling</th>
+        </tr>
+      </thead>
+      <tbody id="waste-body">
+      </tbody>
+    </table>
+    <button class="add-row-btn" onclick="addWasteRow()">+ Add waste stream</button>
+  </div>
+
+  <!-- Emergency procedures -->
+  <div class="section-block">
+    <div class="section-label">Emergency Procedures</div>
+    <table class="emergency-table">
+      <thead>
+        <tr>
+          <th rowspan="2" style="text-align:left;">Substance</th>
+          <th colspan="2">Ingestion</th>
+          <th colspan="2">Inhalation</th>
+          <th colspan="2">Skin Contact</th>
+          <th colspan="2">Eye Contact</th>
+        </tr>
+        <tr>
+          <th class="sub">Induce Vomiting</th>
+          <th class="sub">Medical Attention</th>
+          <th class="sub">Fresh Air</th>
+          <th class="sub">Medical Attention</th>
+          <th class="sub">Rinse w/ Water</th>
+          <th class="sub">Medical Attention</th>
+          <th class="sub">Rinse w/ Water</th>
+          <th class="sub">Medical Attention</th>
+        </tr>
+      </thead>
+      <tbody id="emergency-body">
+      </tbody>
+    </table>
+    <button class="add-row-btn" style="margin-top:4px" onclick="addEmergencyRow()">+ Add substance</button>
+    <div class="field" style="margin-top:12px;">
+      <label>Other emergency notes</label>
+      <textarea id="emergency-notes" rows="2" placeholder="Any additional emergency information..."></textarea>
+    </div>
+  </div>
+
+  <!-- Spillage -->
+  <div class="section-block">
+    <div class="section-label">Spillage Procedure</div>
+    <div class="spill-row">
+      <div class="spill-cell">
+        <label>Small Scale Spillage</label>
+        <textarea id="spill-small" rows="4" placeholder="Describe procedure for small spillages..."></textarea>
+      </div>
+      <div class="spill-cell">
+        <label>Large Spillage</label>
+        <textarea id="spill-large" rows="4" placeholder="Describe procedure for large spillages..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fire and explosion -->
+  <div class="section-block">
+    <div class="section-label">Fire and Explosion Risk</div>
+    <div class="fire-grid">
+      <div class="fire-cell">
+        <div class="fire-q">Fire Risk?</div>
+        <label><input type="radio" name="fire" value="yes"> Yes</label>
+        <label><input type="radio" name="fire" value="no"> No</label>
+      </div>
+      <div class="fire-cell">
+        <div class="fire-q">Explosion Risk?</div>
+        <label><input type="radio" name="explosion" value="yes"> Yes</label>
+        <label><input type="radio" name="explosion" value="no"> No</label>
+      </div>
+      <div class="fire-cell">
+        <div class="fire-q">Toxic Fumes Risk?</div>
+        <label><input type="radio" name="fumes" value="yes"> Yes</label>
+        <label><input type="radio" name="fumes" value="no"> No</label>
+      </div>
+    </div>
+    <div class="fire-detail">
+      <div class="field">
+        <label>Steps taken to control risk (if Yes to any above)</label>
+        <textarea id="fire-control" rows="3"></textarea>
+      </div>
+      <div class="field-row cols-1" style="display:grid;gap:10px;">
+        <div class="field">
+          <label>Action to take in case of fire</label>
+          <textarea id="fire-action" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label>Type of extinguisher</label>
+          <input type="text" id="fire-extinguisher" placeholder="e.g. CO2, Dry Powder (ABC)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="export-bar">
+    <div class="export-label">Export as</div>
+    <div class="export-options">
+      <button class="export-btn active" data-fmt="pdf" onclick="selectFmt('pdf',this)">
+        <span class="fmt-icon">⬛</span>
+        <span class="fmt-name">PDF</span>
+        <span class="fmt-desc">Adobe Portable Document</span>
+      </button>
+      <button class="export-btn" data-fmt="docx" onclick="selectFmt('docx',this)">
+        <span class="fmt-icon">🔵</span>
+        <span class="fmt-name">DOCX</span>
+        <span class="fmt-desc">Microsoft Word</span>
+      </button>
+      <button class="export-btn" data-fmt="latex" onclick="selectFmt('latex',this)">
+        <span class="fmt-icon">🟢</span>
+        <span class="fmt-name">LaTeX</span>
+        <span class="fmt-desc">TeX source (.tex)</span>
+      </button>
+      <button class="export-btn" data-fmt="odt" onclick="selectFmt('odt',this)">
+        <span class="fmt-icon">🟠</span>
+        <span class="fmt-name">ODT</span>
+        <span class="fmt-desc">OpenDocument Text</span>
+      </button>
+    </div>
+    <button class="btn-generate" onclick="runExport()" id="gen-btn">
+      Generate &amp; Download
+    </button>
+  </div>
+  <div class="status-bar" id="status"></div>
+
+</div><!-- /form-card -->
+</div><!-- /shell -->
+
+<!-- AI Autofill Panel -->
+<div class="autofill-scrim" id="af-scrim" onclick="closeAutofillPanel()"></div>
+<div class="autofill-panel" id="af-panel">
+  <div class="af-header">
+    <div>
+      <div class="af-header-title">⚗ PubChem Hazard Lookup</div>
+      <div class="af-header-sub" id="af-substance-name">—</div>
+    </div>
+    <button class="af-close" onclick="closeAutofillPanel()">✕ Close</button>
+  </div>
+  <div class="af-body" id="af-body">
+    <p style="font-family:var(--mono);font-size:11px;color:#7a8490;">Loading hazard data…</p>
+  </div>
+  <div class="af-disclaimer">
+    ⚠ Data sourced from <strong>PubChem (NCBI/NIH)</strong> — free, public, no account required. GHS data is depositor-supplied and may vary by supplier/region. Always verify against your substance's official Safety Data Sheet (SDS) before use. UK WEL values are auto-filled from the built-in EH40 database where available — always verify against the current HSE EH40.
+  </div>
+  <div class="af-actions">
+    <button class="af-btn" onclick="closeAutofillPanel()">Cancel</button>
+    <button class="af-btn primary" id="af-apply-btn" onclick="applyAutofill()">Apply to Row</button>
+  </div>
+</div>
+
+<!-- Standalone CAS Lookup Widget -->
+<div class="cas-lookup-scrim" id="cl-scrim" onclick="closeCASLookup()"></div>
+<div class="cas-lookup-panel" id="cl-panel">
+  <div class="cl-header">
+    <div>
+      <div class="cl-header-title">🔍 Quick CAS / Substance Lookup</div>
+      <div class="cl-header-sub">EH40 WEL + PubChem GHS — reference only, does not modify the form</div>
+    </div>
+    <button class="cl-close" onclick="closeCASLookup()">✕ Close</button>
+  </div>
+  <div class="cl-search-row">
+    <input class="cl-input" id="cl-input" type="text" placeholder="CAS number (e.g. 67-64-1) or substance name…" autocomplete="off"
+      onkeydown="if(event.key==='Enter') runCASLookup()">
+    <button class="cl-search-btn" id="cl-search-btn" onclick="runCASLookup()">Look up</button>
+  </div>
+  <div class="cl-body" id="cl-body">
+    <p style="font-family:var(--mono);font-size:11px;color:#9aabb8;letter-spacing:0.06em;">
+      Enter a CAS number or name above and press Look up or Enter.
+    </p>
+  </div>
+  <div class="cl-disclaimer">
+    ⚠ EH40 data: HSE EH40/2005 4th Ed. + WS1 2023 amendment. PubChem data: depositor-supplied GHS, may vary by supplier/region.
+    Always verify against the current HSE EH40 and your substance SDS before use. Results are for reference only and are not written to the form.
+  </div>
+</div>
+
+<button class="cas-lookup-btn" onclick="openCASLookup()" title="Quick substance lookup — EH40 WEL + PubChem GHS (reference only)">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+    <circle cx="6.5" cy="6.5" r="4.5"/>
+    <path d="M10 10l3.5 3.5"/>
+  </svg>
+  CAS Lookup
+</button>
+
+<script>
+// ── Default date ─────────────────────────────────────────────────────────────
+document.getElementById('assessment-date').value = new Date().toISOString().split('T')[0];
+
+// ── Export format state ───────────────────────────────────────────────────────
+let currentFmt = 'pdf';
+function selectFmt(fmt, btn) {
+  currentFmt = fmt;
+  document.querySelectorAll('.export-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function runExport() {
+  if (currentFmt === 'pdf') generatePDF();
+  else if (currentFmt === 'docx') generateDOCX();
+  else if (currentFmt === 'latex') generateLaTeX();
+  else if (currentFmt === 'odt') generateODT();
+}
+
+// ── Dynamic rows ──────────────────────────────────────────────────────────────
+function substanceRowHTML(i) {
+  return `<tr data-srow="${i}">
+    <td style="position:relative;">
+      <input type="text" placeholder="Substance name" data-row="${i}" data-col="name" class="af-name-input" data-chem-toolbar style="padding-right:70px;">
+      <button class="autofill-btn" title="PubChem Hazard Lookup (free, no account required)" onclick="triggerAutofill(${i})">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 1v6M8 1L5 4M8 1l3 3M1 8h6M1 8L4 5M1 8l3 3M8 15V9M8 15l-3-3M8 15l3-3M15 8H9M15 8l-3-3M15 8l-3 3"/></svg>
+        Lookup
+      </button>
+      <button class="row-del" title="Remove this substance" onclick="removeSubstanceRow(${i})">✕</button>
+    </td>
+    <td><input type="text" placeholder="CAS no." data-row="${i}" data-col="cas" class="af-cas-input"></td>
+    <td><input type="text" placeholder="e.g. 5 mL" data-row="${i}" data-col="qty_used" data-chem-toolbar></td>
+    <td><input type="text" placeholder="e.g. 5 mL" data-row="${i}" data-col="qty_handled" data-chem-toolbar></td>
+    <td><input type="text" placeholder="e.g. 70% w/w" data-row="${i}" data-col="conc" data-chem-toolbar></td>
+    <td><input type="text" placeholder="e.g. TWA 1 ppm" data-row="${i}" data-col="wel" class="af-wel-input" data-chem-toolbar></td>
+    <td><input type="text" placeholder="e.g. H314, H335 — Corrosive, irritant" data-row="${i}" data-col="hazards" class="af-hazards-input" data-chem-toolbar></td>
+  </tr>`;
+}
+function retainedRowHTML(i) {
+  return `<tr>
+    <td style="position:relative;"><input type="text" placeholder="Material name"><button class="row-del" title="Remove row" onclick="removeGenericRow(this)">✕</button></td>
+    <td><input type="text" placeholder="Known hazards"></td>
+    <td><input type="text" placeholder="Cleaning method/reagents"></td>
+    <td><input type="text" placeholder="Location and storage conditions"></td>
+  </tr>`;
+}
+function wasteRowHTML(i) {
+  return `<tr>
+    <td style="position:relative;"><input type="text" placeholder="Chemical and quantity"><button class="row-del" title="Remove row" onclick="removeGenericRow(this)">✕</button></td>
+    <td><input type="text" placeholder="Hazards"></td>
+    <td><input type="text" placeholder="Container type"></td>
+    <td><input type="text" placeholder="Storage / labelling requirements"></td>
+  </tr>`;
+}
+function emergencyRowHTML(i) {
+  return `<tr>
+    <td class="substance-col" style="position:relative;"><input type="text" placeholder="Substance" style="width:100%"><button class="row-del" title="Remove row" onclick="removeGenericRow(this)">✕</button></td>
+    <td><input type="checkbox"></td>
+    <td><input type="checkbox" checked></td>
+    <td><input type="checkbox" checked></td>
+    <td><input type="checkbox" checked></td>
+    <td><input type="checkbox" checked></td>
+    <td><input type="checkbox" checked></td>
+    <td><input type="checkbox" checked></td>
+    <td><input type="checkbox" checked></td>
+  </tr>`;
+}
+
+let substanceCount=0, retainedCount=0, wasteCount=0, emergencyCount=0;
+function addSubstanceRow() {
+  document.getElementById('substances-body').insertAdjacentHTML('beforeend', substanceRowHTML(substanceCount));
+  const row = document.getElementById('substances-body').lastElementChild;
+  const nameInput = row.querySelector('.af-name-input');
+  const casInput = row.querySelector('.af-cas-input');
+  const btn = row.querySelector('.autofill-btn');
+  function showBtn() {
+    const hasVal = nameInput.value.trim().length > 1 || casInput.value.trim().length > 3;
+    btn.classList.toggle('visible', hasVal);
+  }
+  nameInput.addEventListener('input', showBtn);
+  casInput.addEventListener('input', showBtn);
+  // EH40 lookup when CAS is typed/pasted manually and user leaves the field
+  casInput.addEventListener('blur', () => {
+    const cas = casInput.value.trim();
+    if (cas) applyEH40toRow(row, cas);
+  });
+  // Also trigger on Enter in either field
+  [nameInput, casInput].forEach(inp => inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (nameInput.value.trim().length > 1 || casInput.value.trim().length > 3)) {
+      triggerAutofill(substanceCount);
+    }
+  }));
+  substanceCount++;
+}
+function addRetainedRow()  { document.getElementById('retained-body').insertAdjacentHTML('beforeend', retainedRowHTML(retainedCount++)); }
+function addWasteRow()     { document.getElementById('waste-body').insertAdjacentHTML('beforeend', wasteRowHTML(wasteCount++)); }
+function addEmergencyRow() { document.getElementById('emergency-body').insertAdjacentHTML('beforeend', emergencyRowHTML(emergencyCount++)); }
+
+for (let i=0;i<4;i++) addSubstanceRow();
+for (let i=0;i<2;i++) addRetainedRow();
+for (let i=0;i<3;i++) addWasteRow();
+for (let i=0;i<3;i++) addEmergencyRow();
+
+// ── Row removal ──────────────────────────────────────────────────────────────
+
+// Remove a generic table row (waste, emergency, retained)
+function removeGenericRow(btn) {
+  const tr = btn.closest('tr');
+  if (!tr) return;
+  const tbody = tr.closest('tbody');
+  tr.remove();
+  // Ensure at least one blank row remains
+  if (tbody && !tbody.querySelector('tr')) {
+    const id = tbody.id;
+    if (id === 'waste-body')     addWasteRow();
+    if (id === 'emergency-body') addEmergencyRow();
+    if (id === 'retained-body')  addRetainedRow();
+  }
+  markDirty();
+}
+
+// Remove a substance row and cascade to waste / emergency
+function removeSubstanceRow(rowIndex) {
+  const tbody = document.getElementById('substances-body');
+  const row = tbody.querySelector(`tr[data-srow="${rowIndex}"]`);
+  if (!row) return;
+
+  const nameInput = row.querySelector('.af-name-input');
+  const substanceName = (nameInput?.value || '').trim();
+
+  // If the row is blank, just remove it silently
+  if (!substanceName) {
+    row.remove();
+    ensureMinRows('substances-body', addSubstanceRow, 1);
+    markDirty();
+    return;
+  }
+
+  // Check waste and emergency tables for matching rows
+  const wasteMatches  = findMatchingRows('waste-body', substanceName);
+  const emerMatches   = findMatchingRows('emergency-body', substanceName);
+  const linkedCount   = wasteMatches.length + emerMatches.length;
+
+  if (linkedCount === 0) {
+    // No linked rows — just remove the substance row
+    row.remove();
+    ensureMinRows('substances-body', addSubstanceRow, 1);
+    markDirty();
+    toast(`Removed "${substanceName}"`, 'success');
+    return;
+  }
+
+  // Build confirmation message
+  const parts = [];
+  if (wasteMatches.length)  parts.push(`${wasteMatches.length} waste disposal row${wasteMatches.length>1?'s':''}`);
+  if (emerMatches.length)   parts.push(`${emerMatches.length} emergency procedure row${emerMatches.length>1?'s':''}`);
+
+  showModal('Remove Substance',
+    `<p>Remove <strong>${escHtml(substanceName)}</strong> from the hazardous substances table?</p>` +
+    `<p class="hint">This substance also appears in: ${parts.join(' and ')}.</p>`,
+    [
+      { label: 'Cancel', fn: closeModal },
+      { label: 'Remove substance only', fn: () => {
+        row.remove();
+        ensureMinRows('substances-body', addSubstanceRow, 1);
+        markDirty();
+        closeModal();
+        toast(`Removed "${substanceName}" (linked rows kept)`, 'success');
+      }},
+      { label: 'Remove all linked', confirm: true, fn: () => {
+        row.remove();
+        wasteMatches.forEach(tr => tr.remove());
+        emerMatches.forEach(tr => tr.remove());
+        ensureMinRows('substances-body', addSubstanceRow, 1);
+        ensureMinRows('waste-body', addWasteRow, 1);
+        ensureMinRows('emergency-body', addEmergencyRow, 1);
+        markDirty();
+        closeModal();
+        toast(`Removed "${substanceName}" + ${linkedCount} linked row${linkedCount>1?'s':''}`, 'success');
+      }}
+    ]
+  );
+}
+
+// Find rows in a tbody whose first text input matches the substance name (case-insensitive)
+function findMatchingRows(tbodyId, substanceName) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return [];
+  const matches = [];
+  const lowerName = substanceName.toLowerCase();
+  for (const tr of tbody.querySelectorAll('tr')) {
+    const firstInput = tr.querySelector('input[type="text"]');
+    if (firstInput && firstInput.value.trim().toLowerCase() === lowerName) {
+      matches.push(tr);
+    }
+  }
+  return matches;
+}
+
+// Ensure a tbody has at least `min` rows
+function ensureMinRows(tbodyId, addFn, min) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  while (tbody.querySelectorAll('tr').length < min) addFn();
+}
+
+// ── Data helpers ──────────────────────────────────────────────────────────────
+function val(id) { return (document.getElementById(id)?.value||'').trim(); }
+function checked(id) { return document.getElementById(id)?.checked||false; }
+function radio(name) { const el=document.querySelector(`input[name="${name}"]:checked`); return el?el.value.toUpperCase():'—'; }
+function fmtCheck(id,label) { return (checked(id)?'[X] ':'[ ] ')+label; }
+
+// Convert ISO date (YYYY-MM-DD) to UK format (DD/MM/YYYY)
+function ukDate(isoDate) {
+  if (!isoDate) return '—';
+  const parts = isoDate.split('-');
+  if (parts.length !== 3) return isoDate;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+// ── EH40 Workplace Exposure Limits ─────────────────────────────────────────────
+// Source: HSE EH40/2005 (4th edition, 2020) + WS1 2023 amendment.
+// Data loaded from eh40_data.json (externalised for maintainability).
+// Always verify against current HSE EH40 before use — amendments are issued periodically.
+let EH40_DATA = {};
+(async () => {
+  try {
+    const r = await fetch('eh40_data.json');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    EH40_DATA = await r.json();
+  } catch(e) {
+    console.warn('EH40 data could not be loaded:', e.message,
+      '— WEL autofill unavailable. Ensure eh40_data.json is in the same directory as this file.');
+  }
+})();
+
+
+// Normalise a CAS string for lookup (trim whitespace, remove leading zeros in segments)
+function normaliseCAS(cas) {
+  return (cas||'').trim().replace(/\s/g,'');
+}
+
+// Look up a CAS number in EH40_DATA; returns the entry or null
+function lookupEH40(cas) {
+  return EH40_DATA[normaliseCAS(cas)] || null;
+}
+
+// Format an EH40 entry into a readable WEL string for the form field
+function formatWEL(entry) {
+  if (!entry) return null;
+  const fmtPair = (ppm, mgm3) => {
+    if (ppm != null && mgm3 != null) return `${ppm} ppm / ${mgm3} mg/m³`;
+    if (ppm != null) return `${ppm} ppm`;
+    if (mgm3 != null) return `${mgm3} mg/m³`;
+    return null;
+  };
+  const parts = [];
+  const twa  = fmtPair(entry.twa_ppm,  entry.twa_mgm3);
+  const stel = fmtPair(entry.stel_ppm, entry.stel_mgm3);
+  if (twa)  parts.push(`TWA: ${twa}`);
+  if (stel) parts.push(`STEL: ${stel}`);
+  if (entry.notes) parts.push(`(${entry.notes})`);
+  return parts.length ? parts.join('; ') : null;
+}
+
+// Try to fill the WEL cell in a substance table row from EH40, given a CAS string.
+// Returns true if a value was found and applied.
+function applyEH40toRow(row, cas) {
+  const entry = lookupEH40(cas);
+  const welInput = row.querySelector('.af-wel-input');
+  if (!welInput) return false;
+  if (!entry) return false;
+  const welText = formatWEL(entry);
+  if (!welText) return false;
+  if (welInput.value.trim()) return false; // don't overwrite manual entry
+  welInput.value = welText;
+  // Add a subtle EH40 badge to the cell if not already present
+  const td = welInput.closest('td');
+  if (td && !td.querySelector('.eh40-badge')) {
+    const badge = document.createElement('span');
+    badge.className = 'eh40-badge';
+    badge.title = `${entry.name} — EH40 4th Ed. Always verify against current HSE EH40.`;
+    badge.textContent = 'EH40';
+    td.appendChild(badge);
+  }
+  return true;
+}
+
+function getTableRows(tbodyId, cols) {
+  const rows=[];
+  for (const tr of document.getElementById(tbodyId).querySelectorAll('tr')) {
+    const inputs=tr.querySelectorAll('input[type="text"]');
+    const row={};
+    cols.forEach((c,i)=>{ row[c]=inputs[i]?.value.trim()||''; });
+    if (Object.values(row).some(v=>v)) rows.push(row);
+  }
+  return rows;
+}
+function getEmergencyRows() {
+  const rows=[];
+  for (const tr of document.getElementById('emergency-body').querySelectorAll('tr')) {
+    const name=tr.querySelector('input[type="text"]')?.value.trim()||'';
+    if (!name) continue;
+    rows.push({ name, checks: Array.from(tr.querySelectorAll('input[type="checkbox"]')).map(cb=>cb.checked) });
+  }
+  return rows;
+}
+function slugTitle() { return (val('proc-title')||'Assessment').replace(/[^a-z0-9]+/gi,'_'); }
+
+function setStatus(msg, ok) {
+  const s=document.getElementById('status');
+  s.textContent=msg;
+  s.style.color=ok?'#1a6b2f':'#c8392b';
+}
+function setBusy(busy) { document.getElementById('gen-btn').disabled=busy; }
+
+// ── PDF export ────────────────────────────────────────────────────────────────
+async function generatePDF() {
+  setBusy(true); setStatus('Building PDF…', true);
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const W=210,H=297,ml=12,mr=12,mt=12;
+    let y=mt;
+    const cw=W-ml-mr;
+    const INK=[15,25,35],ACCENT=[200,57,43],ACCENT2=[26,74,107],RULE=[196,189,176];
+    const HEADER_BG=[15,25,35],STRIPE=[240,238,234],HIGHLIGHT=[245,230,66],WHITE=[255,255,255];
+
+    function setFont(style,size,color){ doc.setFont('helvetica',style); doc.setFontSize(size); doc.setTextColor(...(color||INK)); }
+    function checkHeight(n){ if(y+n>H-12){ doc.addPage(); y=mt; } }
+    function secLabel(text,yPos){
+      doc.setFillColor(...HEADER_BG); doc.rect(ml,yPos,cw,6,'F');
+      setFont('bold',7,WHITE); doc.text(text.toUpperCase(),ml+3,yPos+4);
+      return yPos+6;
+    }
+
+    doc.setFillColor(...ACCENT); doc.rect(0,0,W,4,'F'); y=4;
+    doc.setFillColor(...HIGHLIGHT); doc.rect(ml,y,cw,10,'F');
+    setFont('bold',10,INK); doc.text('COSHH ASSESSMENT FORM',ml+3,y+6.5);
+    setFont('normal',9,INK); doc.text(`Date: ${ukDate(val('assessment-date'))}`,W-mr-3,y+6.5,{align:'right'});
+    y+=12;
+
+    const fields=[['Procedure Title',val('proc-title')],['Location(s)',val('location')],
+      ['Prepared By',[val('prep-name'),val('prep-email'),val('prep-phone')].filter(Boolean).join('  |  ')],
+      ['Checked By',[val('check-name'),val('check-email'),val('check-phone')].filter(Boolean).join('  |  ')]];
+    for (const [label,value] of fields) {
+      setFont('bold',7,ACCENT2); doc.text(label.toUpperCase(),ml,y+3);
+      setFont('normal',9,INK);
+      const lines=doc.splitTextToSize(value||'—',cw-36);
+      doc.text(lines,ml+34,y+3);
+      doc.setDrawColor(...RULE); doc.line(ml,y+5,ml+cw,y+5);
+      y+=Math.max(6,lines.length*4+2);
+    }
+    y+=2;
+
+    checkHeight(20); y=secLabel('Hazardous Substances (include all byproducts)',y);
+    const sRows=getTableRows('substances-body',['name','cas','qty_used','qty_handled','conc','wel','hazards']);
+    doc.autoTable({ startY:y,
+      head:[['Substance','CAS No.','Qty Used','Qty Handled','Conc.','WEL','Hazards (GHS)']],
+      body:sRows.length?sRows.map(r=>[r.name,r.cas,r.qty_used,r.qty_handled,r.conc,r.wel,r.hazards]):[['—','—','—','—','—','—','—']],
+      margin:{left:ml,right:mr},
+      styles:{fontSize:7.5,cellPadding:2,lineColor:RULE,lineWidth:0.2,overflow:'linebreak'},
+      headStyles:{fillColor:[60,70,80],textColor:WHITE,fontStyle:'bold',fontSize:7},
+      alternateRowStyles:{fillColor:STRIPE},
+      columnStyles:{0:{cellWidth:30},1:{cellWidth:16},2:{cellWidth:14},3:{cellWidth:14},4:{cellWidth:16},5:{cellWidth:28},6:{cellWidth:'auto'}} });
+    y=doc.lastAutoTable.finalY+4;
+
+    checkHeight(36); y=secLabel('Risk Questions',y);
+    const qs=[['1','Can a less hazardous substance be used?',radio('q1')],
+      ['2','Can this procedure enhance hazards or create harmful by-products?',radio('q2')],
+      ['3','Is the substance a known mutagen, carcinogen, or teratogen?',radio('q3')],
+      ['4','Can this procedure cause build-up of pressure or an exothermic reaction?',radio('q4')],
+      ['5','Confirmed materials are not on the prescribed list',checked('q5-confirm')?'☑ Confirmed':'☐ Not confirmed']];
+    doc.autoTable({ startY:y, body:qs, margin:{left:ml,right:mr},
+      styles:{fontSize:8,cellPadding:2,lineColor:RULE,lineWidth:0.2},
+      alternateRowStyles:{fillColor:STRIPE},
+      columnStyles:{0:{cellWidth:6,fontStyle:'bold',textColor:ACCENT},1:{cellWidth:'auto'},2:{cellWidth:24,fontStyle:'bold',textColor:ACCENT2}} });
+    y=doc.lastAutoTable.finalY+4;
+
+    checkHeight(40);
+    for (const [secName,rowData] of [
+      ['Engineering Controls',[[fmtCheck('ec-fume','Fume Cupboard')+' · '+fmtCheck('ec-particle','Particle Containment')+' · '+fmtCheck('ec-gas','Gas Alarms')+' · '+fmtCheck('ec-glove','Glove Box')+' · '+fmtCheck('ec-extract','Extraction')]]],
+      ['Utilities Needed',[[fmtCheck('ut-tap','Tap Water')+' · '+fmtCheck('ut-chilled','Chilled Water')+(val('ut-gases')?' · Gases: '+val('ut-gases'):'')]]],
+      ['Personal Protective Equipment',[[fmtCheck('ppe-nitrile','Nitrile Gloves')+' · '+fmtCheck('ppe-coat','Lab Coat')+' · '+fmtCheck('ppe-glasses','Safety Glasses')+' · '+fmtCheck('ppe-ffp3','FFP3 Mask')],[fmtCheck('ppe-othergloves','Other Gloves')+' · '+fmtCheck('ppe-othereye','Other Eye')+' · '+fmtCheck('ppe-otherppe','Other PPE')+(val('ppe-specify')?' · '+val('ppe-specify'):'')]]],
+      ['Required Control Checks',[[val('control-checks')||'—']]]
+    ]) {
+      checkHeight(12); y=secLabel(secName,y);
+      doc.autoTable({ startY:y, body:rowData, margin:{left:ml,right:mr},
+        styles:{fontSize:8,cellPadding:3,lineColor:RULE,lineWidth:0.2,minCellHeight:8},
+        alternateRowStyles:{fillColor:STRIPE} });
+      y=doc.lastAutoTable.finalY;
+    }
+    y+=4;
+
+    checkHeight(20); y=secLabel('Materials to be Retained',y);
+    const rRows=getTableRows('retained-body',['material','hazards','cleaning','storage']);
+    doc.autoTable({ startY:y, head:[['Materials','Hazards','Cleaning','Storage and Location']],
+      body:rRows.length?rRows.map(r=>[r.material,r.hazards,r.cleaning,r.storage]):[['—','—','—','—']],
+      margin:{left:ml,right:mr}, styles:{fontSize:7.5,cellPadding:2,lineColor:RULE,lineWidth:0.2,overflow:'linebreak'},
+      headStyles:{fillColor:[60,70,80],textColor:WHITE,fontStyle:'bold',fontSize:7}, alternateRowStyles:{fillColor:STRIPE} });
+    y=doc.lastAutoTable.finalY+4;
+
+    checkHeight(20); y=secLabel('Procedure',y);
+    doc.autoTable({ startY:y, body:[[val('procedure')||'—']], margin:{left:ml,right:mr},
+      styles:{fontSize:8,cellPadding:3,lineColor:RULE,lineWidth:0.2,minCellHeight:18} });
+    y=doc.lastAutoTable.finalY; y=secLabel('Relevant Literature',y);
+    doc.autoTable({ startY:y, body:[[val('literature')||'—']], margin:{left:ml,right:mr},
+      styles:{fontSize:8,cellPadding:3,lineColor:RULE,lineWidth:0.2,minCellHeight:10} });
+    y=doc.lastAutoTable.finalY+4;
+
+    checkHeight(20); y=secLabel('Waste Disposal',y);
+    const wRows=getTableRows('waste-body',['chemical','hazards','container','storage']);
+    doc.autoTable({ startY:y, head:[['Chemicals & Quantity','Hazards','Containers Needed','Storage / Labelling']],
+      body:wRows.length?wRows.map(r=>[r.chemical,r.hazards,r.container,r.storage]):[['—','—','—','—']],
+      margin:{left:ml,right:mr}, styles:{fontSize:7.5,cellPadding:2,lineColor:RULE,lineWidth:0.2,overflow:'linebreak'},
+      headStyles:{fillColor:[60,70,80],textColor:WHITE,fontStyle:'bold',fontSize:7}, alternateRowStyles:{fillColor:STRIPE} });
+    y=doc.lastAutoTable.finalY+4;
+
+    checkHeight(20); y=secLabel('Emergency Procedures',y);
+    const eRows=getEmergencyRows();
+    doc.autoTable({ startY:y,
+      head:[['Substance','Induce Vomiting','Medical Attn','Fresh Air','Medical Attn','Rinse Skin','Medical Attn','Rinse Eyes','Medical Attn']],
+      body:eRows.length?eRows.map(r=>[r.name,...r.checks.map(c=>c?'☑':'☐')]):[['—','☐','☐','☐','☐','☐','☐','☐','☐']],
+      margin:{left:ml,right:mr}, styles:{fontSize:7.5,cellPadding:2,lineColor:RULE,lineWidth:0.2,halign:'center'},
+      headStyles:{fillColor:[60,70,80],textColor:WHITE,fontStyle:'bold',fontSize:6.5},
+      columnStyles:{0:{halign:'left',cellWidth:30}}, alternateRowStyles:{fillColor:STRIPE} });
+    y=doc.lastAutoTable.finalY+(val('emergency-notes')?0:4);
+    if (val('emergency-notes')) {
+      doc.autoTable({ startY:y, body:[['Notes: '+val('emergency-notes')]], margin:{left:ml,right:mr},
+        styles:{fontSize:7.5,cellPadding:2,lineColor:RULE,lineWidth:0.2,fontStyle:'italic'} });
+      y=doc.lastAutoTable.finalY+4;
+    }
+
+    checkHeight(24); y=secLabel('Spillage Procedure',y);
+    doc.autoTable({ startY:y, head:[['Small Scale Spillage','Large Spillage']],
+      body:[[val('spill-small')||'—',val('spill-large')||'—']], margin:{left:ml,right:mr},
+      styles:{fontSize:8,cellPadding:3,lineColor:RULE,lineWidth:0.2,overflow:'linebreak',minCellHeight:12},
+      headStyles:{fillColor:[60,70,80],textColor:WHITE,fontStyle:'bold',fontSize:7} });
+    y=doc.lastAutoTable.finalY+4;
+
+    checkHeight(28); y=secLabel('Fire and Explosion Risk',y);
+    doc.autoTable({ startY:y, head:[['Fire Risk','Explosion Risk','Toxic Fumes Risk']],
+      body:[[radio('fire'),radio('explosion'),radio('fumes')]], margin:{left:ml,right:mr},
+      styles:{fontSize:9,cellPadding:3,lineColor:RULE,lineWidth:0.2,halign:'center',fontStyle:'bold'},
+      headStyles:{fillColor:[60,70,80],textColor:WHITE,fontStyle:'bold',fontSize:7} });
+    y=doc.lastAutoTable.finalY;
+    doc.autoTable({ startY:y, head:[['Steps to Control Risk','Action in Case of Fire','Extinguisher Type']],
+      body:[[val('fire-control')||'—',val('fire-action')||'—',val('fire-extinguisher')||'—']], margin:{left:ml,right:mr},
+      styles:{fontSize:8,cellPadding:3,lineColor:RULE,lineWidth:0.2,overflow:'linebreak',minCellHeight:10},
+      headStyles:{fillColor:[80,90,100],textColor:WHITE,fontStyle:'bold',fontSize:7} });
+
+    const pages=doc.getNumberOfPages();
+    for (let p=1;p<=pages;p++) {
+      doc.setPage(p); doc.setFillColor(...ACCENT); doc.rect(0,H-6,W,6,'F');
+      setFont('normal',7,WHITE);
+      doc.text(`COSHH Assessment — ${val('proc-title')||'Untitled'}`,ml,H-2);
+      doc.text(`Page ${p} / ${pages}`,W-mr,H-2,{align:'right'});
+    }
+
+    const fname=`COSHH_${slugTitle()}.pdf`;
+    doc.save(fname);
+    setStatus(`✓ Saved as "${fname}"`, true);
+  } catch(err) { console.error(err); setStatus('✗ PDF error: '+err.message, false); }
+  finally { setBusy(false); }
+}
+
+// ── LaTeX export ──────────────────────────────────────────────────────────────
+
+// texEsc: escape a plain-text string for LaTeX, with full support for
+// Unicode subscripts, superscripts, and Greek letters inserted by the
+// chemistry toolbar.  We use a placeholder technique so that LaTeX commands
+// we generate (which contain backslashes, braces, dollars) are never
+// re-processed by the special-char escaping step.
+function texEsc(s) {
+  const slots = [];           // protected LaTeX snippets
+  const SLOT = i => `\x00S${i}\x00`;   // placeholder that won't clash with LaTeX
+
+  function protect(latex) {
+    const i = slots.length;
+    slots.push(latex);
+    return SLOT(i);
+  }
+
+  // ── Unicode subscript digits/signs → \textsubscript{} ──────────────────
+  const subMap = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4',
+                  '₅':'5','₆':'6','₇':'7','₈':'8','₉':'9',
+                  '₊':'+','₋':'-','₌':'=','₍':'(','₎':')'};
+  // ── Unicode superscript digits/signs → \textsuperscript{} ───────────────
+  const supMap = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4',
+                  '⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9',
+                  '⁺':'+','⁻':'-','⁼':'=','⁽':'(','⁾':')',
+                  'ⁿ':'n','ⁱ':'i'};
+  // ── Greek letters → inline math ─────────────────────────────────────────
+  const greekMap = {
+    'α':'\\alpha','β':'\\beta','γ':'\\gamma','δ':'\\delta',
+    'ε':'\\varepsilon','ζ':'\\zeta','η':'\\eta','θ':'\\theta',
+    'ι':'\\iota','κ':'\\kappa','λ':'\\lambda','μ':'\\mu',
+    'ν':'\\nu','ξ':'\\xi','π':'\\pi','ρ':'\\rho',
+    'σ':'\\sigma','τ':'\\tau','υ':'\\upsilon','φ':'\\varphi',
+    'χ':'\\chi','ψ':'\\psi','ω':'\\omega',
+    'Γ':'\\Gamma','Δ':'\\Delta','Θ':'\\Theta','Λ':'\\Lambda',
+    'Ξ':'\\Xi','Π':'\\Pi','Σ':'\\Sigma','Φ':'\\Phi',
+    'Ψ':'\\Psi','Ω':'\\Omega',
+    '°':'^{\\circ}','±':'\\pm','×':'\\times','÷':'\\div',
+    '∞':'\\infty','≈':'\\approx','≤':'\\leq','≥':'\\geq'
+  };
+
+  let r = (s || '')
+    // Subscripts (collect consecutive runs into one \textsubscript call)
+    .replace(/[₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎]+/g, m =>
+      protect('\\textsubscript{' + m.split('').map(c => subMap[c] ?? c).join('') + '}'))
+    // Superscripts
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿⁱ]+/g, m =>
+      protect('\\textsuperscript{' + m.split('').map(c => supMap[c] ?? c).join('') + '}'))
+    // Greek / special math symbols
+    .replace(/[αβγδεζηθικλμνξπρστυφχψωΓΔΘΛΞΠΣΦΨΩ°±×÷∞≈≤≥]/g, c =>
+      protect('$' + (greekMap[c] ?? c) + '$'));
+
+  // Standard LaTeX special-char escaping (won't touch \x00…\x00 placeholders)
+  r = r
+    .replace(/\\/g, '\\textbackslash{}')
+    .replace(/&/g,  '\\&')
+    .replace(/%/g,  '\\%')
+    .replace(/\$/g, '\\$')
+    .replace(/#/g,  '\\#')
+    .replace(/_/g,  '\\_')
+    .replace(/\^/g, '\\^{}')
+    .replace(/~/g,  '\\textasciitilde{}')
+    .replace(/\{/g, '\\{')
+    .replace(/\}/g, '\\}')
+    .replace(/>/g,  '{>}')
+    .replace(/</g,  '{<}');
+
+  // Restore protected LaTeX snippets
+  r = r.replace(/\x00S(\d+)\x00/g, (_, i) => slots[+i]);
+  return r;
+}
+function texCheck(id) { return checked(id)?'$\\boxtimes$':'$\\square$'; }
+function texRadio(name) { const v=radio(name); if(v==='YES') return '$\\boxtimes$ Yes \\quad $\\square$ No'; if(v==='NO') return '$\\square$ Yes \\quad $\\boxtimes$ No'; return '$\\square$ Yes \\quad $\\square$ No'; }
+
+function generateLaTeX() {
+  setBusy(true); setStatus('Building LaTeX…', true);
+  try {
+    const t = texEsc;
+    const sRows=getTableRows('substances-body',['name','cas','qty_used','qty_handled','conc','wel','hazards']);
+    const rRows=getTableRows('retained-body',['material','hazards','cleaning','storage']);
+    const wRows=getTableRows('waste-body',['chemical','hazards','container','storage']);
+    const eRows=getEmergencyRows();
+
+    const substBody = sRows.length
+      ? sRows.map(r=>`${t(r.name)} & ${t(r.cas)} & ${t(r.qty_used)} & ${t(r.qty_handled)} & ${t(r.conc)} & ${t(r.wel)} & ${t(r.hazards)} \\\\\n\\hline`).join('\n')
+      : '— & — & — & — & — & — & — \\\\\n\\hline';
+
+    const retBody = rRows.length
+      ? rRows.map(r=>`${t(r.material)} & ${t(r.hazards)} & ${t(r.cleaning)} & ${t(r.storage)} \\\\\n\\hline`).join('\n')
+      : '— & — & — & — \\\\\n\\hline';
+
+    const wasteBody = wRows.length
+      ? wRows.map(r=>`${t(r.chemical)} & ${t(r.hazards)} & ${t(r.container)} & ${t(r.storage)} \\\\\n\\hline`).join('\n')
+      : '— & — & — & — \\\\\n\\hline';
+
+    const emerBody = eRows.length
+      ? eRows.map(r=>`${t(r.name)} & ${r.checks[0]?'$\\boxtimes$':'$\\square$'} & ${r.checks[1]?'$\\boxtimes$':'$\\square$'} & ${r.checks[2]?'$\\boxtimes$':'$\\square$'} & ${r.checks[3]?'$\\boxtimes$':'$\\square$'} & ${r.checks[4]?'$\\boxtimes$':'$\\square$'} & ${r.checks[5]?'$\\boxtimes$':'$\\square$'} & ${r.checks[6]?'$\\boxtimes$':'$\\square$'} & ${r.checks[7]?'$\\boxtimes$':'$\\square$'} \\\\\n\\hline`).join('\n')
+      : '— & $\\square$ & $\\square$ & $\\square$ & $\\square$ & $\\square$ & $\\square$ & $\\square$ & $\\square$ \\\\\n\\hline';
+
+    const tex = `\\documentclass[a4paper,10pt]{article}
+\\usepackage[a4paper, margin=1.5cm]{geometry}
+\\usepackage{array,tabularx,colortbl,multirow,enumitem,hyperref,parskip,ragged2e,amssymb}
+\\usepackage[table]{xcolor}
+\\usepackage[T1]{fontenc}
+\\usepackage[utf8]{inputenc}
+\\newcommand{\\cbox}{$\\square$}
+\\newcommand{\\cboxX}{$\\boxtimes$}
+\\definecolor{headergray}{gray}{0.85}
+\\pagestyle{empty}
+
+\\begin{document}
+
+\\noindent
+\\begin{tabularx}{\\textwidth}{Xr}
+  \\colorbox{yellow}{\\textbf{COSHH Assessment Form}} & \\colorbox{yellow}{\\textbf{Date:} ${t(ukDate(val('assessment-date')))}} \\\\
+\\end{tabularx}
+
+\\medskip
+\\noindent\\textbf{Procedure Title:} ${t(val('proc-title'))}\\\\[4pt]
+\\noindent\\textbf{Location(s):} ${t(val('location'))}\\\\[4pt]
+\\noindent\\textbf{Prepared by:} ${t(val('prep-name'))}\\hspace{1em}\\textbar\\hspace{1em}${t(val('prep-email'))}\\hspace{1em}\\textbar\\hspace{1em}${t(val('prep-phone'))}\\\\[4pt]
+\\noindent\\textbf{Checked by:} ${t(val('check-name'))}\\hspace{1em}\\textbar\\hspace{1em}${t(val('check-email'))}\\hspace{1em}\\textbar\\hspace{1em}${t(val('check-phone'))}
+
+\\smallskip
+\\noindent(This form needs to be checked by academic supervisor and/or a qualified nominee)
+
+\\medskip
+\\noindent\\begin{tabularx}{\\textwidth}{|>{\\RaggedRight\\arraybackslash}p{2.8cm}|>{\\centering\\arraybackslash}p{1.6cm}|>{\\centering\\arraybackslash}p{1.3cm}|>{\\centering\\arraybackslash}p{1.3cm}|>{\\centering\\arraybackslash}p{1.8cm}|>{\\RaggedRight\\arraybackslash}p{2.2cm}|>{\\RaggedRight\\arraybackslash}X|}
+\\hline
+\\rowcolor{headergray}
+\\small\\textbf{Hazardous Substance} & \\small\\textbf{CAS No.} & \\small\\textbf{Qty Used} & \\small\\textbf{Qty Handled} & \\small\\textbf{Concentration} & \\small\\textbf{WEL} & \\small\\textbf{Hazards (GHS)} \\\\
+\\hline
+${substBody}
+\\end{tabularx}
+
+\\medskip
+\\begin{enumerate}[leftmargin=*, label=\\arabic{enumi}.]
+  \\item Can a less hazardous substance be used? \\quad ${texRadio('q1')}
+  \\item Can this procedure enhance hazards or create harmful by-products? \\quad ${texRadio('q2')}
+  \\item Is the substance a known mutagen, carcinogen, teratogen? \\quad ${texRadio('q3')}
+  \\item Can this procedure cause build-up of pressure or exothermic reaction? \\quad ${texRadio('q4')}
+  \\item Confirm materials not on prescribed list. \\quad ${checked('q5-confirm')?'$\\boxtimes$~Confirmed':'$\\square$~Not confirmed'}
+\\end{enumerate}
+
+\\medskip
+\\noindent\\begin{tabularx}{\\textwidth}{|X|X|X|X|X|}
+\\hline
+\\rowcolor{headergray}\\multicolumn{5}{|l|}{\\textbf{Engineering Controls}} \\\\
+\\hline
+${texCheck('ec-fume')}~Fume Cupboard & ${texCheck('ec-particle')}~Particle Booth & ${texCheck('ec-gas')}~Gas Alarms & ${texCheck('ec-glove')}~Glove Box & ${texCheck('ec-extract')}~Extraction \\\\
+\\hline
+\\rowcolor{headergray}\\multicolumn{5}{|l|}{\\textbf{Utilities Needed}} \\\\
+\\hline
+${texCheck('ut-tap')}~Tap Water & ${texCheck('ut-chilled')}~Chilled Water & \\multicolumn{3}{l|}{Gases: ${t(val('ut-gases'))||'N/A'}} \\\\
+\\hline
+\\rowcolor{headergray}\\multicolumn{5}{|l|}{\\textbf{Personal Protective Equipment}} \\\\
+\\hline
+${texCheck('ppe-nitrile')}~Nitrile Gloves & ${texCheck('ppe-coat')}~Lab Coat & ${texCheck('ppe-glasses')}~Safety Glasses & \\multicolumn{2}{l|}{${texCheck('ppe-ffp3')}~FFP3 Mask} \\\\
+\\hline
+${texCheck('ppe-othergloves')}~Other Gloves & ${texCheck('ppe-othereye')}~Other Eye & ${texCheck('ppe-otherppe')}~Other PPE & \\multicolumn{2}{l|}{${t(val('ppe-specify'))}} \\\\
+\\hline
+\\rowcolor{headergray}\\multicolumn{5}{|l|}{\\textbf{Required Control Checks}} \\\\
+\\hline
+\\multicolumn{5}{|p{\\dimexpr\\textwidth-2\\tabcolsep-2\\arrayrulewidth}|}{${t(val('control-checks'))}} \\\\
+\\hline
+\\end{tabularx}
+
+\\medskip
+\\noindent\\begin{tabularx}{\\textwidth}{|X|X|X|X|}
+\\hline
+\\rowcolor{headergray}\\multicolumn{4}{|l|}{\\textbf{Materials to be Retained}} \\\\
+\\hline
+Materials & Hazards & Cleaning & Storage \\\\
+\\hline
+${retBody}
+\\end{tabularx}
+
+\\medskip
+\\noindent\\begin{tabularx}{\\textwidth}{|X|}
+\\hline
+\\textbf{Procedure}\\\\
+${t(val('procedure')).replace(/\n/g,'\\\\\\\\\n')}\\\\[4pt]
+\\hline
+\\textbf{Relevant Literature}\\\\
+${t(val('literature')).replace(/\n/g,'\\\\\\\\\n')}\\\\[4pt]
+\\hline
+\\end{tabularx}
+
+\\medskip
+\\noindent\\begin{tabularx}{\\textwidth}{|X|X|X|X|}
+\\hline
+\\rowcolor{headergray}\\multicolumn{4}{|l|}{\\textbf{Waste Disposal}} \\\\
+\\hline
+Chemicals \\& Quantity & Hazards & Containers & Storage / Labelling \\\\
+\\hline
+${wasteBody}
+\\end{tabularx}
+
+\\medskip
+\\noindent\\textbf{Emergency Procedures}\\\\[4pt]
+\\noindent\\begin{tabularx}{\\textwidth}{|>{\\RaggedRight}p{2.2cm}|>{\\centering}p{1.4cm}|>{\\centering}p{1.4cm}|>{\\centering}p{1.4cm}|>{\\centering}p{1.4cm}|>{\\centering}p{1.4cm}|>{\\centering}p{1.4cm}|>{\\centering}p{1.4cm}|>{\\centering\\arraybackslash}p{1.4cm}|}
+\\hline
+\\rowcolor{headergray}
+\\textbf{Substance} & \\multicolumn{2}{c|}{\\textbf{Ingestion}} & \\multicolumn{2}{c|}{\\textbf{Inhalation}} & \\multicolumn{2}{c|}{\\textbf{Skin Contact}} & \\multicolumn{2}{c|}{\\textbf{Eye Contact}} \\\\
+\\hline
+ & \\small Induce vomiting & \\small Medical attn & \\small Fresh air & \\small Medical attn & \\small Rinse water & \\small Medical attn & \\small Rinse water & \\small Medical attn \\\\
+\\hline
+${emerBody}
+\\multicolumn{9}{|l|}{Notes: ${t(val('emergency-notes'))}} \\\\
+\\hline
+\\end{tabularx}
+
+\\medskip
+\\noindent\\begin{tabularx}{\\textwidth}{|X|X|}
+\\hline
+\\textbf{Small Scale Spillage} & \\textbf{Large Spillage} \\\\
+\\hline
+${t(val('spill-small')).replace(/\n/g,'\\\\\\\\\n')} & ${t(val('spill-large')).replace(/\n/g,'\\\\\\\\\n')} \\\\[4pt]
+\\hline
+\\end{tabularx}
+
+\\medskip
+\\noindent\\begin{tabularx}{\\textwidth}{|X|X|X|}
+\\hline
+\\rowcolor{headergray}\\multicolumn{3}{|l|}{\\textbf{Fire and Explosion Risk}} \\\\
+\\hline
+Fire Risk? ${texRadio('fire')} & Explosion Risk? ${texRadio('explosion')} & Toxic Fumes? ${texRadio('fumes')} \\\\
+\\hline
+\\multicolumn{3}{|p{\\dimexpr\\textwidth-2\\tabcolsep-2\\arrayrulewidth}|}{Steps to control risk: ${t(val('fire-control'))}}\\\\[6pt]
+\\hline
+Action in case of fire: ${t(val('fire-action'))} & \\multicolumn{2}{l|}{Extinguisher: ${t(val('fire-extinguisher'))}} \\\\[4pt]
+\\hline
+\\end{tabularx}
+
+\\end{document}
+`;
+
+    const blob = new Blob([tex], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `COSHH_${slugTitle()}.tex`;
+    a.click();
+    setStatus(`✓ Saved as "COSHH_${slugTitle()}.tex"`, true);
+  } catch(err) { console.error(err); setStatus('✗ LaTeX error: '+err.message, false); }
+  finally { setBusy(false); }
+}
+
+// ── DOCX export ───────────────────────────────────────────────────────────────
+async function generateDOCX() {
+  setBusy(true); setStatus('Building DOCX…', true);
+  try {
+    if (typeof docx === 'undefined') {
+      throw new Error('docx library not loaded — check your internet connection and reload the page.');
+    }
+    const D = docx;
+    const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+            WidthType, BorderStyle, AlignmentType, ShadingType, HeadingLevel,
+            VerticalAlign } = D;
+
+    const BLUE = '1a4a6b', RED = 'c8392b', YELLOW = 'f5e642', GRAY = 'e0ddd8', BLACK = '000000';
+
+    function mkBorder(color='CCCCCC') {
+      const b={style:BorderStyle.SINGLE,size:1,color};
+      return {top:b,bottom:b,left:b,right:b};
+    }
+    function hdrCell(text, w, bg=BLUE) {
+      return new TableCell({ width:{size:w,type:WidthType.DXA},
+        shading:{fill:bg,type:ShadingType.CLEAR},
+        borders:mkBorder('333333'),
+        margins:{top:60,bottom:60,left:100,right:100},
+        children:[new Paragraph({children:[new TextRun({text,bold:true,color:'FFFFFF',size:16})]})]
+      });
+    }
+    function dataCell(text, w, shade=false) {
+      return new TableCell({ width:{size:w,type:WidthType.DXA},
+        shading:{fill:shade?GRAY:'FFFFFF',type:ShadingType.CLEAR},
+        borders:mkBorder(),
+        margins:{top:60,bottom:60,left:100,right:100},
+        children:[new Paragraph({children:[new TextRun({text:text||'',size:18})]})]
+      });
+    }
+    function sectionPara(text) {
+      return new Paragraph({
+        shading:{fill:BLUE,type:ShadingType.CLEAR},
+        spacing:{before:120,after:0},
+        children:[new TextRun({text:text.toUpperCase(),bold:true,color:'FFFFFF',size:18})]
+      });
+    }
+    function field(label, value) {
+      return new Paragraph({spacing:{after:80},
+        children:[new TextRun({text:label+': ',bold:true,size:20}),new TextRun({text:value||'—',size:20})]});
+    }
+
+    const CW = 9360; // content width in DXA (A4 with 1" margins)
+
+    // Substances table
+    const sRows = getTableRows('substances-body',['name','cas','qty_used','qty_handled','conc','wel','hazards']);
+    const sCols = [1600,900,780,780,1000,1500,2800];
+    const substTable = new Table({ width:{size:CW,type:WidthType.DXA}, columnWidths:sCols,
+      rows:[ new TableRow({children:['Hazardous Substance','CAS No.','Qty Used','Qty Handled','Conc.','WEL','Hazards (GHS)'].map((h,i)=>hdrCell(h,sCols[i]))}),
+        ...(sRows.length?sRows:['','','','','','',''].map(()=>({name:'',cas:'',qty_used:'',qty_handled:'',conc:'',wel:'',hazards:''}))).map((r,ri)=>
+          new TableRow({children:[r.name,r.cas,r.qty_used,r.qty_handled,r.conc,r.wel,r.hazards].map((v,i)=>dataCell(v,sCols[i],ri%2===1))}))]
+    });
+
+    // Retained table
+    const rRows=getTableRows('retained-body',['material','hazards','cleaning','storage']);
+    const rCols=[2340,2340,2340,2340];
+    const retTable = new Table({ width:{size:CW,type:WidthType.DXA}, columnWidths:rCols,
+      rows:[new TableRow({children:['Materials','Hazards','Cleaning','Storage and Location'].map((h,i)=>hdrCell(h,rCols[i]))}),
+        ...(rRows.length?rRows:[{material:'',hazards:'',cleaning:'',storage:''}]).map((r,ri)=>
+          new TableRow({children:[r.material,r.hazards,r.cleaning,r.storage].map((v,i)=>dataCell(v,rCols[i],ri%2===1))}))]
+    });
+
+    // Waste table
+    const wRows=getTableRows('waste-body',['chemical','hazards','container','storage']);
+    const wCols=[2340,2340,2340,2340];
+    const wasteTable = new Table({ width:{size:CW,type:WidthType.DXA}, columnWidths:wCols,
+      rows:[new TableRow({children:['Chemicals & Quantity','Hazards','Containers Needed','Storage / Labelling'].map((h,i)=>hdrCell(h,wCols[i]))}),
+        ...(wRows.length?wRows:[{chemical:'',hazards:'',container:'',storage:''}]).map((r,ri)=>
+          new TableRow({children:[r.chemical,r.hazards,r.container,r.storage].map((v,i)=>dataCell(v,wCols[i],ri%2===1))}))]
+    });
+
+    // Emergency table
+    const eRows=getEmergencyRows();
+    const eCols=[1760,950,950,950,950,950,950,950,950];
+    const emerHdrs=['Substance','Induce Vomiting','Medical Attn','Fresh Air','Medical Attn','Rinse Skin','Medical Attn','Rinse Eyes','Medical Attn'];
+    const emerTable = new Table({ width:{size:CW,type:WidthType.DXA}, columnWidths:eCols,
+      rows:[new TableRow({children:emerHdrs.map((h,i)=>hdrCell(h,eCols[i]))}),
+        ...(eRows.length?eRows:[{name:'',checks:[false,true,true,true,true,true,true,true]}]).map((r,ri)=>
+          new TableRow({children:[r.name,...r.checks.map(c=>c?'[X]':'[ ]')].map((v,i)=>dataCell(v,eCols[i],ri%2===1))}))]
+    });
+
+    // Split multi-line text into separate Paragraph objects (docx-js ignores \n in TextRun)
+    function multiLineParagraphs(text, opts={}) {
+      const lines = (text||'—').split(/\n/);
+      return lines.map((line, i) => new Paragraph({
+        spacing:{after: i < lines.length-1 ? 40 : (opts.afterLast||80)},
+        children:[new TextRun({text:line, size:opts.size||20, ...(opts.italics?{italics:true}:{})})]
+      }));
+    }
+    function ynRow(num, text, radioName) {
+      const v = radio(radioName);
+      let display;
+      if (v === 'YES')      display = '[X] Yes  [ ] No';
+      else if (v === 'NO')  display = '[ ] Yes  [X] No';
+      else                  display = '[ ] Yes  [ ] No';
+      return new Paragraph({spacing:{after:60},
+        children:[new TextRun({text:`${num}. ${text}   `,size:20}),
+          new TextRun({text:display,bold:true,size:20,color:BLUE})]});
+    }
+    function checkLine(id, label) {
+      return new TextRun({text:(checked(id)?'[X] ':'[ ] ')+label+'   ',size:20});
+    }
+
+    const doc2 = new Document({ sections:[{ properties:{page:{size:{width:11906,height:16838},margin:{top:1080,right:1080,bottom:1080,left:1080}}},
+      children:[
+        // Title
+        new Paragraph({ shading:{fill:YELLOW,type:ShadingType.CLEAR}, spacing:{after:80},
+          children:[new TextRun({text:'COSHH ASSESSMENT FORM',bold:true,size:24}),
+            new TextRun({text:`     Date: ${ukDate(val('assessment-date'))}`,bold:true,size:24})] }),
+
+        field('Procedure Title', val('proc-title')),
+        field('Location(s)', val('location')),
+        field('Prepared By', [val('prep-name'),val('prep-email'),val('prep-phone')].filter(Boolean).join('  |  ')),
+        field('Checked By', [val('check-name'),val('check-email'),val('check-phone')].filter(Boolean).join('  |  ')),
+
+        sectionPara('Hazardous Substances (include all byproducts)'),
+        substTable,
+
+        sectionPara('Risk Questions'),
+        ynRow('1','Can a less hazardous substance be used?','q1'),
+        ynRow('2','Can this procedure enhance hazards or create harmful by-products?','q2'),
+        ynRow('3','Is the substance a known mutagen, carcinogen, or teratogen?','q3'),
+        ynRow('4','Can this procedure cause build-up of pressure or exothermic reaction?','q4'),
+        new Paragraph({spacing:{after:60},children:[new TextRun({text:'5. Confirmed materials not on prescribed list:   ',size:20}),
+          new TextRun({text:checked('q5-confirm')?'[X] Confirmed':'[ ] Not confirmed',bold:true,size:20,color:BLUE})]}),
+
+        sectionPara('Engineering Controls'),
+        new Paragraph({spacing:{after:80},children:[checkLine('ec-fume','Fume Cupboard'),checkLine('ec-particle','Particle Booth'),checkLine('ec-gas','Gas Alarms'),checkLine('ec-glove','Glove Box'),checkLine('ec-extract','Extraction')]}),
+
+        sectionPara('Utilities Needed'),
+        new Paragraph({spacing:{after:80},children:[checkLine('ut-tap','Tap Water'),checkLine('ut-chilled','Chilled Water'),new TextRun({text:'Gases: '+(val('ut-gases')||'N/A'),size:20})]}),
+
+        sectionPara('Personal Protective Equipment'),
+        new Paragraph({spacing:{after:40},children:[checkLine('ppe-nitrile','Nitrile Gloves'),checkLine('ppe-coat','Lab Coat'),checkLine('ppe-glasses','Safety Glasses'),checkLine('ppe-ffp3','FFP3 Mask')]}),
+        new Paragraph({spacing:{after:80},children:[checkLine('ppe-othergloves','Other Gloves'),checkLine('ppe-othereye','Other Eye Protection'),checkLine('ppe-otherppe','Other PPE'),new TextRun({text:val('ppe-specify')||'',size:20})]}),
+
+        sectionPara('Required Control Checks'),
+        ...multiLineParagraphs(val('control-checks'), {afterLast:120}),
+
+        sectionPara('Materials to be Retained'),
+        retTable,
+
+        sectionPara('Procedure'),
+        ...multiLineParagraphs(val('procedure'), {afterLast:80}),
+        sectionPara('Relevant Literature'),
+        ...multiLineParagraphs(val('literature'), {afterLast:120, italics:true}),
+
+        sectionPara('Waste Disposal'),
+        wasteTable,
+
+        sectionPara('Emergency Procedures'),
+        emerTable,
+        ...multiLineParagraphs('Notes: '+(val('emergency-notes')||'—'), {afterLast:80, italics:true}),
+
+        sectionPara('Spillage Procedure'),
+        new Paragraph({spacing:{after: (val('spill-small')||'—').includes('\n') ? 40 : 40},
+          children:[new TextRun({text:'Small Scale: ',bold:true,size:20}),
+            new TextRun({text:(val('spill-small')||'—').split('\n')[0],size:20})]}),
+        ...((val('spill-small')||'').split('\n').slice(1).map(line =>
+          new Paragraph({spacing:{after:40},children:[new TextRun({text:line,size:20})]}))),
+        new Paragraph({spacing:{after: (val('spill-large')||'—').includes('\n') ? 40 : 120},
+          children:[new TextRun({text:'Large Spillage: ',bold:true,size:20}),
+            new TextRun({text:(val('spill-large')||'—').split('\n')[0],size:20})]}),
+        ...((val('spill-large')||'').split('\n').slice(1).map((line,i,a) =>
+          new Paragraph({spacing:{after: i===a.length-1 ? 120 : 40},children:[new TextRun({text:line,size:20})]}))),
+
+        sectionPara('Fire and Explosion Risk'),
+        new Paragraph({spacing:{after:60},children:[
+          new TextRun({text:'Fire Risk: ',bold:true,size:20}),new TextRun({text:(radio('fire')==='YES'?'[X] Yes  [ ] No':radio('fire')==='NO'?'[ ] Yes  [X] No':'[ ] Yes  [ ] No')+'   ',size:20}),
+          new TextRun({text:'Explosion Risk: ',bold:true,size:20}),new TextRun({text:(radio('explosion')==='YES'?'[X] Yes  [ ] No':radio('explosion')==='NO'?'[ ] Yes  [X] No':'[ ] Yes  [ ] No')+'   ',size:20}),
+          new TextRun({text:'Toxic Fumes: ',bold:true,size:20}),new TextRun({text:radio('fumes')==='YES'?'[X] Yes  [ ] No':radio('fumes')==='NO'?'[ ] Yes  [X] No':'[ ] Yes  [ ] No',size:20})]}),
+        new Paragraph({spacing:{after:60},children:[new TextRun({text:'Control steps: ',bold:true,size:20}),
+          new TextRun({text:(val('fire-control')||'—').split('\n')[0],size:20})]}),
+        ...((val('fire-control')||'').split('\n').slice(1).map(line =>
+          new Paragraph({spacing:{after:60},children:[new TextRun({text:line,size:20})]}))),
+        new Paragraph({spacing:{after:60},children:[new TextRun({text:'Action if fire: ',bold:true,size:20}),
+          new TextRun({text:(val('fire-action')||'—').split('\n')[0],size:20})]}),
+        ...((val('fire-action')||'').split('\n').slice(1).map(line =>
+          new Paragraph({spacing:{after:60},children:[new TextRun({text:line,size:20})]}))),
+        new Paragraph({spacing:{after:120},children:[new TextRun({text:'Extinguisher: ',bold:true,size:20}),new TextRun({text:val('fire-extinguisher')||'—',size:20})]})
+      ]
+    }]});
+
+    const buffer = await Packer.toBlob(doc2);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(buffer);
+    a.download = `COSHH_${slugTitle()}.docx`;
+    a.click();
+    setStatus(`✓ Saved as "COSHH_${slugTitle()}.docx"`, true);
+  } catch(err) { console.error(err); setStatus('✗ DOCX error: '+err.message, false); }
+  finally { setBusy(false); }
+}
+
+// ── ODT export ────────────────────────────────────────────────────────────────
+async function generateODT() {
+  setBusy(true); setStatus('Building ODT…', true);
+  try {
+    const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    function odtField(label, value) {
+      return `<text:p text:style-name="TextBody"><text:span text:style-name="Bold">${esc(label)}: </text:span>${esc(value||'—')}</text:p>`;
+    }
+    function odtSection(title) {
+      return `<text:p text:style-name="SectionHeader">${esc(title.toUpperCase())}</text:p>`;
+    }
+    function odtPara(text, style='TextBody') {
+      return `<text:p text:style-name="${style}">${esc(text||'—')}</text:p>`;
+    }
+    function odtCheckLine(items) {
+      return `<text:p text:style-name="TextBody">${items.map(([id,label])=>`${checked(id)?'☑':'☐'} ${esc(label)}   `).join('')}</text:p>`;
+    }
+    function odtYN(num, text, radioName) {
+      const v = radio(radioName);
+      let display;
+      if (v==='YES')      display = '☑ Yes  ☐ No';
+      else if (v==='NO')  display = '☐ Yes  ☑ No';
+      else                display = '☐ Yes  ☐ No';
+      return `<text:p text:style-name="TextBody"><text:span text:style-name="Bold">${num}. </text:span>${esc(text)}   <text:span text:style-name="Bold">${display}</text:span></text:p>`;
+    }
+
+    function odtTable(headers, rows) {
+      const nCols = headers.length;
+      const colW = Math.floor(16.8 / nCols);
+      const cols = headers.map(()=>`<table:table-column table:style-name="TableCol"/>`).join('');
+      const hdr = `<table:table-row>${headers.map(h=>`<table:table-cell table:style-name="TableHeaderCell"><text:p text:style-name="TableHeader">${esc(h)}</text:p></table:table-cell>`).join('')}</table:table-row>`;
+      const body = rows.map((r,ri)=>`<table:table-row>${r.map(v=>`<table:table-cell table:style-name="${ri%2===0?'TableCell':'TableCellAlt'}"><text:p text:style-name="TextBody">${esc(v)}</text:p></table:table-cell>`).join('')}</table:table-row>`).join('');
+      return `<table:table><table:table-column table:number-columns-repeated="${nCols}"/>${hdr}${body}</table:table>`;
+    }
+
+    const sRows=getTableRows('substances-body',['name','cas','qty_used','qty_handled','conc','wel','hazards']);
+    const rRows=getTableRows('retained-body',['material','hazards','cleaning','storage']);
+    const wRows=getTableRows('waste-body',['chemical','hazards','container','storage']);
+    const eRows=getEmergencyRows();
+
+    const content = `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  office:version="1.3">
+<office:automatic-styles>
+  <style:style style:name="TextBody" style:family="paragraph">
+    <style:paragraph-properties fo:margin-bottom="0.1cm"/>
+    <style:text-properties fo:font-size="10pt"/>
+  </style:style>
+  <style:style style:name="Bold" style:family="text">
+    <style:text-properties fo:font-weight="bold"/>
+  </style:style>
+  <style:style style:name="SectionHeader" style:family="paragraph">
+    <style:paragraph-properties fo:margin-top="0.2cm" fo:margin-bottom="0.05cm" fo:background-color="#0f1923" fo:padding="0.1cm"/>
+    <style:text-properties fo:font-weight="bold" fo:font-size="9pt" fo:color="#ffffff"/>
+  </style:style>
+  <style:style style:name="TitleStrip" style:family="paragraph">
+    <style:paragraph-properties fo:background-color="#f5e642" fo:padding="0.15cm" fo:margin-bottom="0.2cm"/>
+    <style:text-properties fo:font-weight="bold" fo:font-size="12pt"/>
+  </style:style>
+  <style:style style:name="TableHeaderCell" style:family="table-cell">
+    <style:table-cell-properties fo:background-color="#1a4a6b" fo:padding="0.1cm" fo:border="0.05cm solid #333333"/>
+  </style:style>
+  <style:style style:name="TableHeader" style:family="paragraph">
+    <style:text-properties fo:font-weight="bold" fo:font-size="8pt" fo:color="#ffffff"/>
+  </style:style>
+  <style:style style:name="TableCell" style:family="table-cell">
+    <style:table-cell-properties fo:padding="0.1cm" fo:border="0.03cm solid #c4bdb0"/>
+  </style:style>
+  <style:style style:name="TableCellAlt" style:family="table-cell">
+    <style:table-cell-properties fo:background-color="#e8e4db" fo:padding="0.1cm" fo:border="0.03cm solid #c4bdb0"/>
+  </style:style>
+</office:automatic-styles>
+<office:body><office:text>
+
+  <text:p text:style-name="TitleStrip">COSHH ASSESSMENT FORM — Date: ${esc(ukDate(val('assessment-date')))}</text:p>
+
+  ${odtField('Procedure Title', val('proc-title'))}
+  ${odtField('Location(s)', val('location'))}
+  ${odtField('Prepared By', [val('prep-name'),val('prep-email'),val('prep-phone')].filter(Boolean).join('  |  '))}
+  ${odtField('Checked By', [val('check-name'),val('check-email'),val('check-phone')].filter(Boolean).join('  |  '))}
+
+  ${odtSection('Hazardous Substances (include all byproducts)')}
+  ${odtTable(
+    ['Hazardous Substance','CAS No.','Qty Used','Qty Handled','Conc.','WEL','Hazards (GHS)'],
+    sRows.length ? sRows.map(r=>[r.name,r.cas,r.qty_used,r.qty_handled,r.conc,r.wel,r.hazards]) : [['—','—','—','—','—','—','—']]
+  )}
+
+  ${odtSection('Risk Questions')}
+  ${odtYN('1','Can a less hazardous substance be used?','q1')}
+  ${odtYN('2','Can this procedure enhance hazards or create harmful by-products?','q2')}
+  ${odtYN('3','Is the substance a known mutagen, carcinogen, or teratogen?','q3')}
+  ${odtYN('4','Can this procedure cause build-up of pressure or exothermic reaction?','q4')}
+  <text:p text:style-name="TextBody">5. Confirmed materials not on prescribed list: <text:span text:style-name="Bold">${checked('q5-confirm')?'☑ Confirmed':'☐ Not confirmed'}</text:span></text:p>
+
+  ${odtSection('Engineering Controls')}
+  ${odtCheckLine([['ec-fume','Fume Cupboard'],['ec-particle','Particle Booth'],['ec-gas','Gas Alarms'],['ec-glove','Glove Box'],['ec-extract','Extraction']])}
+
+  ${odtSection('Utilities Needed')}
+  ${odtCheckLine([['ut-tap','Tap Water'],['ut-chilled','Chilled Water']])}
+  ${odtPara('Gases: '+(val('ut-gases')||'N/A'))}
+
+  ${odtSection('Personal Protective Equipment')}
+  ${odtCheckLine([['ppe-nitrile','Nitrile Gloves'],['ppe-coat','Lab Coat'],['ppe-glasses','Safety Glasses'],['ppe-ffp3','FFP3 Mask']])}
+  ${odtCheckLine([['ppe-othergloves','Other Gloves'],['ppe-othereye','Other Eye Protection'],['ppe-otherppe','Other PPE']])}
+  ${odtPara('Specify other PPE: '+(val('ppe-specify')||'—'))}
+
+  ${odtSection('Required Control Checks')}
+  ${odtPara(val('control-checks'))}
+
+  ${odtSection('Materials to be Retained')}
+  ${odtTable(['Materials','Hazards','Cleaning','Storage and Location'],
+    rRows.length?rRows.map(r=>[r.material,r.hazards,r.cleaning,r.storage]):[['—','—','—','—']])}
+
+  ${odtSection('Procedure')}
+  ${odtPara(val('procedure'))}
+  ${odtSection('Relevant Literature')}
+  ${odtPara(val('literature'))}
+
+  ${odtSection('Waste Disposal')}
+  ${odtTable(['Chemicals & Quantity','Hazards','Containers Needed','Storage / Labelling'],
+    wRows.length?wRows.map(r=>[r.chemical,r.hazards,r.container,r.storage]):[['—','—','—','—']])}
+
+  ${odtSection('Emergency Procedures')}
+  ${odtTable(['Substance','Induce Vomiting','Medical Attn','Fresh Air','Medical Attn','Rinse Skin','Medical Attn','Rinse Eyes','Medical Attn'],
+    eRows.length?eRows.map(r=>[r.name,...r.checks.map(c=>c?'☑':'☐')]):[['—','☐','☐','☐','☐','☐','☐','☐','☐']])}
+  ${odtPara('Notes: '+(val('emergency-notes')||'—'))}
+
+  ${odtSection('Spillage Procedure')}
+  <text:p text:style-name="TextBody"><text:span text:style-name="Bold">Small Scale: </text:span>${esc(val('spill-small'))}</text:p>
+  <text:p text:style-name="TextBody"><text:span text:style-name="Bold">Large Spillage: </text:span>${esc(val('spill-large'))}</text:p>
+
+  ${odtSection('Fire and Explosion Risk')}
+  <text:p text:style-name="TextBody">
+    <text:span text:style-name="Bold">Fire Risk: </text:span>${radio('fire')==='YES'?'☑ Yes  ☐ No':radio('fire')==='NO'?'☐ Yes  ☑ No':'☐ Yes  ☐ No'}   
+    <text:span text:style-name="Bold">Explosion Risk: </text:span>${radio('explosion')==='YES'?'☑ Yes  ☐ No':radio('explosion')==='NO'?'☐ Yes  ☑ No':'☐ Yes  ☐ No'}   
+    <text:span text:style-name="Bold">Toxic Fumes: </text:span>${radio('fumes')==='YES'?'☑ Yes  ☐ No':radio('fumes')==='NO'?'☐ Yes  ☑ No':'☐ Yes  ☐ No'}
+  </text:p>
+  <text:p text:style-name="TextBody"><text:span text:style-name="Bold">Control steps: </text:span>${esc(val('fire-control'))}</text:p>
+  <text:p text:style-name="TextBody"><text:span text:style-name="Bold">Action if fire: </text:span>${esc(val('fire-action'))}</text:p>
+  <text:p text:style-name="TextBody"><text:span text:style-name="Bold">Extinguisher type: </text:span>${esc(val('fire-extinguisher'))}</text:p>
+
+</office:text></office:body>
+</office:document-content>`;
+
+    const mimetype = 'application/vnd.oasis.opendocument.text';
+    const manifest = `<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
+  <manifest:file-entry manifest:full-path="/" manifest:media-type="${mimetype}"/>
+  <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
+  <manifest:file-entry manifest:full-path="META-INF/manifest.xml" manifest:media-type="text/xml"/>
+</manifest:manifest>`;
+
+    const meta = `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:dc="http://purl.org/dc/elements/1.1/" office:version="1.3">
+<office:meta><dc:title>${esc(val('proc-title'))}</dc:title></office:meta>
+</office:document-meta>`;
+
+    const zip = new JSZip();
+    zip.file('mimetype', mimetype, {compression:'STORE'});
+    zip.file('content.xml', content);
+    zip.file('META-INF/manifest.xml', manifest);
+    zip.file('meta.xml', meta);
+
+    const blob = await zip.generateAsync({type:'blob', mimeType:mimetype,
+      compression:'DEFLATE', compressionOptions:{level:6}});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `COSHH_${slugTitle()}.odt`;
+    a.click();
+    setStatus(`✓ Saved as "COSHH_${slugTitle()}.odt"`, true);
+  } catch(err) { console.error(err); setStatus('✗ ODT error: '+err.message, false); }
+  finally { setBusy(false); }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SAVE / LOAD SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+
+const AUTOSAVE_KEY = 'coshh_autosave';
+const DRAFTS_KEY   = 'coshh_drafts';
+let autosaveTimer  = null;
+let isDirty        = false;
+
+// ── Collect all form data into a plain JS object ──────────────────────────
+function collectFormData() {
+  const data = {
+    _version: 2,
+    _saved: new Date().toISOString(),
+    // Header fields
+    date: val('assessment-date'),
+    proc_title: val('proc-title'),
+    location: val('location'),
+    prep_name: val('prep-name'), prep_email: val('prep-email'), prep_phone: val('prep-phone'),
+    check_name: val('check-name'), check_email: val('check-email'), check_phone: val('check-phone'),
+    // Yes/No radios
+    q1: radio('q1'), q2: radio('q2'), q3: radio('q3'), q4: radio('q4'),
+    q5: checked('q5-confirm'),
+    // Engineering controls
+    ec_fume: checked('ec-fume'), ec_particle: checked('ec-particle'),
+    ec_gas: checked('ec-gas'), ec_glove: checked('ec-glove'), ec_extract: checked('ec-extract'),
+    // Utilities
+    ut_tap: checked('ut-tap'), ut_chilled: checked('ut-chilled'), ut_gases: val('ut-gases'),
+    // PPE
+    ppe_nitrile: checked('ppe-nitrile'), ppe_coat: checked('ppe-coat'),
+    ppe_glasses: checked('ppe-glasses'), ppe_ffp3: checked('ppe-ffp3'),
+    ppe_othergloves: checked('ppe-othergloves'), ppe_othereye: checked('ppe-othereye'),
+    ppe_otherppe: checked('ppe-otherppe'), ppe_specify: val('ppe-specify'),
+    control_checks: val('control-checks'),
+    // Procedure
+    procedure: val('procedure'), literature: val('literature'),
+    // Emergency
+    emergency_notes: val('emergency-notes'),
+    // Spillage
+    spill_small: val('spill-small'), spill_large: val('spill-large'),
+    // Fire
+    fire: radio('fire'), explosion: radio('explosion'), fumes: radio('fumes'),
+    fire_control: val('fire-control'), fire_action: val('fire-action'),
+    fire_extinguisher: val('fire-extinguisher'),
+    // Dynamic tables
+    substances: collectTableRows('substances-body', 7),
+    retained:   collectTableRows('retained-body', 4),
+    waste:      collectTableRows('waste-body', 4),
+    emergency:  collectEmergencyTable(),
+  };
+  return data;
+}
+
+function collectTableRows(tbodyId, cols) {
+  const rows = [];
+  for (const tr of document.getElementById(tbodyId).querySelectorAll('tr')) {
+    const inputs = Array.from(tr.querySelectorAll('input[type="text"]'));
+    rows.push(inputs.map(i => i.value));
+  }
+  return rows;
+}
+
+function collectEmergencyTable() {
+  const rows = [];
+  for (const tr of document.getElementById('emergency-body').querySelectorAll('tr')) {
+    const name = tr.querySelector('input[type="text"]')?.value || '';
+    const cbs  = Array.from(tr.querySelectorAll('input[type="checkbox"]')).map(cb => cb.checked);
+    rows.push({ name, checks: cbs });
+  }
+  return rows;
+}
+
+// ── Restore form from a data object ──────────────────────────────────────
+function restoreFormData(data) {
+  if (!data || data._version !== 2) { toast('Unrecognised draft format.', 'error'); return; }
+
+  function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; }
+  function setChk(id, v) { const el = document.getElementById(id); if (el) el.checked = !!v; }
+  function setRadio(name, v) {
+    const el = document.querySelector(`input[name="${name}"][value="${(v||'').toLowerCase()}"]`);
+    if (el) el.checked = true;
+  }
+
+  setVal('assessment-date', data.date);
+  setVal('proc-title', data.proc_title); setVal('location', data.location);
+  setVal('prep-name', data.prep_name); setVal('prep-email', data.prep_email); setVal('prep-phone', data.prep_phone);
+  setVal('check-name', data.check_name); setVal('check-email', data.check_email); setVal('check-phone', data.check_phone);
+
+  setRadio('q1', data.q1); setRadio('q2', data.q2); setRadio('q3', data.q3); setRadio('q4', data.q4);
+  setChk('q5-confirm', data.q5);
+
+  setChk('ec-fume', data.ec_fume); setChk('ec-particle', data.ec_particle);
+  setChk('ec-gas', data.ec_gas); setChk('ec-glove', data.ec_glove); setChk('ec-extract', data.ec_extract);
+  setChk('ut-tap', data.ut_tap); setChk('ut-chilled', data.ut_chilled); setVal('ut-gases', data.ut_gases);
+  setChk('ppe-nitrile', data.ppe_nitrile); setChk('ppe-coat', data.ppe_coat);
+  setChk('ppe-glasses', data.ppe_glasses); setChk('ppe-ffp3', data.ppe_ffp3);
+  setChk('ppe-othergloves', data.ppe_othergloves); setChk('ppe-othereye', data.ppe_othereye);
+  setChk('ppe-otherppe', data.ppe_otherppe); setVal('ppe-specify', data.ppe_specify);
+  setVal('control-checks', data.control_checks);
+  setVal('procedure', data.procedure); setVal('literature', data.literature);
+  setVal('emergency-notes', data.emergency_notes);
+  setVal('spill-small', data.spill_small); setVal('spill-large', data.spill_large);
+  setRadio('fire', data.fire); setRadio('explosion', data.explosion); setRadio('fumes', data.fumes);
+  setVal('fire-control', data.fire_control); setVal('fire-action', data.fire_action);
+  setVal('fire-extinguisher', data.fire_extinguisher);
+
+  // Restore dynamic tables (reset counters first so row IDs start fresh)
+  substanceCount = 0; retainedCount = 0; wasteCount = 0; emergencyCount = 0;
+  if (data.substances) restoreTableRows('substances-body', data.substances, addSubstanceRow, 7);
+  if (data.retained)   restoreTableRows('retained-body',   data.retained,   addRetainedRow,  4);
+  if (data.waste)      restoreTableRows('waste-body',      data.waste,      addWasteRow,     4);
+  if (data.emergency)  restoreEmergencyTable(data.emergency);
+
+  markClean();
+}
+
+function restoreTableRows(tbodyId, savedRows, addFn, colCount) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '';
+  // Reset counter then add fresh rows
+  savedRows.forEach((row, ri) => {
+    addFn();
+    const tr = tbody.querySelectorAll('tr')[ri];
+    if (!tr) return;
+    const inputs = Array.from(tr.querySelectorAll('input[type="text"]'));
+    row.forEach((v, ci) => { if (inputs[ci]) inputs[ci].value = v || ''; });
+  });
+  // Ensure at least a couple of blank rows
+  const minRows = colCount === 7 ? 4 : 2;
+  while (tbody.querySelectorAll('tr').length < minRows) addFn();
+}
+
+function restoreEmergencyTable(savedRows) {
+  const tbody = document.getElementById('emergency-body');
+  tbody.innerHTML = '';
+  savedRows.forEach((row, ri) => {
+    addEmergencyRow();
+    const tr = tbody.querySelectorAll('tr')[ri];
+    if (!tr) return;
+    const nameInput = tr.querySelector('input[type="text"]');
+    if (nameInput) nameInput.value = row.name || '';
+    const cbs = Array.from(tr.querySelectorAll('input[type="checkbox"]'));
+    (row.checks || []).forEach((v, ci) => { if (cbs[ci]) cbs[ci].checked = !!v; });
+  });
+  while (tbody.querySelectorAll('tr').length < 3) addEmergencyRow();
+}
+
+// ── Dirty tracking & autosave ─────────────────────────────────────────────
+function markDirty() {
+  isDirty = true;
+  document.getElementById('autosave-dot').className = 'autosave-dot stale';
+  document.getElementById('autosave-txt').textContent = 'unsaved changes';
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(autoSaveBrowser, 4000); // autosave after 4s idle
+}
+
+function markClean() {
+  isDirty = false;
+  document.getElementById('autosave-dot').className = 'autosave-dot';
+  document.getElementById('autosave-txt').textContent = 'autosaved ' + new Date().toLocaleTimeString();
+}
+
+function autoSaveBrowser() {
+  try {
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(collectFormData()));
+    markClean();
+  } catch(e) { /* storage full or unavailable */ }
+}
+
+// Hook all inputs to dirty tracking
+function attachDirtyListeners() {
+  // Use event delegation on the form card
+  document.querySelector('.form-card').addEventListener('input', markDirty);
+  document.querySelector('.form-card').addEventListener('change', markDirty);
+}
+
+// ── 1. SAVE TO LOCAL FILE ─────────────────────────────────────────────────
+function saveLocal() {
+  const data = collectFormData();
+  const title = (data.proc_title || 'COSHH_Draft').replace(/[^a-z0-9_\-]/gi, '_');
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${title}.coshh`;
+  a.click();
+  toast('Draft saved as ' + title + '.coshh', 'success');
+  markClean();
+}
+
+// ── 2. LOAD FROM LOCAL FILE ───────────────────────────────────────────────
+function openLoadModal() {
+  document.getElementById('load-file-input').click();
+}
+
+function loadFromFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      confirmLoad(data, `Load "${file.name}"?`, () => {
+        restoreFormData(data);
+        toast('Draft loaded from ' + file.name, 'success');
+      });
+    } catch(err) {
+      toast('Could not parse file: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  input.value = ''; // reset so same file can be re-loaded
+}
+
+// ── 3. BROWSER LOCAL STORAGE DRAFTS ──────────────────────────────────────
+function saveBrowser() {
+  const data = collectFormData();
+  const title = (data.proc_title || 'Untitled').trim();
+  showInputModal('Save Draft in Browser', 'Enter a name for this draft:', title, name => {
+    if (!name) return;
+    try {
+      const drafts = getBrowserDrafts();
+      drafts[name] = { data, saved: new Date().toISOString() };
+      localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+      autoSaveBrowser();
+      toast(`Draft "${name}" saved in browser.`, 'success');
+    } catch(e) {
+      toast('Browser storage error: ' + e.message, 'error');
+    }
+  });
+}
+
+function getBrowserDrafts() {
+  try { return JSON.parse(localStorage.getItem(DRAFTS_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function openBrowserDrafts() {
+  const drafts = getBrowserDrafts();
+  const keys = Object.keys(drafts).sort((a,b) => drafts[b].saved.localeCompare(drafts[a].saved));
+  if (!keys.length) {
+    showModal('Browser Drafts', '<p>No drafts saved in this browser yet.</p><p class="hint">Use "Save in browser" to create one.</p>', [
+      { label: 'Close', fn: closeModal }
+    ]);
+    return;
+  }
+  const listHtml = '<ul class="draft-list">' + keys.map(k => {
+    const d = new Date(drafts[k].saved);
+    const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+    return `<li class="draft-item" onclick="loadBrowserDraft('${encodeURIComponent(k)}')">
+      <span class="draft-name">${escHtml(k)}</span>
+      <span class="draft-date">${dateStr}</span>
+      <span class="draft-del" onclick="deleteBrowserDraft('${encodeURIComponent(k)}',event)" title="Delete">×</span>
+    </li>`;
+  }).join('') + '</ul>';
+
+  showModal('Browser Drafts', `<p>${keys.length} saved draft${keys.length>1?'s':''}. Click to load.</p>${listHtml}`, [
+    { label: 'Close', fn: closeModal }
+  ]);
+}
+
+function loadBrowserDraft(encodedKey) {
+  const key = decodeURIComponent(encodedKey);
+  const drafts = getBrowserDrafts();
+  const entry = drafts[key];
+  if (!entry) { toast('Draft not found.', 'error'); return; }
+  confirmLoad(entry.data, `Load draft "${key}"?`, () => {
+    restoreFormData(entry.data);
+    closeModal();
+    toast(`Draft "${key}" loaded.`, 'success');
+  });
+}
+
+function deleteBrowserDraft(encodedKey, event) {
+  event.stopPropagation();
+  const key = decodeURIComponent(encodedKey);
+  if (!confirm(`Delete draft "${key}"?`)) return;
+  const drafts = getBrowserDrafts();
+  delete drafts[key];
+  localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+  openBrowserDrafts(); // refresh list
+  toast(`Draft "${key}" deleted.`, 'success');
+}
+
+
+// ── UI helpers ────────────────────────────────────────────────────────────
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function showModal(title, bodyHtml, actions) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  const actEl = document.getElementById('modal-actions');
+  actEl.innerHTML = '';
+  (actions||[]).forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-btn' + (a.confirm ? ' confirm' : '');
+    btn.textContent = a.label;
+    btn.onclick = a.fn;
+    actEl.appendChild(btn);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function showInputModal(title, prompt, defaultVal, callback) {
+  const bodyHtml = `<p>${escHtml(prompt)}</p><input type="text" id="modal-input" value="${escHtml(defaultVal)}" style="width:100%;margin-top:8px;padding:8px 10px;font-size:13px;border:1px solid var(--rule);">`;
+  showModal(title, bodyHtml, [
+    { label: 'Cancel', fn: closeModal },
+    { label: 'Save', confirm: true, fn: () => { callback(document.getElementById('modal-input').value.trim()); closeModal(); } }
+  ]);
+  setTimeout(() => { const i = document.getElementById('modal-input'); if (i) { i.focus(); i.select(); } }, 50);
+}
+
+function confirmLoad(data, promptText, onConfirm) {
+  const info = data.proc_title ? `<strong>${escHtml(data.proc_title)}</strong><br>` : '';
+  const date = data._saved ? `Saved: ${new Date(data._saved).toLocaleString()}` : '';
+  showModal('Load Draft',
+    `<p>${escHtml(promptText)}</p><p>${info}<span class="hint">${date}</span></p><p class="hint">This will replace the current form contents.</p>`,
+    [
+      { label: 'Cancel', fn: closeModal },
+      { label: 'Load', confirm: true, fn: onConfirm }
+    ]);
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ── AI Autofill ───────────────────────────────────────────────────────────────
+let currentAutofillRow = null;
+let currentAutofillData = null;
+
+// ── PubChem helpers ───────────────────────────────────────────────────────────
+const PUBCHEM = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug';
+const PUBCHEM_VIEW = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug_view';
+
+// Strip Unicode sub/superscript digits back to plain ASCII before sending to
+// PubChem — the API doesn't recognise e.g. "H₂SO₄" but does recognise "H2SO4".
+// Greek letters are left as-is; PubChem's name search handles UTF-8 fine for
+// those (e.g. it matches "α-pinene" correctly).
+function normalisePubChemName(s) {
+  const subDigits = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4',
+                     '₅':'5','₆':'6','₇':'7','₈':'8','₉':'9',
+                     '₊':'+','₋':'-','₌':'=','₍':'(','₎':')'};
+  const supDigits = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4',
+                     '⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9',
+                     '⁺':'+','⁻':'-','⁼':'=','⁽':'(','⁾':')',
+                     'ⁿ':'n','ⁱ':'i'};
+  return (s||'').split('').map(c => subDigits[c] ?? supDigits[c] ?? c).join('');
+}
+
+async function pubchemGet(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`PubChem ${r.status}: ${r.statusText}`);
+  return r.json();
+}
+
+// Resolve a name or CAS → PubChem CID
+async function resolveCID(name, cas) {
+  if (cas) {
+    try {
+      const d = await pubchemGet(`${PUBCHEM}/compound/name/${encodeURIComponent(cas)}/cids/JSON`);
+      if (d.IdentifierList?.CID?.[0]) return d.IdentifierList.CID[0];
+    } catch(e) { /* fall through */ }
+  }
+  if (name) {
+    const d = await pubchemGet(`${PUBCHEM}/compound/name/${encodeURIComponent(name)}/cids/JSON`);
+    if (d.IdentifierList?.CID?.[0]) return d.IdentifierList.CID[0];
+  }
+  throw new Error('Compound not found in PubChem. Check spelling or try the CAS number.');
+}
+
+// Fetch ONLY the GHS Classification section (much faster than full PUG View)
+async function fetchGHSSection(cid) {
+  return pubchemGet(`${PUBCHEM_VIEW}/data/compound/${cid}/JSON?heading=GHS+Classification`);
+}
+
+// Fetch basic properties
+async function fetchProperties(cid) {
+  return pubchemGet(`${PUBCHEM}/compound/cid/${cid}/property/IUPACName,MolecularFormula,MolecularWeight/JSON`);
+}
+
+// Fetch synonyms to find CAS number
+async function fetchSynonyms(cid) {
+  return pubchemGet(`${PUBCHEM}/compound/cid/${cid}/synonyms/JSON`);
+}
+
+// Walk all Information entries in a GHS Classification section and collect data
+// Returns the best merged result from all sources
+function extractGHSFromSection(ghsSec) {
+  const result = {
+    hazard_codes: [],
+    hazard_statements: [],
+    signal_word: '',
+    ghs_pictograms: [],
+    carcinogen: false,
+    mutagen: false,
+    reprotoxic: false
+  };
+
+  if (!ghsSec || !ghsSec.Information) return result;
+
+  // Each Information entry is a different source (ECHA, supplier, etc.)
+  // We merge them, deduplicating H-codes, taking the signal word from first hit
+  for (const info of ghsSec.Information) {
+    const name = info.Name || '';
+    const values = info.Value?.StringWithMarkup || [];
+
+    if (name === 'Signal' && !result.signal_word) {
+      result.signal_word = values[0]?.String || '';
+    }
+
+    if (name === 'Pictogram(s)') {
+      for (const swm of values) {
+        for (const markup of (swm.Markup || [])) {
+          if (markup.URL && markup.URL.includes('/ghs/GHS')) {
+            // Extract GHS code from URL like .../GHS02.svg
+            const m = markup.URL.match(/GHS(\d{2})/i);
+            if (m) {
+              const code = 'GHS' + m[1];
+              if (!result.ghs_pictograms.includes(code)) result.ghs_pictograms.push(code);
+            }
+          }
+          // Also check Extra field directly
+          if (markup.Extra && !markup.URL) {
+            // Extra like "Flammable" maps to GHS codes — handled via H-codes below
+          }
+        }
+      }
+    }
+
+    if (name === 'GHS Hazard Statements') {
+      for (const swm of values) {
+        const str = swm.String || '';
+        // Format: "H225: Highly flammable..." or "H225 (> 99.9%): Highly flammable..."
+        // or just "H225 Highly flammable..."
+        const m = str.match(/^(H\d{3}[A-Z]?(?:\+H\d{3}[A-Z]?)?)(?:\s*\([^)]+\))?\s*[:\-–]?\s*(.+)/i);
+        if (m) {
+          const rawCodes = m[1].split(/\+/);
+          rawCodes.forEach(c => {
+            c = c.trim().toUpperCase();
+            if (c && !result.hazard_codes.includes(c)) result.hazard_codes.push(c);
+          });
+          // Statement: strip trailing [...] hazard class annotation
+          let stmt = m[2].trim().replace(/\s*\[[^\]]*\]\s*$/, '').trim();
+          if (stmt && !result.hazard_statements.some(s => s.startsWith(m[1]))) {
+            result.hazard_statements.push(`${m[1].trim()}: ${stmt}`);
+          }
+        }
+      }
+    }
+  }
+
+  // Derive CMR from H-codes
+  result.hazard_codes.forEach(h => {
+    if (/^H35[01]/.test(h)) result.carcinogen = true;
+    if (/^H34[01]/.test(h)) result.mutagen = true;
+    if (/^H36[01]/.test(h)) result.reprotoxic = true;
+  });
+
+  // Sort H-codes numerically
+  result.hazard_codes.sort((a, b) => {
+    const na = parseInt(a.replace(/\D/g,''));
+    const nb = parseInt(b.replace(/\D/g,''));
+    return na - nb;
+  });
+
+  // Sort statements to match code order
+  result.hazard_statements.sort((a, b) => {
+    const na = parseInt(a.replace(/\D/g,''));
+    const nb = parseInt(b.replace(/\D/g,''));
+    return na - nb;
+  });
+
+  return result;
+}
+
+// Find the GHS Classification section anywhere in the tree
+function findGHSClassification(sections) {
+  if (!sections) return null;
+  for (const s of sections) {
+    if (s.TOCHeading === 'GHS Classification') return s;
+    if (s.Section) {
+      const found = findGHSClassification(s.Section);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+// Extract flash point from Safety section (if we have it)
+function findSection(sections, heading) {
+  if (!sections) return null;
+  for (const s of sections) {
+    if (s.TOCHeading === heading) return s;
+    if (s.Section) {
+      const found = findSection(s.Section, heading);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+function extractStrings(section) {
+  const results = [];
+  if (!section) return results;
+  function walk(obj) {
+    if (!obj) return;
+    if (obj.StringWithMarkup) obj.StringWithMarkup.forEach(s => { if (s.String) results.push(s.String); });
+    if (obj.Information) obj.Information.forEach(walk);
+    if (obj.Section) obj.Section.forEach(walk);
+  }
+  walk(section);
+  return results;
+}
+
+// Fire risk from H-codes
+function deriveFireRisk(hazardCodes) {
+  return hazardCodes.some(h => /^H(220|221|222|223|224|225|226|227|228|229|230|231|232|241|242|250|251|252|260|261)/.test(h));
+}
+
+// Emergency defaults from H-codes
+function deriveEmergency(hazardCodes) {
+  const noVomit = hazardCodes.some(h => /^H(290|314|318|304)/.test(h));
+  const acuteTox = hazardCodes.some(h => /^H(300|301|302|310|311|312|330|331|332)/.test(h));
+  const inhalHazard = hazardCodes.some(h => /^H(330|331|332|334|335|336)/.test(h));
+  const skinHazard = hazardCodes.some(h => /^H(310|311|312|314|315|316|317|318|319)/.test(h));
+  return {
+    emergency_ingestion_vomit: !noVomit,
+    emergency_ingestion_medical: acuteTox || noVomit,
+    emergency_inhalation_air: true,
+    emergency_inhalation_medical: inhalHazard || acuteTox,
+    emergency_skin_rinse: true,
+    emergency_skin_medical: skinHazard,
+    emergency_eye_rinse: true,
+    emergency_eye_medical: hazardCodes.some(h => /^H(318|319)/.test(h)) || acuteTox
+  };
+}
+
+// Main lookup — uses targeted GHS endpoint for speed, falls back to full view
+async function lookupPubChem(name, cas) {
+  // 1. Resolve CID
+  const cid = await resolveCID(name, cas);
+
+  // 2. Fetch GHS section + properties + synonyms in parallel
+  const [ghsData, propData, synData] = await Promise.all([
+    fetchGHSSection(cid),
+    fetchProperties(cid).catch(() => null),
+    fetchSynonyms(cid).catch(() => null)
+  ]);
+
+  // 3. Extract GHS data
+  const sections = ghsData?.Record?.Section || [];
+  const ghsSec = findGHSClassification(sections);
+  const ghs = extractGHSFromSection(ghsSec);
+
+  // 4. Official name
+  const props = propData?.PropertyTable?.Properties?.[0] || {};
+  const officialName = props.IUPACName || name || '';
+
+  // 5. CAS from synonyms — find first entry matching CAS pattern
+  let resolvedCas = cas || '';
+  if (!resolvedCas && synData) {
+    const syns = synData.InformationList?.Information?.[0]?.Synonym || [];
+    const casMatch = syns.find(s => /^\d{2,7}-\d{2}-\d$/.test(s.trim()));
+    if (casMatch) resolvedCas = casMatch.trim();
+  }
+
+  // 6. Derive extras
+  const fireRisk = deriveFireRisk(ghs.hazard_codes);
+  const emergency = deriveEmergency(ghs.hazard_codes);
+
+  return {
+    name: officialName,
+    cas: resolvedCas,
+    cid,
+    formula: props.MolecularFormula || '',
+    hazard_codes: ghs.hazard_codes,
+    hazard_statements: ghs.hazard_statements,
+    signal_word: ghs.signal_word,
+    ghs_pictograms: ghs.ghs_pictograms,
+    carcinogen: ghs.carcinogen,
+    mutagen: ghs.mutagen,
+    reprotoxic: ghs.reprotoxic,
+    fire_risk: fireRisk,
+    flash_point: '',
+    wel_8hr: '',
+    wel_short: '',
+    storage_notes: '',
+    disposal_notes: '',
+    ...emergency,
+    pubchem_url: `https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`
+  };
+}
+
+async function triggerAutofill(rowIndex) {
+  const tbody = document.getElementById('substances-body');
+  const row = tbody.querySelector(`tr[data-srow="${rowIndex}"]`);
+  if (!row) return;
+
+  const nameInput = row.querySelector('.af-name-input');
+  const casInput  = row.querySelector('.af-cas-input');
+  const btn       = row.querySelector('.autofill-btn');
+
+  const name = nameInput.value.trim();
+  const cas  = casInput.value.trim();
+  if (!name && !cas) return;
+
+  // Normalise any toolbar-inserted Unicode sub/superscripts back to ASCII
+  // digits before sending to PubChem (the API won't match "H₂SO₄" but
+  // will match "H2SO4").
+  const pubchemName = normalisePubChemName(name);
+
+  currentAutofillRow  = rowIndex;
+  currentAutofillData = null;
+
+  document.getElementById('af-substance-name').textContent = name || `CAS: ${cas}`;
+  document.getElementById('af-body').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;padding:10px 0;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="2" style="animation:spin 1s linear infinite;flex-shrink:0">
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10"/>
+      </svg>
+      <span style="font-family:var(--mono);font-size:11px;color:#5a6673;letter-spacing:0.08em;">
+        Querying PubChem database…
+      </span>
+    </div>`;
+  document.getElementById('af-apply-btn').disabled = true;
+  openAutofillPanel();
+  btn.classList.add('loading');
+
+  try {
+    currentAutofillData = await lookupPubChem(pubchemName, cas);
+    renderAutofillPanel(currentAutofillData);
+    document.getElementById('af-apply-btn').disabled = false;
+  } catch(err) {
+    console.error('PubChem autofill error:', err);
+    document.getElementById('af-body').innerHTML = `
+      <div style="background:#fdecea;border:1px solid #ef9a9a;padding:14px 16px;margin-bottom:12px;">
+        <p style="font-family:var(--mono);font-size:10px;color:#b71c1c;letter-spacing:0.08em;margin-bottom:6px;">
+          ✗ ${err.message}
+        </p>
+        <p style="font-size:12px;color:#555;line-height:1.5;">
+          Suggestions:<br>
+          • Check spelling (e.g. "ethanol" not "ethenol")<br>
+          • Try the CAS number instead (e.g. 64-17-5)<br>
+          • Use the IUPAC name from the SDS<br>
+          • Some proprietary mixtures are not in PubChem
+        </p>
+      </div>
+      <p style="font-size:11px;color:#888;font-family:var(--mono);">
+        Data source: <a href="https://pubchem.ncbi.nlm.nih.gov" target="_blank" style="color:var(--accent2)">PubChem (NCBI)</a> — free, no account required
+      </p>`;
+  } finally {
+    btn.classList.remove('loading');
+  }
+}
+
+function renderAutofillPanel(d) {
+  const ghsColors = {
+    GHS01:'danger',GHS02:'danger',GHS03:'warn',GHS04:'',GHS05:'danger',
+    GHS06:'danger',GHS07:'warn',GHS08:'danger',GHS09:'env'
+  };
+  const ghsNames = {
+    GHS01:'Explosive',GHS02:'Flammable',GHS03:'Oxidising',GHS04:'Compressed Gas',
+    GHS05:'Corrosive',GHS06:'Toxic',GHS07:'Irritant/Harmful',GHS08:'Health Hazard',GHS09:'Environmental'
+  };
+
+  const ghsChips = (d.ghs_pictograms||[]).map(g =>
+    `<span class="af-ghs-chip ${ghsColors[g]||''}">${g} — ${ghsNames[g]||g}</span>`
+  ).join('');
+
+  // Build H-phrase rows for table display
+  const hPhraseRows = (d.hazard_statements||[]).map(s => {
+    const m = s.match(/^(H[\d]{3}[A-Z+]*)[:\s]+(.+)/);
+    const code = m ? m[1] : '';
+    const text = m ? m[2] : s;
+    let cls = '';
+    if (code) {
+      const n = parseInt(code.replace(/\D/g,''));
+      if (n >= 200 && n < 300) cls = 'warn';
+      else if (n >= 300 && n < 400) cls = 'danger';
+      else if (n >= 400 && n < 500) cls = 'env';
+    }
+    return `<tr>
+      <td style="white-space:nowrap;padding:5px 8px;font-family:var(--mono);font-size:11px;font-weight:700;border:1px solid var(--rule);vertical-align:top;">
+        <span class="af-ghs-chip ${cls}" style="margin:0">${code||'—'}</span>
+      </td>
+      <td style="padding:5px 10px;font-size:12px;border:1px solid var(--rule);line-height:1.4;">${text}</td>
+    </tr>`;
+  }).join('');
+
+  // Text preview for hazards column
+  const stmtsForCol = (d.hazard_statements||[]).map(s => {
+    const m = s.match(/^(H[\d]{3}[A-Z+]*)[:\s]+(.+)/);
+    return m ? `${m[1]}: ${m[2]}` : s;
+  }).join('; ');
+  const codesOnly = (d.hazard_codes||[]).join(', ');
+  const hazardColText = codesOnly ? (stmtsForCol ? `${codesOnly} — ${stmtsForCol}` : codesOnly) : stmtsForCol || '';
+
+  const flags = [];
+  if (d.carcinogen) flags.push('<span class="af-ghs-chip danger">Carcinogen (H350/H351)</span>');
+  if (d.mutagen)    flags.push('<span class="af-ghs-chip danger">Mutagen (H340/H341)</span>');
+  if (d.reprotoxic) flags.push('<span class="af-ghs-chip warn">Reprotoxic (H360/H361)</span>');
+  if (d.fire_risk)  flags.push('<span class="af-ghs-chip warn">Fire Risk</span>');
+
+  document.getElementById('af-substance-name').textContent =
+    `${d.name || '—'}${d.cas ? '  ·  CAS ' + d.cas : ''}${d.formula ? '  ·  ' + d.formula : ''}`;
+
+  const noData = !d.hazard_codes?.length && !d.ghs_pictograms?.length;
+
+  document.getElementById('af-body').innerHTML =
+    (noData ? `<div style="background:#fff8e1;border:1px solid #ffe082;padding:12px 14px;margin-bottom:16px;font-size:12px;line-height:1.5;">
+      <strong>⚠ No GHS classification found in PubChem for this compound.</strong><br>
+      The compound was identified (CID ${d.cid}) but PubChem holds no depositor-supplied GHS/H-phrase data.<br>
+      Please consult the SDS from your supplier directly.<br>
+      <a href="${d.pubchem_url}" target="_blank" style="color:var(--accent2);font-family:var(--mono);font-size:10px;">↗ View PubChem record</a>
+    </div>` : '') +
+
+    `<div class="af-field-group">
+      <div class="af-field-label">GHS Pictograms${d.signal_word ?
+        ` &nbsp;·&nbsp; Signal: <span style="color:${d.signal_word.toLowerCase()==='danger'?'#b71c1c':'#e65100'};font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">${d.signal_word}</span>` : ''}</div>
+      <div class="af-ghs-row">${ghsChips || '<span style="font-size:12px;color:#999;">None found</span>'}</div>
+    </div>
+
+    <div class="af-field-group">
+      <div class="af-field-label">UN GHS H-phrases (Chapter 2.x classifications)
+        <span class="af-tag">→ Hazards column</span>
+      </div>
+      ${hPhraseRows
+        ? `<table style="width:100%;border-collapse:collapse;margin-top:4px;">${hPhraseRows}</table>`
+        : '<div class="af-field-val" style="color:#999;font-size:12px;">No H-phrases found in PubChem for this compound</div>'}
+    </div>
+
+    <div class="af-field-group">
+      <div class="af-field-label">UK Workplace Exposure Limit (EH40)
+        <span class="af-tag">→ WEL column</span>
+      </div>
+      <div style="font-size:12px;line-height:1.7;padding:8px 10px;border:1px solid var(--rule);background:#fff;">
+        The WEL column is auto-filled from the built-in EH40 database (~360 substances) when a matching CAS number is found. Always verify against the current HSE EH40:<br>
+        <a href="https://www.hse.gov.uk/pubns/priced/eh40.pdf" target="_blank" style="color:var(--accent2);font-family:var(--mono);font-size:10px;">↗ HSE EH40 Table of WELs (PDF)</a>
+        &nbsp;&nbsp;
+        <a href="https://www.hse.gov.uk/coshh/basics/exposurelimits.htm" target="_blank" style="color:var(--accent2);font-family:var(--mono);font-size:10px;">↗ HSE WEL guidance</a>
+      </div>
+    </div>` +
+
+    (flags.length ? `<div class="af-field-group">
+      <div class="af-field-label">CMR / Special Designations <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:9px;">(auto-checks Q3 if present)</span></div>
+      <div class="af-ghs-row">${flags.join('')}</div>
+    </div>` : '') +
+
+    `<div class="af-field-group">
+      <div class="af-field-label">Suggested Emergency Defaults <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:9px;">(from H-codes — verify against SDS)</span></div>
+      <div class="af-field-val" style="font-size:11px;font-family:var(--mono);line-height:1.9;">
+Ingestion — Induce vomiting: ${d.emergency_ingestion_vomit ? 'Yes' : '<span style="color:#c62828;font-weight:600">⚠ No (corrosive/aspiration risk)</span>'}  |  Medical: ${d.emergency_ingestion_medical ? 'Yes' : 'Optional'}<br>
+Inhalation — Fresh air: Yes  |  Medical: ${d.emergency_inhalation_medical ? 'Yes' : 'Optional'}<br>
+Skin — Rinse w/ water: Yes  |  Medical: ${d.emergency_skin_medical ? 'Yes' : 'Optional'}<br>
+Eyes — Rinse w/ water: Yes  |  Medical: ${d.emergency_eye_medical ? 'Yes' : 'Optional'}
+      </div>
+    </div>
+
+    <div style="margin-top:4px;">
+      <a href="${d.pubchem_url}" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--accent2);letter-spacing:0.08em;">
+        ↗ Full PubChem record (CID ${d.cid})
+      </a>
+    </div>` +
+
+    (hazardColText ? `
+    <div style="margin-top:16px;padding:10px 12px;background:#f0f5ff;border:1px solid #c0d4ea;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--accent2);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:6px;">Preview — text written to Hazards column on Apply:</div>
+      <div style="font-size:11px;line-height:1.5;word-break:break-word;">${hazardColText}</div>
+    </div>` : '');
+}
+
+
+function applyAutofill() {
+  if (!currentAutofillData || currentAutofillRow === null) return;
+  const d = currentAutofillData;
+  const tbody = document.getElementById('substances-body');
+  const row = tbody.querySelector(`tr[data-srow="${currentAutofillRow}"]`);
+  if (!row) return;
+
+  // The name the user actually typed (prefer this over IUPAC for matching other tables)
+  const nameInput = row.querySelector('.af-name-input');
+  const userTypedName = nameInput.value.trim();
+
+  // Fill CAS if empty
+  const casInput = row.querySelector('.af-cas-input');
+  if (!casInput.value.trim() && d.cas) casInput.value = d.cas;
+
+  // Fill WEL from EH40 using whichever CAS we now have
+  const resolvedCAS = casInput.value.trim();
+  if (resolvedCAS) {
+    const found = applyEH40toRow(row, resolvedCAS);
+    if (!found) {
+      // PubChem may give a different CAS variant — try the one from PubChem data too
+      if (d.cas && d.cas !== resolvedCAS) applyEH40toRow(row, d.cas);
+    }
+  }
+
+  // Build hazard text from H-phrases
+  const hazardText = buildHazardText(d);
+
+  // Fill hazards column if empty
+  const hazInput = row.querySelector('.af-hazards-input');
+  if (hazInput && !hazInput.value.trim() && hazardText) {
+    hazInput.value = hazardText;
+  }
+
+  // Auto-check Q3 if carcinogen / mutagen / reprotoxic
+  if (d.carcinogen || d.mutagen || d.reprotoxic) {
+    const q3yes = document.querySelector('input[name="q3"][value="yes"]');
+    if (q3yes && !document.querySelector('input[name="q3"]:checked')) q3yes.checked = true;
+  }
+
+  // Auto-check fire risk
+  if (d.fire_risk) {
+    const fireYes = document.querySelector('input[name="fire"][value="yes"]');
+    if (fireYes && !document.querySelector('input[name="fire"]:checked')) fireYes.checked = true;
+  }
+
+  // ── 1. Emergency Procedures table ────────────────────────────────────────
+  // Use the name the user typed (more likely to match what they put in the
+  // emergency table), falling back to the IUPAC name from PubChem.
+  updateOrCreateEmergencyRow(d, userTypedName || d.name);
+
+  // ── 2. Waste Disposal table ───────────────────────────────────────────────
+  // Find the first waste row whose chemical cell matches this substance name,
+  // or the first completely empty row, and fill its Hazards cell.
+  if (hazardText) {
+    populateWasteHazards(userTypedName || d.name, hazardText);
+  }
+
+  closeAutofillPanel();
+  toast('Hazard data applied — check Emergency & Waste tables', 'success');
+  markDirty && markDirty();
+}
+
+// Build a compact hazard string from H-codes + statements
+function buildHazardText(d) {
+  const codes = (d.hazard_codes||[]).join(', ');
+  const stmts = (d.hazard_statements||[]).map(s => {
+    const m = s.match(/^(H[\d]{3}[A-Z+]*)[:\s]+(.+)/);
+    return m ? `${m[1]}: ${m[2]}` : s;
+  }).join('; ');
+  return codes ? (stmts ? `${codes} — ${stmts}` : codes) : stmts || '';
+}
+
+// Update an existing matching emergency row, or find the first blank row,
+// or append a new row if all are occupied.
+function updateOrCreateEmergencyRow(d, substanceName) {
+  const tbody = document.getElementById('emergency-body');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+
+  // Helper: apply checkbox values to a row
+  function applyToRow(tr) {
+    const nameEl = tr.querySelector('input[type="text"]');
+    if (nameEl && !nameEl.value.trim()) nameEl.value = substanceName;
+    const cbs = tr.querySelectorAll('input[type="checkbox"]');
+    if (cbs.length >= 8) {
+      cbs[0].checked = !!d.emergency_ingestion_vomit;
+      cbs[1].checked = !!d.emergency_ingestion_medical;
+      cbs[2].checked = !!d.emergency_inhalation_air;
+      cbs[3].checked = !!d.emergency_inhalation_medical;
+      cbs[4].checked = !!d.emergency_skin_rinse;
+      cbs[5].checked = !!d.emergency_skin_medical;
+      cbs[6].checked = !!d.emergency_eye_rinse;
+      cbs[7].checked = !!d.emergency_eye_medical;
+    }
+  }
+
+  // 1. Exact name match (case-insensitive)
+  for (const tr of rows) {
+    const nameEl = tr.querySelector('input[type="text"]');
+    if (nameEl && nameEl.value.trim().toLowerCase() === substanceName.toLowerCase()) {
+      applyToRow(tr);
+      return;
+    }
+  }
+
+  // 2. First empty row
+  for (const tr of rows) {
+    const nameEl = tr.querySelector('input[type="text"]');
+    if (nameEl && !nameEl.value.trim()) {
+      applyToRow(tr);
+      return;
+    }
+  }
+
+  // 3. No empty row — append a new one
+  addEmergencyRow();
+  const newRow = tbody.lastElementChild;
+  applyToRow(newRow);
+}
+
+// Find or create a waste row for this substance and fill its Hazards cell.
+function populateWasteHazards(substanceName, hazardText) {
+  const tbody = document.getElementById('waste-body');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+
+  function applyHazardsToRow(tr) {
+    const inputs = tr.querySelectorAll('input[type="text"]');
+    if (inputs.length < 2) return;
+    // inputs[0] = chemical name, inputs[1] = hazards
+    if (!inputs[0].value.trim()) inputs[0].value = substanceName;
+    if (!inputs[1].value.trim()) inputs[1].value = hazardText;
+  }
+
+  // 1. Row whose chemical cell already matches this substance name
+  for (const tr of rows) {
+    const inputs = tr.querySelectorAll('input[type="text"]');
+    if (inputs[0] && inputs[0].value.trim().toLowerCase() === substanceName.toLowerCase()) {
+      if (inputs[1] && !inputs[1].value.trim()) inputs[1].value = hazardText;
+      return;
+    }
+  }
+
+  // 2. First row that is completely empty
+  for (const tr of rows) {
+    const inputs = tr.querySelectorAll('input[type="text"]');
+    const allEmpty = Array.from(inputs).every(i => !i.value.trim());
+    if (allEmpty) {
+      applyHazardsToRow(tr);
+      return;
+    }
+  }
+
+  // 3. Append a new waste row
+  addWasteRow();
+  const newRow = tbody.lastElementChild;
+  applyHazardsToRow(newRow);
+}
+
+function openAutofillPanel() {
+  document.getElementById('af-scrim').classList.add('open');
+  document.getElementById('af-panel').classList.add('open');
+}
+function closeAutofillPanel() {
+  document.getElementById('af-scrim').classList.remove('open');
+  document.getElementById('af-panel').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STANDALONE CAS LOOKUP WIDGET
+// Reference-only lookup: EH40 WEL + PubChem GHS. Never writes to the form.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openCASLookup() {
+  document.getElementById('cl-scrim').classList.add('open');
+  document.getElementById('cl-panel').classList.add('open');
+  setTimeout(() => document.getElementById('cl-input').focus(), 80);
+}
+
+function closeCASLookup() {
+  document.getElementById('cl-scrim').classList.remove('open');
+  document.getElementById('cl-panel').classList.remove('open');
+}
+
+// Detect whether the query looks like a CAS number
+function looksLikeCAS(s) {
+  return /^\d{2,7}-\d{2}-\d$/.test(s.trim());
+}
+
+function clSetBody(html) {
+  document.getElementById('cl-body').innerHTML = html;
+}
+
+async function runCASLookup() {
+  const query = document.getElementById('cl-input').value.trim();
+  if (!query) return;
+
+  const btn = document.getElementById('cl-search-btn');
+  btn.disabled = true;
+  btn.textContent = 'Looking up…';
+
+  clSetBody(`
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 0;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="2"
+           style="animation:spin 0.9s linear infinite;flex-shrink:0">
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.2"/>
+        <path d="M12 2a10 10 0 0 1 10 10"/>
+      </svg>
+      <span style="font-family:var(--mono);font-size:11px;color:#5a6673;letter-spacing:0.08em;">
+        Querying EH40 + PubChem…
+      </span>
+    </div>`);
+
+  try {
+    const isCAS = looksLikeCAS(query);
+    const cas  = isCAS ? query : '';
+    const name = isCAS ? '' : query;
+
+    // ── 1. EH40 local lookup (instant) ──────────────────────────────────
+    const eh40Entry = lookupEH40(query); // works on CAS or normalised CAS
+    const welText   = eh40Entry ? formatWEL(eh40Entry) : null;
+
+    let eh40Html = '';
+    if (eh40Entry && welText) {
+      const notes = eh40Entry.notes
+        ? `<div class="cl-eh40-notes">⚑ ${eh40Entry.notes}</div>` : '';
+      eh40Html = `
+        <div class="cl-eh40-box">
+          <div class="cl-eh40-label">EH40 Workplace Exposure Limit</div>
+          <div class="cl-eh40-name">${escHtml(eh40Entry.name)}</div>
+          <div class="cl-eh40-wel">${escHtml(welText)}</div>
+          ${notes}
+        </div>`;
+    } else {
+      eh40Html = `<div class="cl-no-eh40">No EH40 WEL found for this substance — it may not be listed in Table 1, or a different CAS form may be needed.</div>`;
+    }
+
+    // ── 2. PubChem lookup (async) ────────────────────────────────────────
+    let pubchemHtml = '';
+    try {
+      const d = await lookupPubChem(normalisePubChemName(name || query), cas);
+
+      const ghsColors = {
+        GHS01:'danger',GHS02:'danger',GHS03:'warn',GHS04:'',
+        GHS05:'danger',GHS06:'danger',GHS07:'warn',GHS08:'danger',GHS09:'env'
+      };
+      const ghsNames = {
+        GHS01:'Explosive',GHS02:'Flammable',GHS03:'Oxidising',GHS04:'Compressed Gas',
+        GHS05:'Corrosive',GHS06:'Toxic',GHS07:'Irritant / Harmful',
+        GHS08:'Health Hazard',GHS09:'Environmental'
+      };
+
+      const chips = (d.ghs_pictograms||[]).map(g =>
+        `<span class="af-ghs-chip ${ghsColors[g]||''}">${g} — ${ghsNames[g]||g}</span>`
+      ).join('');
+
+      const hRows = (d.hazard_statements||[]).map(s => {
+        const m = s.match(/^(H[\d]{3}[A-Z+]*)[:\s]+(.+)/);
+        const code = m ? m[1] : '';
+        const text = m ? m[2] : s;
+        let cls = '';
+        if (code) {
+          const n = parseInt(code.replace(/\D/g,''));
+          if (n >= 200 && n < 300) cls = 'warn';
+          else if (n >= 300 && n < 400) cls = 'danger';
+          else if (n >= 400 && n < 500) cls = 'env';
+        }
+        return `<tr>
+          <td style="white-space:nowrap;padding:5px 8px;font-family:var(--mono);font-size:11px;font-weight:700;border:1px solid var(--rule);vertical-align:top;">
+            <span class="af-ghs-chip ${cls}" style="margin:0">${code||'—'}</span>
+          </td>
+          <td style="padding:5px 10px;font-size:12px;border:1px solid var(--rule);line-height:1.4;">${escHtml(text)}</td>
+        </tr>`;
+      }).join('');
+
+      const flags = [];
+      if (d.carcinogen) flags.push('<span class="af-ghs-chip danger">Carcinogen (H350/H351)</span>');
+      if (d.mutagen)    flags.push('<span class="af-ghs-chip danger">Mutagen (H340/H341)</span>');
+      if (d.reprotoxic) flags.push('<span class="af-ghs-chip warn">Reprotoxic (H360/H361)</span>');
+      if (d.fire_risk)  flags.push('<span class="af-ghs-chip warn">Fire Risk</span>');
+
+      // If EH40 didn't have a name but PubChem resolved CAS, fill the gap
+      if (!eh40Entry && d.cas) {
+        const eh40ByCAS = lookupEH40(d.cas);
+        if (eh40ByCAS) {
+          const wt = formatWEL(eh40ByCAS);
+          if (wt) {
+            const n2 = eh40ByCAS.notes ? `<div class="cl-eh40-notes">⚑ ${eh40ByCAS.notes}</div>` : '';
+            eh40Html = `
+              <div class="cl-eh40-box">
+                <div class="cl-eh40-label">EH40 Workplace Exposure Limit <span style="font-weight:400">(matched via PubChem CAS ${escHtml(d.cas)})</span></div>
+                <div class="cl-eh40-name">${escHtml(eh40ByCAS.name)}</div>
+                <div class="cl-eh40-wel">${escHtml(wt)}</div>
+                ${n2}
+              </div>`;
+          }
+        }
+      }
+
+      const noGHS = !d.hazard_codes?.length && !d.ghs_pictograms?.length;
+
+      pubchemHtml = `
+        <div style="margin-bottom:14px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:6px;">
+            PubChem Record
+          </div>
+          <div style="font-size:13px;font-weight:600;">${escHtml(d.name || query)}</div>
+          <div style="font-family:var(--mono);font-size:10px;color:#5a6673;margin-top:2px;">
+            ${d.cas ? 'CAS ' + escHtml(d.cas) + '&nbsp;&nbsp;·&nbsp;&nbsp;' : ''}
+            ${d.formula ? escHtml(d.formula) + '&nbsp;&nbsp;·&nbsp;&nbsp;' : ''}
+            <a href="${escHtml(d.pubchem_url)}" target="_blank" style="color:var(--accent2);">CID ${d.cid} ↗</a>
+          </div>
+        </div>
+        ${noGHS ? `<div style="background:#fff8e1;border:1px solid #ffe082;padding:10px 14px;font-size:12px;color:#795548;margin-bottom:14px;">
+          ⚠ No GHS classification data found in PubChem for this compound. Consult your SDS directly.
+        </div>` : ''}
+        ${chips ? `<div style="margin-bottom:14px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:6px;">
+            GHS Pictograms${d.signal_word ? ' &nbsp;·&nbsp; Signal: <span style="color:' + (d.signal_word.toLowerCase()==='danger'?'#b71c1c':'#e65100') + ';font-weight:700;text-transform:uppercase;">' + escHtml(d.signal_word) + '</span>' : ''}
+          </div>
+          <div class="af-ghs-row">${chips}</div>
+        </div>` : ''}
+        ${hRows ? `<div style="margin-bottom:14px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:6px;">
+            H-phrases (UN GHS)
+          </div>
+          <table style="width:100%;border-collapse:collapse;">${hRows}</table>
+        </div>` : ''}
+        ${flags.length ? `<div style="margin-bottom:10px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:6px;">CMR / Special</div>
+          <div class="af-ghs-row">${flags.join('')}</div>
+        </div>` : ''}`;
+
+    } catch(pubErr) {
+      pubchemHtml = `
+        <div style="background:#fdecea;border:1px solid #ef9a9a;padding:12px 14px;margin-bottom:12px;">
+          <p style="font-family:var(--mono);font-size:10px;color:#b71c1c;letter-spacing:0.06em;margin-bottom:4px;">
+            ✗ PubChem: ${escHtml(pubErr.message)}
+          </p>
+          <p style="font-size:11px;color:#555;line-height:1.5;">
+            Check spelling, try a CAS number, or use the IUPAC name from the SDS.
+          </p>
+        </div>`;
+    }
+
+    clSetBody(eh40Html + pubchemHtml);
+
+  } catch(err) {
+    clSetBody(`<div style="background:#fdecea;border:1px solid #ef9a9a;padding:12px 14px;">
+      <p style="font-family:var(--mono);font-size:10px;color:#b71c1c;">✗ ${escHtml(err.message)}</p>
+    </div>`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Look up';
+  }
+}
+
+// Boot ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Attach dirty listeners after tables are seeded (rows added below)
+  setTimeout(attachDirtyListeners, 100);
+
+  // Restore autosave on load
+  const autosaved = localStorage.getItem(AUTOSAVE_KEY);
+  if (autosaved) {
+    try {
+      const data = JSON.parse(autosaved);
+      const d = new Date(data._saved);
+      const ago = Math.round((Date.now() - d.getTime()) / 60000);
+      const msg = ago < 60
+        ? `You have an autosaved draft from ${ago} minute${ago!==1?'s':''} ago.`
+        : `You have an autosaved draft from ${d.toLocaleDateString()}.`;
+      // Show restore banner after a brief delay
+      setTimeout(() => {
+        showModal('Restore Autosaved Draft', `<p>${msg}</p><p class="hint">Procedure: ${escHtml(data.proc_title||'—')}</p><p class="hint">Restore it, or dismiss to start fresh.</p>`,
+          [
+            { label: 'Start Fresh', fn: () => { localStorage.removeItem(AUTOSAVE_KEY); closeModal(); } },
+            { label: 'Restore Draft', confirm: true, fn: () => { restoreFormData(data); closeModal(); toast('Autosaved draft restored.', 'success'); } }
+          ]);
+      }, 600);
+    } catch(e) { /* corrupt autosave, ignore */ }
+  }
+});
+
+// Warn on unload if unsaved changes
+window.addEventListener('beforeunload', e => {
+  if (isDirty) { e.preventDefault(); e.returnValue = ''; }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHEMISTRY TOOLBAR  –  sub/superscript + Greek letter insertion
+// ═══════════════════════════════════════════════════════════════════════════
+
+(function buildChemToolbar() {
+  // ── Character definitions ────────────────────────────────────────────────
+  const SUB_CHARS = [
+    ['0','₀'],['1','₁'],['2','₂'],['3','₃'],['4','₄'],
+    ['5','₅'],['6','₆'],['7','₇'],['8','₈'],['9','₉'],
+    ['+','₊'],['-','₋']
+  ];
+  const SUP_CHARS = [
+    ['0','⁰'],['1','¹'],['2','²'],['3','³'],['4','⁴'],
+    ['5','⁵'],['6','⁶'],['7','⁷'],['8','⁸'],['9','⁹'],
+    ['+','⁺'],['-','⁻'],['n','ⁿ']
+  ];
+  const GREEK_LC = ['α','β','γ','δ','ε','ζ','η','θ','κ','λ','μ','ν','ξ','π','ρ','σ','τ','φ','χ','ψ','ω'];
+  const GREEK_UC = ['Γ','Δ','Θ','Λ','Ξ','Π','Σ','Φ','Ψ','Ω'];
+  const SPECIAL  = [['°','°'],['±','±'],['×','×'],['÷','÷'],['∞','∞'],['≈','≈'],['≤','≤'],['≥','≥']];
+
+  function makeBtn(label, char) {
+    const b = document.createElement('button');
+    b.className = 'ct-char' + (label.length > 1 ? ' wide' : '');
+    b.textContent = char;
+    b.title = label !== char ? `${char}  (${label})` : char;
+    b.onmousedown = () => false;   // prevent focus steal
+    b.onclick     = () => ctInsert(char);
+    return b;
+  }
+  function makeLabel(txt) {
+    const s = document.createElement('span');
+    s.className = 'ct-row-label';
+    s.textContent = txt;
+    return s;
+  }
+  function makeSep() {
+    const d = document.createElement('span');
+    d.className = 'ct-sep';
+    return d;
+  }
+  function makeRow(...children) {
+    const d = document.createElement('div');
+    d.className = 'ct-row';
+    children.forEach(c => d.appendChild(c));
+    return d;
+  }
+
+  // ── Sub/Sup section ──────────────────────────────────────────────────────
+  const secScript = document.getElementById('ct-section-script');
+  const subRow = makeRow(makeLabel('sub'));
+  SUB_CHARS.forEach(([lbl, ch]) => subRow.appendChild(makeBtn(lbl, ch)));
+  const supRow = makeRow(makeLabel('sup'));
+  SUP_CHARS.forEach(([lbl, ch]) => supRow.appendChild(makeBtn(lbl, ch)));
+  secScript.appendChild(subRow);
+  secScript.appendChild(supRow);
+
+  // ── Greek section ────────────────────────────────────────────────────────
+  const secGreek = document.getElementById('ct-section-greek');
+  const lcRow = makeRow(makeLabel('lc'));
+  GREEK_LC.forEach(ch => lcRow.appendChild(makeBtn(ch, ch)));
+  const ucRow = makeRow(makeLabel('uc'));
+  GREEK_UC.forEach(ch => ucRow.appendChild(makeBtn(ch, ch)));
+  ucRow.appendChild(makeSep());
+  SPECIAL.forEach(([lbl, ch]) => ucRow.appendChild(makeBtn(lbl, ch)));
+  secGreek.appendChild(lcRow);
+  secGreek.appendChild(ucRow);
+})();
+
+// ── Toolbar state & logic ─────────────────────────────────────────────────
+let _ctTarget   = null;   // currently focused input / textarea
+let _ctHideTimer = null;
+let _ctDismissed = false; // user explicitly closed; don't re-open until next focus cycle
+
+function ctSetTab(name) {
+  document.querySelectorAll('.ct-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('ct-tab-' + name).classList.add('active');
+  document.querySelectorAll('.ct-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('ct-section-' + name).classList.add('active');
+}
+
+function ctInsert(char) {
+  const el = _ctTarget;
+  if (!el) return;
+  el.focus();
+  const start = el.selectionStart ?? el.value.length;
+  const end   = el.selectionEnd   ?? el.value.length;
+  el.value = el.value.slice(0, start) + char + el.value.slice(end);
+  el.selectionStart = el.selectionEnd = start + char.length;
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  if (typeof markDirty === 'function') markDirty();
+}
+
+function ctShow(el) {
+  clearTimeout(_ctHideTimer);
+  _ctTarget = el;
+  const tb = document.getElementById('chem-toolbar');
+  tb.style.display = 'block';
+  // Animate in
+  tb.classList.add('ct-entering');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => tb.classList.remove('ct-entering'));
+  });
+  ctReposition();
+}
+
+function ctReposition() {
+  const el = _ctTarget;
+  if (!el) return;
+  const tb = document.getElementById('chem-toolbar');
+  const rect = el.getBoundingClientRect();
+  const tbW  = tb.offsetWidth  || 340;
+  const tbH  = tb.offsetHeight || 90;
+  const gap  = 6;
+
+  let top  = rect.bottom + gap;
+  let left = rect.left;
+
+  // Flip above if it would go off-screen below
+  if (top + tbH > window.innerHeight - 8)
+    top = Math.max(8, rect.top - tbH - gap);
+
+  // Keep within horizontal viewport
+  left = Math.min(left, window.innerWidth - tbW - 8);
+  left = Math.max(8, left);
+
+  tb.style.top  = top  + 'px';
+  tb.style.left = left + 'px';
+}
+
+function ctHide() {
+  _ctHideTimer = setTimeout(() => {
+    _ctTarget = null;
+    document.getElementById('chem-toolbar').style.display = 'none';
+  }, 180);
+}
+
+function ctForceHide() {
+  clearTimeout(_ctHideTimer);
+  _ctDismissed = true;
+  _ctTarget = null;
+  document.getElementById('chem-toolbar').style.display = 'none';
+}
+
+// ── Attach only to opted-in text inputs & textareas (data-chem-toolbar) ──────
+document.addEventListener('focusin', e => {
+  const el = e.target;
+  if (el.tagName === 'TEXTAREA' ||
+      (el.tagName === 'INPUT' && el.type === 'text')) {
+    // Only show toolbar on fields that explicitly opt in
+    if (!el.hasAttribute('data-chem-toolbar')) { _ctTarget = null; ctForceHide(); return; }
+    clearTimeout(_ctHideTimer);
+    if (_ctDismissed && _ctTarget !== el) {
+      // Re-enable toolbar when user moves to a new field
+      _ctDismissed = false;
+    }
+    if (!_ctDismissed) ctShow(el);
+    else _ctTarget = el;   // track target even if hidden
+  }
+});
+
+document.addEventListener('focusout', e => {
+  const el = e.target;
+  if (el.tagName === 'TEXTAREA' ||
+      (el.tagName === 'INPUT' && el.type === 'text')) {
+    ctHide();
+  }
+});
+
+// Reposition on scroll/resize so toolbar tracks the field
+window.addEventListener('scroll', ctReposition, { passive: true, capture: true });
+window.addEventListener('resize', ctReposition, { passive: true });
+
+
+
+</script>
+</body>
+</html>
