@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hazard Profile Lookup | EH40 WEL, PubChem GHS &amp; EPA CTX | COSHH.uk</title>
+<meta name="description" content="Free browser-based hazard profile tool for research labs. Look up EH40 workplace exposure limits, PubChem GHS classifications, and EPA CTX toxicity data by CAS number or substance name.">
+<link rel="canonical" href="https://coshh.uk/hp.html">
+<meta property="og:title" content="Hazard Profile Lookup — EH40, PubChem &amp; EPA CTX">
+<meta property="og:description" content="Look up EH40 WELs, GHS hazard data, and EPA toxicity values for any substance. Free browser-based tool for research laboratory COSHH assessment support.">
+<meta property="og:url" content="https://coshh.uk/hp.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hazard Profile Lookup — EH40, PubChem &amp; EPA CTX">
+<meta name="twitter:description" content="Look up EH40 WELs, GHS hazard data, and EPA toxicity values for any substance. Free browser-based tool for research labs."
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #dddbd3;
+    --border2: #c8c5bc;
+    --text: #1a1917;
+    --text2: #5a5855;
+    --text3: #8a8783;
+    --accent: #1a4a6b;
+    --accent2: #2563a0;
+    --accent-bg: #e8f0f7;
+    --danger: #8b1f1f;
+    --danger-bg: #fdf0f0;
+    --danger-border: #e8b4b4;
+    --warn: #7a4a00;
+    --warn-bg: #fdf4e7;
+    --warn-border: #f0d090;
+    --ok: #1a5c2a;
+    --ok-bg: #eef7f0;
+    --ok-border: #a8d8b4;
+    --info: #0f3d6b;
+    --info-bg: #e8f2fb;
+    --info-border: #a8ccec;
+    --mono: 'Courier New', monospace;
+    --sans: 'Georgia', serif;
+    --ui: system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1917;
+      --surface: #242320;
+      --surface2: #2e2c28;
+      --border: #3a3835;
+      --border2: #4a4845;
+      --text: #e8e6e0;
+      --text2: #a8a5a0;
+      --text3: #6a6865;
+      --accent: #6aaed8;
+      --accent2: #4a90cc;
+      --accent-bg: #1a2d3d;
+      --danger: #e88080;
+      --danger-bg: #2d1a1a;
+      --danger-border: #5a2a2a;
+      --warn: #e8b860;
+      --warn-bg: #2d2210;
+      --warn-border: #5a4020;
+      --ok: #70c880;
+      --ok-bg: #1a2d1e;
+      --ok-border: #2a5030;
+      --info: #80b8e8;
+      --info-bg: #1a2535;
+      --info-border: #2a4560;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--ui); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+  
+  header { background: var(--accent); color: #e8f0f7; padding: 16px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 2px solid #0d3050; }
+  header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.03em; font-family: var(--sans); }
+  header .sub { font-size: 11px; opacity: 0.7; margin-top: 1px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .hdr-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .card-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 10px; }
+
+  .search-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+  .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+  .field label { font-size: 11px; color: var(--text2); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+  input[type=text], select { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: var(--ui); width: 100%; outline: none; transition: border-color 0.15s; }
+  input[type=text]:focus, select:focus { border-color: var(--accent2); box-shadow: 0 0 0 2px rgba(37,99,160,0.15); }
+  select option { background: var(--surface); }
+  
+  .btn { padding: 8px 18px; border-radius: 5px; border: 1px solid var(--accent2); background: var(--accent); color: #e8f0f7; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--ui); transition: background 0.15s, opacity 0.15s; white-space: nowrap; }
+  .btn:hover { background: var(--accent2); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--accent); }
+  .btn-ghost:hover { background: var(--accent-bg); }
+
+  .forms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; margin-top: 8px; }
+  .form-chip { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--text2); background: var(--surface2); transition: all 0.15s; user-select: none; }
+  .form-chip:hover { border-color: var(--accent2); color: var(--text); }
+  .form-chip.active { border-color: var(--accent2); background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+  .form-chip input { width: 13px; height: 13px; flex-shrink: 0; accent-color: var(--accent2); }
+
+  .api-key-row { display: flex; gap: 8px; align-items: flex-end; }
+  .api-key-row .field { flex: 1; }
+  .key-status { font-size: 11px; margin-top: 4px; }
+  .key-status.set { color: var(--ok); }
+  .key-status.unset { color: var(--text3); }
+
+  .status-bar { padding: 8px 14px; border-radius: 5px; font-size: 12px; margin-bottom: 12px; display: none; }
+  .status-bar.loading { display: block; background: var(--info-bg); border: 1px solid var(--info-border); color: var(--info); }
+  .status-bar.error { display: block; background: var(--danger-bg); border: 1px solid var(--danger-border); color: var(--danger); }
+
+  .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #results { display: none; }
+  .compound-header { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .compound-name { flex: 1; min-width: 200px; }
+  .compound-name h2 { font-size: 20px; font-weight: 600; font-family: var(--sans); color: var(--text); }
+  .compound-name .iupac { font-size: 12px; color: var(--text3); margin-top: 2px; font-family: var(--mono); word-break: break-all; }
+  .compound-ids { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .id-badge { font-size: 11px; padding: 2px 8px; border-radius: 12px; font-family: var(--mono); font-weight: 500; }
+  .id-badge.cid { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+  .id-badge.cas { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .id-badge.form { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin: 16px 0 0; overflow-x: auto; }
+  .tab { padding: 8px 16px; font-size: 12px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text2); white-space: nowrap; transition: color 0.15s; margin-bottom: -1px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tab:hover { color: var(--text); }
+  .tab.active { border-bottom-color: var(--accent2); color: var(--accent); }
+  .tab-panel { display: none; padding: 14px 0; }
+  .tab-panel.active { display: block; }
+
+  .ghs-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+  .ghs-pic { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .ghs-pic img { width: 48px; height: 48px; }
+  .ghs-pic span { font-size: 10px; color: var(--text3); text-align: center; max-width: 56px; }
+  .signal-word { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+  .signal-word.danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+  .signal-word.warning { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+
+  .h-statements { margin: 10px 0; }
+  .h-stmt { display: flex; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .h-stmt:last-child { border-bottom: none; }
+  .h-code { font-family: var(--mono); font-weight: 600; color: var(--danger); min-width: 40px; flex-shrink: 0; }
+  .h-text { color: var(--text2); }
+
+  .props-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+  .prop-item { background: var(--surface2); border-radius: 6px; padding: 10px 12px; border: 1px solid var(--border); }
+  .prop-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); font-weight: 600; margin-bottom: 3px; }
+  .prop-val { font-size: 14px; color: var(--text); font-family: var(--mono); }
+  .prop-val.na { color: var(--text3); font-style: italic; font-family: var(--ui); font-size: 12px; }
+
+  .wels-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .wels-table th { text-align: left; padding: 6px 10px; border-bottom: 2px solid var(--border2); color: var(--text3); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; background: var(--surface2); }
+  .wels-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .wels-table tr:hover td { background: var(--surface2); }
+  .wels-table .val { font-family: var(--mono); font-weight: 600; color: var(--accent); }
+  .wels-table .skin { font-size: 10px; background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+  .wels-table .sens { font-size: 10px; background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+  .wels-table .carc { font-size: 10px; background: #f0e8f8; color: #5a1a8a; border: 1px solid #c8a8e0; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+
+  .ctx-block { margin-bottom: 12px; }
+  .ctx-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 6px; }
+  .tox-row { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; align-items: baseline; flex-wrap: wrap; }
+  .tox-row:last-child { border-bottom: none; }
+  .tox-src { min-width: 90px; color: var(--text3); font-size: 11px; flex-shrink: 0; }
+  .tox-val { font-family: var(--mono); font-weight: 600; color: var(--accent); margin-right: 4px; }
+  .tox-desc { color: var(--text2); flex: 1; }
+  .tox-species { font-size: 11px; color: var(--text3); margin-left: auto; }
+
+  .form-panel { margin-bottom: 16px; }
+  .form-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+  .form-tab { padding: 4px 12px; font-size: 11px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; font-weight: 500; transition: all 0.15s; }
+  .form-tab:hover { border-color: var(--accent2); color: var(--text); }
+  .form-tab.active { background: var(--accent-bg); border-color: var(--accent2); color: var(--accent); }
+  .form-note { font-size: 12px; color: var(--text2); padding: 8px 12px; background: var(--surface2); border-radius: 5px; border-left: 3px solid var(--accent2); margin-bottom: 10px; }
+
+  .no-data { color: var(--text3); font-size: 12px; font-style: italic; padding: 12px 0; }
+  .source-tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 600; letter-spacing: 0.03em; }
+  .src-pubchem { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+  .src-epa { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-border); }
+  .src-eh40 { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+
+  .section-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .section-head h3 { font-size: 13px; font-weight: 600; color: var(--text); }
+
+  footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); margin-top: 24px; }
+
+  .export-bar { display: flex; align-items: center; gap: 8px; padding: 10px 0 2px; flex-wrap: wrap; }
+  .reg-banner { border-radius: 7px; padding: 12px 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.6; }
+  .reg-banner.red { background: var(--danger-bg); border: 1.5px solid var(--danger-border); color: var(--danger); }
+  .reg-banner.amber { background: var(--warn-bg); border: 1.5px solid var(--warn-border); color: var(--warn); }
+  .reg-banner.green { background: var(--ok-bg); border: 1px solid var(--ok-border); color: var(--ok); }
+  .reg-banner-title { font-weight: 700; font-size: 12px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .reg-banner label { display: flex; align-items: flex-start; gap: 8px; margin-top:8px; cursor: pointer; font-size:12px; }
+  .reg-banner input[type=checkbox] { width:15px; height:15px; flex-shrink:0; margin-top:1px; accent-color: var(--ok); }
+  .ai-summary { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+  .ai-summary-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .ai-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-border); }
+  .ai-section { margin-bottom: 10px; }
+  .ai-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 4px; }
+  .ai-section-body { font-size: 13px; color: var(--text2); line-height: 1.65; }
+  .ai-thinking { display: flex; align-items: center; gap: 8px; padding: 14px; font-size: 12px; color: var(--text3); font-style: italic; }
+  .btn-curate { padding: 7px 16px; border-radius: 5px; border: 1px solid var(--ok-border); background: var(--ok-bg); color: var(--ok); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--ui); transition: all 0.15s; }
+  .btn-curate:hover { background: var(--ok); color: white; border-color: var(--ok); }
+  .btn-curate:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-toggle-full { font-size: 11px; color: var(--accent2); background: none; border: none; cursor: pointer; padding: 0; text-decoration: underline; font-family: var(--ui); }
+  .lcss-section { margin-bottom: 14px; }
+  .lcss-section-title { font-size: 12px; font-weight: 600; color: var(--text); padding: 7px 12px; background: var(--surface2); border-left: 3px solid var(--accent2); border-radius: 0 5px 5px 0; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .lcss-item { font-size: 12px; color: var(--text2); padding: 4px 0 4px 12px; border-bottom: 1px solid var(--border); line-height: 1.6; }
+  .lcss-item:last-child { border-bottom: none; }
+  .lcss-item strong { color: var(--text); font-weight: 500; }
+  .lcss-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .lcss-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .lcss-card-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 6px; }
+  .lcss-card-body { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .export-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); font-weight: 600; margin-right: 4px; }
+  .btn-export { padding: 5px 14px; border-radius: 5px; border: 1px solid var(--border2); background: var(--surface2); color: var(--text2); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--ui); letter-spacing: 0.04em; transition: all 0.15s; text-transform: uppercase; }
+  .btn-export:hover { border-color: var(--accent2); color: var(--accent); background: var(--accent-bg); }
+
+  @media (max-width: 600px) {
+    .search-row { flex-direction: column; }
+    .props-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">&#9763;</div>
+  <div style="flex:1">
+    <h1>Hazard Profile Tool</h1>
+    <div class="sub">PubChem &bull; EPA CTX &bull; EH40 WEL Database &bull; AI Safety Curation</div>
+  </div>
+  <nav style="display:flex;gap:12px;align-items:center;flex-shrink:0">
+    <a href="index.html" style="color:#a8c8e8;font-size:12px;text-decoration:none;opacity:0.85;white-space:nowrap">&#8592; coshh.uk</a>
+    <a href="app.html" style="color:#fff;font-size:12px;background:rgba(255,255,255,0.15);padding:5px 12px;border-radius:4px;text-decoration:none;white-space:nowrap">COSHH Form &#8594;</a>
+  </nav>
+</header>
+
+<div class="main">
+
+  <!-- API Config -->
+  <div class="card">
+    <div class="card-title">Data Sources &amp; Configuration</div>
+
+    <!-- CTX key — pre-configured, UI hidden -->
+    <div style="display:none">
+    <div class="api-key-row">
+      <div class="field">
+        <label>EPA CTX API Key <span style="font-weight:400;text-transform:none;color:var(--text3)">(optional — free from <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d3b0b0a7b68cb2a3ba93b6a3b2fdb4bca5">[email&#160;protected]</a>)</span></label>
+        <input type="text" id="ctxKey" placeholder="Paste your CTX API key here" autocomplete="off">
+      </div>
+      <button class="btn btn-ghost" onclick="saveKey('ctx')">Save</button>
+    </div>
+    <div class="key-status unset" id="keyStatus">CTX API key not set — EH40 &amp; PubChem data will still load</div>
+    </div><!-- end hidden CTX key block -->
+
+    <div style="height:12px"></div>
+
+    <!-- AI curation toggle -->
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+      <input type="checkbox" id="aiToggle" style="width:16px;height:16px;accent-color:var(--accent2);cursor:pointer;flex-shrink:0"
+        onchange="toggleAI(this.checked)">
+      <div>
+        <label for="aiToggle" style="font-size:13px;font-weight:500;color:var(--text);cursor:pointer">Enable AI safety curation</label>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">Uses Gemini 1.5 Flash (free tier) to distil the LCSS into a concise lab-scale summary, stripping ERG references and large-scale response data</div>
+      </div>
+    </div>
+
+    <!-- Gemini key — hidden until AI toggled on -->
+    <div id="geminiKeyPanel" style="display:none;margin-top:10px">
+      <div class="api-key-row">
+        <div class="field">
+          <label>Gemini API Key <span style="font-weight:400;text-transform:none;color:var(--text3)">— free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent2)">aistudio.google.com/apikey</a></span></label>
+          <input type="text" id="geminiKey" placeholder="Paste your Gemini API key here (starts with AIzaSy…)" autocomplete="off">
+        </div>
+        <button class="btn btn-ghost" onclick="saveKey('gemini')">Save</button>
+      </div>
+      <div class="key-status unset" id="geminiStatus">Gemini key not set — enter key above to enable AI curation</div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="card">
+    <div class="card-title">Substance Search</div>
+    <div class="search-row">
+      <div class="field" style="flex:2">
+        <label>Chemical name or CAS number</label>
+        <input type="text" id="query" placeholder="e.g. sodium hydroxide, 1310-73-2, acetone…" onkeydown="if(event.key==='Enter')search()">
+      </div>
+      <button class="btn" id="searchBtn" onclick="search()">Look up</button>
+    </div>
+
+    <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+      <div class="field">
+        <label>Operation / process</label>
+        <select id="opSelect" onchange="toggleOtherOp(this.value)">
+          <option value="">— select —</option>
+          <option value="Weighing">Weighing</option>
+          <option value="Dissolving / preparing solution">Dissolving / solution prep</option>
+          <option value="Mixing / stirring">Mixing / stirring</option>
+          <option value="Heating / reflux">Heating / reflux</option>
+          <option value="Grinding / milling / crushing">Grinding / milling / crushing</option>
+          <option value="Transfer / decanting / pipetting">Transfer / decanting</option>
+          <option value="Pressure reaction / autoclave">Pressure reaction / autoclave</option>
+          <option value="Laser processing">Laser processing</option>
+          <option value="Sintering / furnace work">Sintering / furnace work</option>
+          <option value="Pelletisation">Pelletisation</option>
+          <option value="Dissolution in acid">Dissolution in acid</option>
+          <option value="Precipitation / filtration">Precipitation / filtration</option>
+          <option value="Cleaning up / disposal">Cleaning up / disposal</option>
+          <option value="other">Other (specify below)</option>
+        </select>
+        <input type="text" id="opOther" placeholder="Describe operation…" style="display:none;margin-top:6px">
+      </div>
+
+      <div class="field">
+        <label>Quantity</label>
+        <select id="qtySelect" onchange="invalidateLCSSCache()">
+          <option value="">— select —</option>
+          <option value="trace / analytical scale (<1 mg or <1 µl)">Trace / analytical (&lt;1 mg or &lt;1 µl)</option>
+          <option value="small (1 mg – 1 g or 1 µl – 1 ml)">Small (1 mg–1 g / 1–1000 µl)</option>
+          <option value="moderate (1–10 g or 1–10 ml)">Moderate (1–10 g / 1–10 ml)</option>
+          <option value="intermediate (10–100 g or 10–100 ml)">Intermediate (10–100 g / 10–100 ml)</option>
+          <option value="large (100 g – 1 kg or 100 ml – 1 L)">Large (100 g–1 kg / 100 ml–1 L)</option>
+          <option value="bulk (>1 kg or >1 L)">Bulk (&gt;1 kg / &gt;1 L)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Containment / location</label>
+        <select id="containSelect" onchange="invalidateLCSSCache()">
+          <option value="">— select —</option>
+          <option value="fume cupboard (ducted)">Fume cupboard (ducted)</option>
+          <option value="fume cupboard (recirculating)">Fume cupboard (recirculating)</option>
+          <option value="glove box / isolator">Glove box / isolator</option>
+          <option value="open bench with local exhaust ventilation (LEV)">Open bench with LEV</option>
+          <option value="open bench, no LEV">Open bench, no LEV</option>
+          <option value="outdoor / well-ventilated area">Outdoor / well-ventilated</option>
+          <option value="enclosed system (closed vessel, no exposure expected)">Enclosed system</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusBar"></div>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="card">
+      <div class="compound-header">
+        <div class="compound-name">
+          <h2 id="cmpName">—</h2>
+          <div class="iupac" id="cmpIupac"></div>
+          <div class="compound-ids" id="cmpIds"></div>
+        </div>
+        <div id="ghs-pics" class="ghs-grid"></div>
+      </div>
+
+      <!-- Regulatory scope banners — shown/hidden by JS -->
+      <div id="regBanners" style="margin-top:12px"></div>
+
+      <div class="tabs" id="tabBar">
+        <div class="tab active" onclick="switchTab('hazard',this)">GHS / Hazard</div>
+        <div class="tab" onclick="switchTab('lcss',this)">Safety Summary</div>
+        <div class="tab" onclick="switchTab('wels',this)">EH40 WELs</div>
+        <div class="tab" onclick="switchTab('ctx',this)">EPA Toxicity</div>
+        <div class="tab" onclick="switchTab('props',this)">Physical Props</div>
+      </div>
+
+      <div class="tab-panel active" id="tab-hazard"></div>
+      <div class="tab-panel" id="tab-lcss"></div>
+      <div class="tab-panel" id="tab-wels"></div>
+      <div class="tab-panel" id="tab-ctx"></div>
+      <div class="tab-panel" id="tab-props"></div>
+
+      <div class="export-bar">
+        <span class="export-label">Export</span>
+        <button class="btn-export" onclick="exportCSV()">CSV</button>
+        <button class="btn-export" onclick="exportJSON()">JSON</button>
+        <button class="btn-export" onclick="exportPDF()">PDF Report</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Data sources: PubChem (NIH/NCBI) &bull; EPA CTX API (CompTox) &bull; EH40 Workplace Exposure Limits (HSE/GB) &bull; This tool is for reference only — always consult current SDS and regulatory guidance.
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+let EH40 = [];
+let EH40_SYNONYMS = {};
+let eh40Loaded = false;
+
+async function loadEH40Data(){
+  try {
+    const r = await fetch('./eh40_data.json');
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    EH40 = data.EH40;
+    EH40_SYNONYMS = data.EH40_SYNONYMS;
+    eh40Loaded = true;
+  } catch(e){
+    console.error('Failed to load EH40 data:', e);
+    const bar = document.getElementById('statusBar');
+    if(bar){
+      bar.className = 'status-bar error';
+      bar.innerHTML = '<strong>Warning:</strong> Could not load eh40_data.json — WEL lookups unavailable. Ensure the file is in the same directory as this page.';
+    }
+  }
+}
+
+
+
+
+let currentData = {};
+let ctxApiKey = localStorage.getItem('ctxApiKey') || '4322d98f-7bb0-4f66-889e-3ce7dfe056d2';
+let geminiApiKey = localStorage.getItem('geminiApiKey') || '';
+let lcssShowFull = false;
+
+let aiEnabled = localStorage.getItem('aiEnabled') === 'true';
+
+// Init
+(function init(){
+  loadEH40Data();
+  if(ctxApiKey){ updateKeyStatus(true); }
+  if(geminiApiKey){ document.getElementById('geminiKey').value=geminiApiKey; updateGeminiStatus(true); }
+  const toggle = document.getElementById('aiToggle');
+  toggle.checked = aiEnabled;
+  if(aiEnabled) document.getElementById('geminiKeyPanel').style.display = 'block';
+  if(location.protocol === 'file:'){
+    const warn = document.createElement('div');
+    warn.style.cssText = 'background:#fdf4e7;border:1px solid #f0d090;border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#7a4a00';
+    warn.innerHTML = '<strong>Note:</strong> This tool is running from a local file. Some browsers block external API calls in this mode. Serve via a local web server or deploy to your web host.';
+    document.querySelector('.main').prepend(warn);
+  }
+})();
+
+function toggleAI(checked){
+  aiEnabled = checked;
+  localStorage.setItem('aiEnabled', checked);
+  document.getElementById('geminiKeyPanel').style.display = checked ? 'block' : 'none';
+  // If we have data loaded, re-render the LCSS tab immediately
+  if(currentData.cid) renderLCSSTab();
+}
+
+// ─── REGULATORY SCOPE DATA ───────────────────────────────────────────────────
+
+// CAS prefixes / exact CAS for substance-based triggers
+const REG_TRIGGERS = {
+  asbestos: {
+    label: 'Asbestos',
+    cas: ['1332-21-4','12001-28-4','12172-73-5','77536-66-4','77536-67-5','77536-68-6','132207-32-0'],
+    names: ['asbestos','chrysotile','amosite','crocidolite','actinolite','tremolite','anthophyllite'],
+    regulation: 'Control of Asbestos Regulations 2012 (CAR 2012)',
+    type: 'red',
+    message: 'CAR 2012 applies <strong>instead of COSHH</strong> for asbestos work. A standard COSHH assessment is not sufficient. Specialist asbestos assessment, licensed contractor involvement, and notifiable non-licensed work (NNLW) procedures may be required.',
+  },
+  lead: {
+    label: 'Lead compound',
+    cas: ['7439-92-1','1317-36-8','1314-87-0','598-63-0','7758-97-6','1344-37-2','7446-27-7'],
+    names: ['lead ','lead(','plumbum','lead acetate','lead nitrate','lead oxide','lead sulfate','lead chromate'],
+    regulation: 'Control of Lead at Work Regulations 2002 (CLAW)',
+    type: 'amber',
+    message: 'CLAW 2002 applies <strong>in addition to COSHH</strong> for lead and lead compounds. Additional requirements include: biological monitoring (blood lead levels), specific action and suspension levels, medical surveillance, and enhanced control measures. Both a COSHH assessment and CLAW compliance are required.',
+  },
+  silica: {
+    label: 'Crystalline silica',
+    cas: ['14808-60-7','14464-46-1','15468-32-3'],
+    names: ['silica, respirable crystalline','quartz','cristobalite','tridymite'],
+    regulation: 'COSHH Regulation 7(5) — Carcinogen',
+    type: 'amber',
+    message: 'Respirable crystalline silica is classified as a carcinogen under COSHH. Regulation 7(5) requires exposure to be reduced to as low as reasonably practicable (ALARP), not merely below the WEL of 0.1 mg·m⁻³. Enhanced control measures, health surveillance, and exposure monitoring are required.',
+  },
+};
+
+// Process-based triggers from operation dropdown
+const PROCESS_TRIGGERS = {
+  pressure: {
+    match: ['pressure reaction','autoclave'],
+    label: 'Pressure system',
+    regulation: 'Pressure Systems Safety Regulations 2000 (PSSR 2000)',
+    type: 'amber',
+    message: 'PSSR 2000 applies <strong>in addition to COSHH</strong> for pressure reactions and autoclave work. A written scheme of examination, competent person assessment, and safe operating limits documentation are required separately from the COSHH assessment.',
+  },
+  laser: {
+    match: ['laser'],
+    label: 'Laser processing',
+    regulation: 'MHSWR 1999 / BS EN 60825-1 Laser Safety',
+    type: 'amber',
+    message: 'Laser use requires a separate Laser Risk Assessment and Local Rules under BS EN 60825-1. A Laser Safety Officer (LSO) must be appointed. This is required <strong>in addition to</strong> any COSHH assessment for chemical hazards associated with the process.',
+  },
+};
+
+function toggleOtherOp(val){
+  document.getElementById('opOther').style.display = val === 'other' ? 'block' : 'none';
+  invalidateLCSSCache();
+}
+
+function invalidateLCSSCache(){
+  if(currentData.cid){
+    sessionStorage.removeItem(`lcss_curated_${currentData.cid}`);
+    // Re-render banners so process triggers update immediately
+    renderRegBanners(currentData.cas, currentData.query + ' ' + (currentData.props?.IUPACName||''));
+    if(aiEnabled && geminiApiKey) renderLCSSTab();
+  }
+}
+
+function getUseContext(){
+  const opSel = document.getElementById('opSelect').value;
+  const opOther = document.getElementById('opOther').value.trim();
+  const op = opSel === 'other' ? (opOther || 'unspecified operation') : (opSel || '');
+  const qty = document.getElementById('qtySelect').value || '';
+  const contain = document.getElementById('containSelect').value || '';
+  return {op, qty, contain};
+}
+
+function renderRegBanners(cas, name){
+  const bannerEl = document.getElementById('regBanners');
+  const {op} = getUseContext();
+  let html = '';
+
+  // Always show radioactive confirmation banner
+  const radConfirmed = document.getElementById('radConfirm')?.checked || false;
+  html += `<div class="reg-banner ${radConfirmed ? 'green' : 'red'}" id="radBanner">
+    <div class="reg-banner-title">⚠ Radioactive / ionising radiation check — IRR17 &amp; EPR</div>
+    <div>If this substance is radioactive or contains radioactive components, a <strong>COSHH assessment alone is insufficient</strong>. 
+    Both a COSHH assessment <strong>and</strong> a Radiation Risk Assessment (RRA) are required under IRR17 and EPR. 
+    RPS involvement is required; RPA involvement may also be required depending on the nature and activity of the material. 
+    Contact your RPS before proceeding.</div>
+    <label>
+      <input type="checkbox" id="radConfirm" ${radConfirmed?'checked':''} onchange="updateRadBanner(this.checked)">
+      <span>I confirm this substance is <strong>not radioactive</strong> — or I confirm that a separate RRA has been or will be completed under IRR17/EPR and the RPS has been informed.</span>
+    </label>
+  </div>`;
+
+  // Substance-based triggers
+  const casLower = (cas||'').toLowerCase();
+  const nameLower = (name||'').toLowerCase();
+  for(const [key, trig] of Object.entries(REG_TRIGGERS)){
+    const casHit = trig.cas.some(c => casLower === c.toLowerCase());
+    const nameHit = trig.names.some(n => nameLower.includes(n.toLowerCase()));
+    if(casHit || nameHit){
+      html += `<div class="reg-banner ${trig.type}">
+        <div class="reg-banner-title">⚠ ${trig.label} detected — ${trig.regulation}</div>
+        <div>${trig.message}</div>
+      </div>`;
+    }
+  }
+
+  // Process-based triggers
+  if(op){
+    const opLower = op.toLowerCase();
+    for(const [key, trig] of Object.entries(PROCESS_TRIGGERS)){
+      if(trig.match.some(m => opLower.includes(m))){
+        html += `<div class="reg-banner ${trig.type}">
+          <div class="reg-banner-title">⚠ ${trig.label} — ${trig.regulation}</div>
+          <div>${trig.message}</div>
+        </div>`;
+      }
+    }
+  }
+
+  bannerEl.innerHTML = html;
+}
+
+function updateRadBanner(checked){
+  const banner = document.getElementById('radBanner');
+  if(!banner) return;
+  banner.className = `reg-banner ${checked ? 'green' : 'red'}`;
+}
+
+function saveKey(which){
+  if(which==='ctx'){
+    const k = document.getElementById('ctxKey').value.trim();
+    ctxApiKey = k;
+    localStorage.setItem('ctxApiKey', k);
+    updateKeyStatus(!!k);
+  } else {
+    const k = document.getElementById('geminiKey').value.trim();
+    geminiApiKey = k;
+    localStorage.setItem('geminiApiKey', k);
+    updateGeminiStatus(!!k);
+  }
+}
+
+function updateGeminiStatus(set){
+  const el = document.getElementById('geminiStatus');
+  el.className = 'key-status ' + (set?'set':'unset');
+  el.textContent = set ? 'Gemini key saved — AI safety curation enabled' : 'Gemini key not set — AI safety curation unavailable, full LCSS will be shown';
+}
+
+function updateKeyStatus(set){
+  const el = document.getElementById('keyStatus');
+  el.className = 'key-status ' + (set?'set':'unset');
+  el.textContent = set ? 'CTX API key saved — EPA toxicity data enabled' : 'CTX API key not set — EH40 & PubChem data will still load';
+}
+
+function setStatus(msg, type){
+  const b = document.getElementById('statusBar');
+  b.className = 'status-bar ' + type;
+  b.innerHTML = type==='loading' ? `<span class="spinner"></span>${msg}` : msg;
+}
+
+function clearStatus(){ document.getElementById('statusBar').className='status-bar'; }
+
+async function search(){
+  const q = document.getElementById('query').value.trim();
+  if(!q) return;
+  document.getElementById('searchBtn').disabled = true;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('regBanners').innerHTML = '';
+  lcssShowFull = false;
+  setStatus('Searching PubChem...', 'loading');
+  try {
+    await fetchAll(q);
+  } catch(e){
+    console.error('Search error:', e);
+    setStatus(`<strong>Error:</strong> ${e.message}`, 'error');
+  }
+  document.getElementById('searchBtn').disabled = false;
+}
+
+async function pugFetch(url){
+  const res = await fetch(url);
+  if(!res.ok){
+    const txt = await res.text().catch(()=>'');
+    throw new Error(`PubChem request failed (HTTP ${res.status}): ${url.split('?')[0]}\n${txt.slice(0,200)}`);
+  }
+  return res.json();
+}
+
+async function fetchAll(q){
+  // 1. PubChem: resolve CID
+  setStatus('Resolving compound in PubChem...', 'loading');
+  let cidData;
+  try {
+    cidData = await pugFetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(q)}/cids/JSON`);
+  } catch(e) {
+    throw new Error(`Could not find "${q}" in PubChem. Check the name or try a CAS number. (${e.message})`);
+  }
+  const cid = cidData.IdentifierList?.CID?.[0];
+  if(!cid) throw new Error(`No CID returned for "${q}"`);
+
+  // 2. Parallelise: properties + synonyms + physical description simultaneously
+  setStatus('Fetching properties, synonyms & safety data...', 'loading');
+  const [propsResult, synResult, pdResult] = await Promise.allSettled([
+    pugFetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/IUPACName,MolecularFormula,MolecularWeight,XLogP,TPSA,HBondDonorCount,HBondAcceptorCount,RotatableBondCount,ExactMass,Charge/JSON`),
+    pugFetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/synonyms/JSON`),
+    pugFetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/${cid}/JSON?heading=Physical+Description`),
+  ]);
+
+  const props = propsResult.status === 'fulfilled'
+    ? (propsResult.value.PropertyTable?.Properties?.[0] || {})
+    : (console.warn('Props fetch failed:', propsResult.reason), {});
+
+  let cas = '';
+  if(synResult.status === 'fulfilled'){
+    const syns = synResult.value.InformationList?.Information?.[0]?.Synonym || [];
+    cas = syns.find(s => /^\d{2,7}-\d{2}-\d$/.test(s)) || '';
+  } else { console.warn('Synonyms fetch failed:', synResult.reason); }
+
+  const physProps = pdResult.status === 'fulfilled'
+    ? parsePhysProps(pdResult.value)
+    : (console.warn('Physical props fetch failed:', pdResult.reason), {});
+
+  // 3. GHS + LCSS — try Safety+Hazards heading first, fall back to full record
+  setStatus('Fetching GHS classification & LCSS...', 'loading');
+  let ghs = { signal:'', pictograms:[], hstatements:[] };
+  let lcssData = null;
+
+  const safetyUrls = [
+    `https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/${cid}/JSON?heading=Safety+and+Hazards`,
+    `https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/${cid}/JSON`,
+  ];
+
+  for(const url of safetyUrls){
+    try {
+      const safetyData = await pugFetch(url);
+      if(safetyData?.Record){
+        // Guard against extremely large LCSS payloads: truncate if needed
+        const payloadSize = JSON.stringify(safetyData).length;
+        if(payloadSize > 3_000_000){
+          console.warn(`LCSS payload large (${(payloadSize/1e6).toFixed(1)} MB) — storing reference only`);
+          lcssData = { Record: { Section: safetyData.Record.Section?.slice(0, 20) || [] }, _truncated: true };
+        } else {
+          lcssData = safetyData;
+        }
+        const parsed = parseGHS(safetyData);
+        if(parsed.pictograms.length || parsed.hstatements.length || parsed.signal){
+          ghs = parsed;
+          console.log(`GHS from ${url}: ${parsed.pictograms.length} pics, ${parsed.hstatements.length} H-stmts, signal="${parsed.signal}"`);
+          break;
+        } else {
+          console.warn(`GHS parse found nothing from ${url}, trying next...`);
+        }
+      }
+    } catch(e) { console.warn(`Safety fetch failed for ${url}:`, e.message); }
+  }
+
+  // 4. EH40 lookup (synchronous — in-memory)
+  const welMatches = lookupEH40(q, cas, props.IUPACName);
+
+  // 5. Render immediately with PubChem data — don't wait for EPA
+  currentData = { cid, props, ghs, cas, welMatches, ctxData: null, physProps, lcssData, query: q };
+  clearStatus();
+  renderResults();
+
+  // 6. EPA CTX — fetch in background and update when ready (non-blocking)
+  if(ctxApiKey){
+    setStatus('Querying EPA CTX API (background)...', 'loading');
+    fetchCTX(q, cas).then(ctxData => {
+      currentData.ctxData = ctxData;
+      renderCTXTab();
+      clearStatus();
+    }).catch(e => {
+      console.warn('CTX error:', e);
+      clearStatus();
+    });
+  }
+}
+
+function parseGHS(data){
+  let signal='', pictograms=[], hstatements=[];
+  try {
+    function walkSections(sections){
+      for(const s of (sections||[])){
+        const h = (s.TOCHeading||'').toLowerCase();
+
+        // Pictograms — match any heading containing 'pictogram'
+        if(h.includes('pictogram')){
+          for(const i of (s.Information||[])){
+            for(const v of (i.Value?.StringWithMarkup||[])){
+              for(const m of (v.Markup||[])){
+                if(m.URL && m.URL.includes('GHS')){
+                  const match = m.URL.match(/GHS(\d+)/);
+                  if(match){
+                    const label = m.Extra || ('GHS'+match[1]);
+                    if(!pictograms.find(p=>p.code==='GHS'+match[1]))
+                      pictograms.push({code:'GHS'+match[1], label, url:m.URL});
+                  }
+                }
+              }
+              // Also check StringWithMarkup type=Icon entries
+              if(v.Markup){
+                for(const m of v.Markup){
+                  if(m.Type==='Icon' && m.URL && m.URL.includes('GHS')){
+                    const match = m.URL.match(/GHS(\d+)/);
+                    if(match && !pictograms.find(p=>p.code==='GHS'+match[1]))
+                      pictograms.push({code:'GHS'+match[1], label:m.Extra||('GHS'+match[1]), url:m.URL});
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Signal word
+        if(h.includes('signal')){
+          for(const i of (s.Information||[])){
+            const v = (i.Value?.StringWithMarkup||[])[0]?.String||'';
+            if(v && !signal) signal = v;
+          }
+        }
+
+        // Hazard statements — match 'hazard statement' or 'h statement'
+        if(h.includes('hazard statement') || h==='hazard'){
+          for(const i of (s.Information||[])){
+            for(const v of (i.Value?.StringWithMarkup||[])){
+              const txt = (v.String||'').trim();
+              if(!txt) continue;
+              // Format: "H225 Highly flammable liquid" or "H225: Highly..."
+              const m = txt.match(/^(H\d+[A-Za-z+i]*)[:\s]+(.*)/);
+              if(m) hstatements.push({code:m[1].toUpperCase(), text:m[2].trim()});
+              else if(txt.match(/^H\d+/)) hstatements.push({code:txt, text:''});
+              else hstatements.push({code:'', text:txt});
+            }
+          }
+        }
+
+        // Recurse
+        if(s.Section) walkSections(s.Section);
+      }
+    }
+
+    const topSections = data.Record?.Section || [];
+    walkSections(topSections);
+
+    // Deduplicate hazard statements by code+text
+    const seen = new Set();
+    hstatements = hstatements.filter(h=>{
+      const key = h.code+h.text;
+      if(seen.has(key)) return false;
+      seen.add(key); return true;
+    });
+
+    console.log(`parseGHS: signal="${signal}", ${pictograms.length} pictograms, ${hstatements.length} H-statements`);
+
+  } catch(e){ console.warn('parseGHS error:', e); }
+  return {signal, pictograms, hstatements};
+}
+
+function parsePhysProps(data){
+  const props = {};
+  try {
+    const sections = data.Record.Section||[];
+    function walk(s){
+      if(s.Information){
+        for(const i of s.Information){
+          if(i.Name && i.Value?.StringWithMarkup?.[0]?.String){
+            props[i.Name] = i.Value.StringWithMarkup[0].String;
+          }
+        }
+      }
+      if(s.Section) s.Section.forEach(walk);
+    }
+    sections.forEach(walk);
+  }catch(e){}
+  return props;
+}
+
+
+
+function lookupEH40(query, cas, iupac){
+  const q = (query||'').toLowerCase().trim();
+  // Normalise CAS: strip hyphens/spaces for dash-free comparison
+  const normCAS = s => (s||'').replace(/[-\s]/g,'');
+  const qCASNorm = normCAS(cas);
+  const matches = [];
+  const seen = new Set();
+
+  // Resolve synonym → canonical search term
+  let synonymTarget = null;
+  let synonymMatched = false;
+  for(const [syn, target] of Object.entries(EH40_SYNONYMS)){
+    if(q === syn || q.startsWith(syn+' ') || q.endsWith(' '+syn)){
+      synonymTarget = target; // may be null (known non-WEL substance)
+      synonymMatched = true;
+      break;
+    }
+  }
+  // If synonym maps to null, it's a known substance with no EH40 WEL
+  if(synonymMatched && synonymTarget === null){
+    return []; // return empty — no WEL, user will see the "no WEL found" message
+  }
+  const effectiveQ = synonymTarget || q;
+
+  for(const r of EH40){
+    const name = r[0].toLowerCase();
+    const rcas = (r[1]||'').trim();
+    const rcasNorm = normCAS(rcas);
+
+    // 1. CAS match (normalised — handles input "64175" vs "64-17-5")
+    const casExact = qCASNorm && rcasNorm && qCASNorm === rcasNorm;
+
+    // 2. Query string itself looks like a CAS number — match against EH40
+    const queryCAS = normCAS(q);
+    const queryCASMatch = /^\d{5,9}$/.test(queryCAS) && rcasNorm && queryCAS === rcasNorm;
+
+    // 3. Exact name match
+    const nameExact = name === effectiveQ;
+
+    // 4. Name starts with effectiveQ (at least 5 chars to avoid false positives)
+    const nameStartsWith = effectiveQ.length >= 5 && name.startsWith(effectiveQ);
+
+    // 5. Synonym partial: effectiveQ is contained at start of name
+    const synPartial = synonymTarget && effectiveQ.length >= 4 && name.includes(effectiveQ);
+
+    // 6. IUPAC exact match
+    const iupacExact = iupac && name === (iupac||'').toLowerCase().trim();
+
+    if(casExact || queryCASMatch || nameExact || nameStartsWith || synPartial || iupacExact){
+      const key = r[0]+rcas;
+      if(!seen.has(key)){ seen.add(key); matches.push(r); }
+    }
+  }
+
+  // If no match yet, try word-boundary search on original query
+  if(matches.length === 0 && q.length >= 4){
+    const escaped = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const wordBoundary = new RegExp(`(^|\\s|,|-)${escaped}(\\s|,|-|\\(|$)`);
+    for(const r of EH40){
+      const name = r[0].toLowerCase();
+      if(wordBoundary.test(name)){
+        const key = r[0]+(r[1]||'');
+        if(!seen.has(key)){ seen.add(key); matches.push(r); }
+      }
+    }
+  }
+
+  return matches;
+}
+
+async function fetchCTX(query, cas){
+  const id = cas || query;
+  const headers = { 'x-api-key': ctxApiKey };
+  
+  // Search for DTXSID
+  const searchRes = await fetch(`https://api-ccte.epa.gov/chemical/search/equal/${encodeURIComponent(id)}`, {headers});
+  if(!searchRes.ok) return null;
+  const searchData = await searchRes.json();
+  if(!searchData || !searchData.length) return null;
+  const dtxsid = searchData[0].dtxsid;
+  if(!dtxsid) return null;
+
+  // Fetch hazard data
+  const hazRes = await fetch(`https://api-ccte.epa.gov/hazard/human/search/by-dtxsid/${dtxsid}`, {headers});
+  if(!hazRes.ok) return { dtxsid, hazard: [] };
+  const hazData = await hazRes.json();
+
+  return { dtxsid, hazard: hazData||[], source: searchData[0] };
+}
+
+// Escape user-supplied strings before inserting into innerHTML to prevent XSS
+function escapeHtml(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderResults(){
+  const d = currentData;
+  document.getElementById('results').style.display = 'block';
+
+  // Header
+  document.getElementById('cmpName').textContent = d.query.charAt(0).toUpperCase()+d.query.slice(1);
+  document.getElementById('cmpIupac').textContent = d.props.IUPACName || '';
+  const idsEl = document.getElementById('cmpIds');
+  idsEl.innerHTML = `<span class="id-badge cid">CID: ${d.cid}</span>` +
+    (d.cas ? `<span class="id-badge cas">CAS: ${d.cas}</span>` : '') +
+    `<span class="id-badge cas">MW: ${parseFloat(d.props.MolecularWeight||0).toFixed(2)} g/mol</span>` +
+    `<span class="id-badge cas">Formula: ${d.props.MolecularFormula||'—'}</span>`;
+
+  // Regulatory banners
+  renderRegBanners(d.cas, d.query + ' ' + (d.props.IUPACName||''));
+
+  // GHS pictograms (updated later by renderHazardTab)
+  document.getElementById('ghs-pics').innerHTML = '';
+
+  renderHazardTab();
+  renderLCSSTab();
+  renderWELsTab();
+  renderCTXTab();
+  renderPropsTab();
+}
+
+function renderHazardTab(){
+  const d = currentData;
+
+  // Build GHS data — prefer direct fetch, fall back to LCSS sections
+  let signal = d.ghs?.signal || '';
+  let pictograms = d.ghs?.pictograms || [];
+  let hstatements = d.ghs?.hstatements || [];
+  let ghsSource = 'PubChem (GHS C&L)';
+
+  // If direct GHS fetch was empty, mine the LCSS for it
+  if(!signal && !hstatements.length && d.lcssData){
+    const lcss = parseLCSS(d.lcssData);
+
+    // Extract signal word and H-statements from GHS/hazard sections
+    const ghsSec = lcss['ghs'] || lcss['hazard'] || null;
+    if(ghsSec){
+      for(const item of ghsSec.items){
+        const txt = item.text || '';
+        // Signal word
+        if(!signal && /^(danger|warning)$/i.test(txt.trim())) signal = txt.trim();
+        // H-statements
+        const m = txt.match(/^(H\d+[A-Za-z+i]*)[:\s]+(.*)/);
+        if(m) hstatements.push({code: m[1].toUpperCase(), text: m[2].trim()});
+      }
+      if(signal || hstatements.length) ghsSource = 'PubChem LCSS (parsed)';
+    }
+
+    // Extract pictogram URLs directly from the raw LCSS record
+    if(!pictograms.length){
+      function findPics(sections){
+        for(const s of (sections||[])){
+          const h = (s.TOCHeading||'').toLowerCase();
+          if(h.includes('pictogram')){
+            for(const i of (s.Information||[])){
+              for(const v of (i.Value?.StringWithMarkup||[])){
+                for(const mk of (v.Markup||[])){
+                  if((mk.URL||'').includes('GHS') || mk.Type==='Icon'){
+                    const match = (mk.URL||'').match(/GHS(\d+)/);
+                    if(match && !pictograms.find(p=>p.code==='GHS'+match[1])){
+                      pictograms.push({code:'GHS'+match[1], label:mk.Extra||('GHS'+match[1]), url:mk.URL});
+                    }
+                  }
+                }
+              }
+            }
+          }
+          if(s.Section) findPics(s.Section);
+        }
+      }
+      findPics(d.lcssData?.Record?.Section||[]);
+    }
+  }
+
+  // If pictograms are STILL empty, derive them from H-statements
+  // H-code → GHS pictogram mapping per UN GHS Purple Book
+  if(!pictograms.length && hstatements.length){
+    const H_TO_GHS = {
+      // GHS01 Exploding bomb
+      GHS01: ['H200','H201','H202','H203','H204','H205','H240','H241'],
+      // GHS02 Flame
+      GHS02: ['H224','H223','H222','H221','H220','H225','H226','H228','H241','H242','H250','H251','H252','H260','H261'],
+      // GHS03 Flame over circle (oxidiser)
+      GHS03: ['H270','H271','H272'],
+      // GHS04 Gas cylinder
+      GHS04: ['H280','H281'],
+      // GHS05 Corrosion
+      GHS05: ['H290','H314','H318'],
+      // GHS06 Skull and crossbones
+      GHS06: ['H300','H301','H310','H311','H330','H331'],
+      // GHS07 Exclamation mark
+      GHS07: ['H302','H312','H315','H316','H317','H319','H320','H332','H335','H336','H303','H313','H333'],
+      // GHS08 Health hazard
+      GHS08: ['H340','H341','H350','H350i','H351','H360','H360D','H360F','H361','H361d','H361f','H362','H370','H371','H372','H373','H334'],
+      // GHS09 Environment
+      GHS09: ['H400','H401','H402','H410','H411','H412','H413','H420'],
+    };
+    const GHS_LABELS = {
+      GHS01:'Explosive', GHS02:'Flammable', GHS03:'Oxidising',
+      GHS04:'Compressed Gas', GHS05:'Corrosive', GHS06:'Toxic',
+      GHS07:'Irritant', GHS08:'Health Hazard', GHS09:'Environmental Hazard'
+    };
+    const BASE_URL = 'https://pubchem.ncbi.nlm.nih.gov/images/ghs/';
+    const codes = new Set(hstatements.map(h=>h.code.toUpperCase()));
+    const addedPics = new Set();
+    for(const [ghs, hcodes] of Object.entries(H_TO_GHS)){
+      if(hcodes.some(h=>codes.has(h)) && !addedPics.has(ghs)){
+        addedPics.add(ghs);
+        pictograms.push({
+          code: ghs,
+          label: GHS_LABELS[ghs] || ghs,
+          url: `${BASE_URL}${ghs}.svg`
+        });
+      }
+    }
+    // Sort by GHS number
+    pictograms.sort((a,b)=>a.code.localeCompare(b.code));
+    if(pictograms.length) ghsSource += ' · pictograms inferred from H-statements';
+  }
+
+  // Also check EH40 notations to add a Carc/Sk warning if GHS is still sparse
+  const welNotations = (d.welMatches||[]).flatMap(r=>(r[6]||'').split(',').map(n=>n.trim())).filter(Boolean);
+  const hasCarcFromWEL = welNotations.includes('Carc');
+  const hasSkFromWEL = welNotations.includes('Sk');
+  const hasSenFromWEL = welNotations.includes('Sen');
+
+  let html = `<span class="source-tag src-pubchem" style="margin-bottom:10px;display:inline-block">Source: ${ghsSource}</span>`;
+
+  // Signal word
+  if(signal){
+    const cls = signal.toLowerCase().includes('danger') ? 'danger' : 'warning';
+    html += `<div style="margin-bottom:12px"><span class="signal-word ${cls}">${signal}</span></div>`;
+  }
+
+  // Pictograms
+  if(pictograms.length){
+    html += `<div class="ghs-grid" style="margin-bottom:12px">` +
+      pictograms.map(p=>`<div class="ghs-pic">
+        <img src="${p.url}" alt="${p.label}" onerror="this.style.display='none'" style="width:48px;height:48px">
+        <span>${p.label}</span></div>`).join('') +
+      `</div>`;
+  }
+
+  // H-statements
+  if(hstatements.length){
+    // Deduplicate
+    const seen = new Set();
+    const unique = hstatements.filter(h=>{ const k=h.code+h.text; if(seen.has(k)) return false; seen.add(k); return true; });
+    html += `<div class="section-head"><h3>Hazard statements</h3></div><div class="h-statements">`;
+    for(const h of unique){
+      if(!h.code && !h.text) continue;
+      html += `<div class="h-stmt"><span class="h-code">${h.code||'—'}</span><span class="h-text">${h.text}</span></div>`;
+    }
+    html += '</div>';
+  } else {
+    html += `<p class="no-data" style="margin-bottom:8px">GHS hazard statements not returned by PubChem API for this compound — see the Safety Summary tab for full LCSS data.</p>`;
+  }
+
+  // EH40-derived hazard flags (always shown if applicable)
+  if(hasCarcFromWEL || hasSkFromWEL || hasSenFromWEL){
+    html += `<div style="margin:10px 0 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">EH40 Notations</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">`;
+    if(hasCarcFromWEL) html += `<div style="padding:5px 12px;border-radius:5px;font-size:12px;background:#f0e8f8;color:#5a1a8a;border:1px solid #c8a8e0;font-weight:500">⚠ Carcinogen (EH40)</div>`;
+    if(hasSkFromWEL)   html += `<div style="padding:5px 12px;border-radius:5px;font-size:12px;background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border);font-weight:500">⚠ Skin absorption (EH40)</div>`;
+    if(hasSenFromWEL)  html += `<div style="padding:5px 12px;border-radius:5px;font-size:12px;background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);font-weight:500">⚠ Sensitiser (EH40)</div>`;
+    html += '</div>';
+  }
+
+  // Form-specific notes
+  html += `
+    <div style="margin-top:10px;padding:10px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Form-specific considerations</div>
+      ${renderFormHazardNotes()}
+    </div>`;
+
+  document.getElementById('tab-hazard').innerHTML = html;
+
+  // Also update header pictograms from whatever we found
+  const ghsEl = document.getElementById('ghs-pics');
+  ghsEl.innerHTML = pictograms.map(p=>`
+    <div class="ghs-pic">
+      <img src="${p.url}" alt="${p.label}" onerror="this.style.display='none'">
+      <span>${p.label}</span>
+    </div>`).join('');
+}
+
+function renderFormHazardNotes(){
+  // Now driven by the operation/containment dropdowns rather than form chips
+  const {op, qty, contain} = getUseContext();
+  const notes = [];
+  if(op.toLowerCase().includes('grind')||op.toLowerCase().includes('mill')||op.toLowerCase().includes('crush'))
+    notes.push('⚠ Grinding/milling generates fine respirable dust — inhalation risk is significantly elevated. RPE required unless fully enclosed.');
+  if(op.toLowerCase().includes('heat')||op.toLowerCase().includes('reflux')||op.toLowerCase().includes('sinter')||op.toLowerCase().includes('furnace'))
+    notes.push('⚠ Thermal processes may generate fume or decomposition products with different hazard profiles — check SDS for thermal decomposition products.');
+  if(op.toLowerCase().includes('acid')||op.toLowerCase().includes('dissolv'))
+    notes.push('⚠ Acid dissolution — corrosive splash risk and potential generation of toxic gases (e.g. HCN from cyanides, H₂S from sulfides, NOₓ from nitric acid reactions).');
+  if(op.toLowerCase().includes('pressure')||op.toLowerCase().includes('autoclave'))
+    notes.push('⚠ Pressure work — overpressure and projectile risk in addition to chemical hazard. PSSR 2000 applies.');
+  if(contain.toLowerCase().includes('open bench') && !contain.toLowerCase().includes('lev'))
+    notes.push('⚠ Open bench with no LEV — inhalation controls rely entirely on room ventilation. Ensure WEL compliance is achievable for this arrangement.');
+  if(contain.toLowerCase().includes('recirculating'))
+    notes.push('⚠ Recirculating fume cupboard — verify the filter type is appropriate for this substance. Not suitable for all chemicals.');
+  if(qty.toLowerCase().includes('large')||qty.toLowerCase().includes('bulk'))
+    notes.push('⚠ Large/bulk quantity — spill risk and vapour generation are substantially elevated compared to small-scale work. Review emergency procedures.');
+  if(!op && !qty && !contain)
+    return '<div style="font-size:12px;color:var(--text3)">Select operation, quantity and containment above for context-specific notes.</div>';
+  return notes.map(n=>
+    `<div style="font-size:12px;color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border)">${n}</div>`
+  ).join('') || '<div style="font-size:12px;color:var(--text3)">No specific concerns identified for the selected operation and containment.</div>';
+}
+
+function renderWELsTab(){
+  const d = currentData;
+  let html = `<span class="source-tag src-eh40" style="margin-bottom:10px;display:inline-block">Source: EH40/2005 Fourth Edition 2020 (HSE, OGL v3.0)</span>`;
+
+  // Version caveat and "no WEL != safe" warning
+  html += `<div style="margin:8px 0 12px;padding:8px 12px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:5px;font-size:11px;color:var(--warn)">
+    <strong>Note:</strong> Data encoded from EH40/2005 (4th Ed., January 2020). Check
+    <a href="https://www.hse.gov.uk/pubns/books/eh40.htm" target="_blank" style="color:inherit">HSE EH40</a>
+    for any post-2020 amendments. The <strong>absence</strong> of a WEL does not indicate the substance is safe
+    — a COSHH assessment is still required.
+  </div>`;
+
+  if(!d.welMatches.length){
+    html += `<p class="no-data">No EH40 WEL found matching "${escapeHtml(d.query)}"${d.cas ? ` / CAS ${escapeHtml(d.cas)}` : ''}. Check EH40 Table 1 directly or try a synonym. Absence from this list does not mean the substance is safe.</p>`;
+  } else {
+    html += `<table class="wels-table"><thead><tr>
+      <th>Substance</th><th>CAS</th><th>TWA (ppm)</th><th>TWA (mg&middot;m<sup>-3</sup>)</th><th>STEL (ppm)</th><th>STEL (mg&middot;m<sup>-3</sup>)</th><th>Notations</th>
+    </tr></thead><tbody>`;
+    for(const r of d.welMatches){
+      // Safe display helper: null/undefined/"" all become em-dash; 0 is a valid value
+      const fv = v => (v !== null && v !== undefined && v !== '') ? v : '&#8212;';
+      const notations = (r[6]||'').split(',').filter(n=>n.trim()).map(n=>{
+        const n2=n.trim();
+        if(n2==='Sk')   return '<span class="skin">Sk</span>';
+        if(n2==='Sen')  return '<span class="sens">Sen</span>';
+        if(n2==='Carc') return '<span class="carc">Carc</span>';
+        if(n2==='BMGV') return '<a href="https://www.hse.gov.uk/pubns/books/eh40.htm" target="_blank" title="Biological Monitoring Guidance Value — see EH40 Table 2" style="text-decoration:none"><span style="font-size:10px;background:var(--info-bg);color:var(--info);border:1px solid var(--info-border);padding:1px 5px;border-radius:3px;font-weight:600;cursor:pointer">BMGV ↗</span></a>';
+        if(n2) return `<span style="font-size:10px;padding:1px 5px;border-radius:3px;border:1px solid var(--border2);color:var(--text2)">${n2}</span>`;
+        return '';
+      }).filter(Boolean).join(' ');
+      html += `<tr>
+        <td>${r[0]}</td>
+        <td style="font-family:var(--mono);font-size:11px">${r[1]||'&#8212;'}</td>
+        <td class="val">${fv(r[2])}</td>
+        <td class="val">${fv(r[3])}</td>
+        <td class="val">${fv(r[4])}</td>
+        <td class="val">${fv(r[5])}</td>
+        <td>${notations||'&#8212;'}</td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    html += `<div style="margin-top:10px;font-size:11px;color:var(--text3)">
+      <strong>Sk</strong> = skin absorption (dermal route contributes to systemic toxicity);
+      <strong>Sen</strong> = respiratory/skin sensitiser (occupational asthma potential);
+      <strong>Carc</strong> = capable of causing cancer or heritable genetic damage;
+      <strong>BMGV</strong> = <a href="https://www.hse.gov.uk/pubns/books/eh40.htm" target="_blank" style="color:inherit">biological monitoring guidance value</a> available (EH40 Table 2).<br>
+      Where no STEL is listed, use <strong>3&times; the TWA</strong> as a short-term guideline (EH40 §14).<br>
+      WELs apply to the airborne substance. COSHH assessment required regardless of whether a WEL applies.
+    </div>`;
+  }
+
+  // Operation-based WEL note — flag dust/respirable concern if relevant operation selected
+  const {op: welOp} = getUseContext();
+  const hasDustOp = welOp && (welOp.toLowerCase().includes('grind') || welOp.toLowerCase().includes('mill') || welOp.toLowerCase().includes('crush') || welOp.toLowerCase().includes('powder'));
+  if(hasDustOp && d.welMatches.length){
+    html += `<div style="margin-top:12px;padding:10px 12px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:6px;font-size:12px;color:var(--warn)">
+      <strong>Dust-generating operation:</strong> Where separate inhalable and respirable dust WELs exist (e.g. silica, wood dust), the respirable fraction limit applies to particles &lt;10 µm AED. Check EH40 Table 1 for substance-specific dust limits.
+    </div>`;
+  }
+
+  document.getElementById('tab-wels').innerHTML = html;
+}
+
+function renderCTXTab(){
+  const d = currentData;
+  let html = `<span class="source-tag src-epa" style="margin-bottom:10px;display:inline-block">Source: EPA CTX API (CompTox / ToxValDB)</span>`;
+
+  if(!ctxApiKey){
+    html += `<div style="padding:16px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);text-align:center">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:8px">EPA CTX API key required</div>
+      <div style="font-size:12px;color:var(--text3)">Enter your free API key above (ccte_api@epa.gov) to load EPA toxicity values including NOAEL, LOAEL, RfD, and ToxCast data.</div>
+    </div>`;
+  } else if(!d.ctxData){
+    html += `<p class="no-data">No CTX data returned for this compound. The substance may not be in the CompTox database under this name/CAS.</p>`;
+  } else {
+    const haz = d.ctxData.hazard || [];
+    if(d.ctxData.dtxsid){
+      html += `<div style="margin-bottom:10px;font-size:12px;color:var(--text2)">DTXSID: <span style="font-family:var(--mono);color:var(--accent)">${d.ctxData.dtxsid}</span></div>`;
+    }
+    if(haz.length){
+      html += `<div class="ctx-label">Toxicity values (ToxValDB)</div>`;
+      const byType = {};
+      for(const h of haz){
+        const t=h.toxvalType||h.study_type||'Other';
+        if(!byType[t]) byType[t]=[];
+        byType[t].push(h);
+      }
+      for(const [type,rows] of Object.entries(byType).slice(0,15)){
+        html += `<div class="ctx-block"><div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600">${type}</div>`;
+        for(const r of rows.slice(0,4)){
+          const val = r.toxval_numeric||r.value||'—';
+          const unit = r.toxval_units||r.units||'';
+          const species = r.species_common||r.species||'';
+          const src = r.supercategory||r.source||'';
+          html += `<div class="tox-row">
+            <span class="tox-src">${src}</span>
+            <span class="tox-val">${val} ${unit}</span>
+            <span class="tox-desc">${r.study_type||r.effect||''}</span>
+            <span class="tox-species">${species}</span>
+          </div>`;
+        }
+        html += '</div>';
+      }
+    } else {
+      html += '<p class="no-data">No quantitative hazard values found in ToxValDB for this compound.</p>';
+    }
+  }
+
+  document.getElementById('tab-ctx').innerHTML = html;
+}
+
+function renderPropsTab(){
+  const d = currentData;
+  let html = `<span class="source-tag src-pubchem" style="margin-bottom:10px;display:inline-block">Source: PubChem</span>`;
+
+  const propDefs = [
+    {key:'MolecularFormula',label:'Formula'},
+    {key:'MolecularWeight',label:'MW (g/mol)'},
+    {key:'ExactMass',label:'Exact mass'},
+    {key:'XLogP',label:'XLogP'},
+    {key:'TPSA',label:'TPSA (Å²)'},
+    {key:'HBondDonorCount',label:'H-bond donors'},
+    {key:'HBondAcceptorCount',label:'H-bond acceptors'},
+    {key:'RotatableBondCount',label:'Rotatable bonds'},
+    {key:'Charge',label:'Charge'},
+  ];
+
+  html += '<div class="props-grid">';
+  for(const p of propDefs){
+    const v = d.props[p.key];
+    html += `<div class="prop-item"><div class="prop-label">${p.label}</div><div class="prop-val ${v==null?'na':''}">${v!=null?v:'n/a'}</div></div>`;
+  }
+
+  // Physical description from PubChem
+  for(const [k,v] of Object.entries(d.physProps||{}).slice(0,6)){
+    html += `<div class="prop-item" style="grid-column:span 2"><div class="prop-label">${k}</div><div class="prop-val" style="font-family:var(--ui);font-size:12px;font-weight:400;color:var(--text2)">${v}</div></div>`;
+  }
+
+  html += '</div>';
+
+  // Operation-dependent physical hazard notes
+  const {op: propsOp, contain: propsContain} = getUseContext();
+  const phNotes = [];
+  if(propsOp && (propsOp.toLowerCase().includes('grind')||propsOp.toLowerCase().includes('mill')||propsOp.toLowerCase().includes('crush')))
+    phNotes.push({label:'Dust explosion potential', note:'Check ATEX classification. Fine powders of organic/metal compounds may be explosible — assess Kst, MIE, and LOC.'});
+  if(propsOp && (propsOp.toLowerCase().includes('dissolv')||propsOp.toLowerCase().includes('solution')||propsOp.toLowerCase().includes('acid')))
+    phNotes.push({label:'Vapour pressure consideration', note:'Inhalation exposure in solution depends on vapour pressure at working temperature and ventilation conditions. Henry\'s law constant relevant for aqueous solutions.'});
+  if(propsOp && (propsOp.toLowerCase().includes('heat')||propsOp.toLowerCase().includes('sinter')||propsOp.toLowerCase().includes('furnace')))
+    phNotes.push({label:'Thermal decomposition', note:'Check SDS Section 10 for decomposition products. Thermal processes may generate fumes with substantially different hazard profiles from the parent compound.'});
+  if(propsContain && propsContain.toLowerCase().includes('open bench') && !propsContain.toLowerCase().includes('lev'))
+    phNotes.push({label:'Ventilation adequacy', note:'Open bench with no LEV — for volatile or dusty materials, confirm that natural ventilation is sufficient to maintain exposure below the WEL. Consider air monitoring.'});
+
+  if(phNotes.length){
+    html += `<div style="margin-top:14px"><div class="section-head"><h3>Operation-specific physical hazard notes</h3></div>`;
+    for(const n of phNotes){
+      html += `<div style="padding:8px 12px;border-left:3px solid var(--accent2);margin-bottom:8px;background:var(--surface2);border-radius:0 5px 5px 0;font-size:12px">
+        <strong style="color:var(--text)">${n.label}</strong><br><span style="color:var(--text2)">${n.note}</span>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  document.getElementById('tab-props').innerHTML = html;
+}
+
+function parseLCSS(data){
+  // Walk the LCSS record and extract named sections into a structured object.
+  // LCSS sections include: Hazard Summary, First Aid, Fire Fighting,
+  // Accidental Release, Handling & Storage, Exposure Controls/PPE,
+  // Stability/Reactivity, Toxicology, Ecological, Disposal, GHS Classification
+  const sections = {};
+
+  const SECTION_MAP = {
+    'hazard':       ['hazard summary','hazard classes','health hazard','health hazards','hazards identification','hazard identification'],
+    'firstaid':     ['first aid','first-aid'],
+    'firefighting': ['fire fighting','firefighting','fire hazard','fire-fighting'],
+    'spill':        ['accidental release','spill','release measures'],
+    'handling':     ['handling','storage','handling and storage','safe handling'],
+    'exposure':     ['exposure controls','personal protection','protective equipment','ppe','control parameters'],
+    'stability':    ['stability','reactivity','stability and reactivity','chemical stability'],
+    'toxicology':   ['toxicological','toxicology','toxicity'],
+    'ecological':   ['ecological','environment','ecotoxicity'],
+    'disposal':     ['disposal','waste'],
+    'transport':    ['transport','transportation'],
+    'ghs':          ['ghs classification','classification and labelling','ghs'],
+    'lcss':         ['laboratory chemical safety','lcss'],
+  };
+
+  function categorise(heading){
+    const h = heading.toLowerCase();
+    for(const [key, patterns] of Object.entries(SECTION_MAP)){
+      if(patterns.some(p => h.includes(p))) return key;
+    }
+    return null;
+  }
+
+  function extractText(information){
+    const lines = [];
+    for(const i of (information||[])){
+      const name = i.Name||'';
+      for(const v of (i.Value?.StringWithMarkup||[])){
+        const txt = (v.String||'').trim();
+        if(txt) lines.push({name, text: txt});
+      }
+      // Table values
+      if(i.Value?.Table){
+        for(const row of (i.Value.Table.Row||[])){
+          const cells = (row.Cell||[]).map(c=>(c.StringWithMarkup||[])[0]?.String||'').filter(Boolean);
+          if(cells.length) lines.push({name, text: cells.join(' — ')});
+        }
+      }
+    }
+    return lines;
+  }
+
+  function walkForLCSS(sectionList){
+    for(const s of (sectionList||[])){
+      const heading = s.TOCHeading||'';
+      const cat = categorise(heading);
+      if(cat){
+        if(!sections[cat]) sections[cat] = {title: heading, items: []};
+        const items = extractText(s.Information);
+        sections[cat].items.push(...items);
+        // Also grab sub-section text
+        for(const sub of (s.Section||[])){
+          const subItems = extractText(sub.Information);
+          subItems.forEach(item => { if(item.name==='' && sub.TOCHeading) item.name = sub.TOCHeading; });
+          sections[cat].items.push(...subItems);
+        }
+      }
+      // Always recurse
+      if(s.Section) walkForLCSS(s.Section);
+    }
+  }
+
+  walkForLCSS(data?.Record?.Section||[]);
+  return sections;
+}
+
+function renderLCSSTab(){
+  const d = currentData;
+  const el = document.getElementById('tab-lcss');
+
+  if(!d.lcssData){
+    el.innerHTML = `<span class="source-tag src-pubchem" style="margin-bottom:12px;display:inline-block">Source: PubChem LCSS</span>
+      <p class="no-data">LCSS data not available for this compound.</p>
+      <p style="font-size:11px;color:var(--text3);margin-top:4px">
+        <a href="https://pubchem.ncbi.nlm.nih.gov/compound/${d.cid}#section=Safety-and-Hazards" target="_blank" style="color:var(--accent2)">View on PubChem ↗</a>
+      </p>`;
+    return;
+  }
+
+  if(geminiApiKey && aiEnabled && !lcssShowFull){
+    // AI curation mode
+    renderLCSSCurated(d, el);
+  } else {
+    // Full LCSS fallback mode
+    renderLCSSFull(d, el);
+  }
+}
+
+async function renderLCSSCurated(d, el){
+  // Check if we already have a cached curation for this compound
+  const cacheKey = `lcss_curated_${d.cid}`;
+  const cached = sessionStorage.getItem(cacheKey);
+
+  if(cached){
+    el.innerHTML = buildCuratedHTML(JSON.parse(cached), d);
+    return;
+  }
+
+  // Show loading state
+  el.innerHTML = `
+    <div class="ai-thinking">
+      <span class="spinner"></span>
+      Curating safety summary for lab use — stripping emergency response data, extracting what matters for research…
+    </div>`;
+
+  // Build input text from LCSS sections
+  const sections = parseLCSS(d.lcssData);
+  const LAB_SECTIONS = ['hazard','firstaid','firefighting','spill','handling','exposure','stability','toxicology','disposal'];
+  let rawText = '';
+  for(const key of LAB_SECTIONS){
+    const sec = sections[key];
+    if(!sec || !sec.items.length) continue;
+    rawText += `\n\n=== ${sec.title.toUpperCase()} ===\n`;
+    const seen = new Set();
+    for(const item of sec.items){
+      const k = item.name+item.text;
+      if(seen.has(k)) continue; seen.add(k);
+      rawText += (item.name ? `${item.name}: ` : '') + item.text + '\n';
+    }
+  }
+
+  const welInfo = (d.welMatches||[]).map(r=>
+    `${r[0]}: TWA ${r[2]!=null?r[2]+' ppm':''} ${r[3]!=null?r[3]+' mg/m\u207b\u00b3':''} ${r[6]?'['+r[6]+']':''}`
+  ).join('; ');
+
+  const {op, qty, contain} = getUseContext();
+  const useContext = [
+    op ? `Operation: ${op}` : '',
+    qty ? `Quantity: ${qty}` : '',
+    contain ? `Containment: ${contain}` : '',
+  ].filter(Boolean).join(' | ');
+
+  const prompt = `You are a COSHH (Control of Substances Hazardous to Health) safety adviser at a UK university research laboratory.
+
+I will give you the raw PubChem LCSS (Laboratory Chemical Safety Summary) data for ${d.query} (CAS: ${d.cas||'unknown'}, MW: ${d.props?.MolecularWeight||'unknown'} g/mol).
+${welInfo ? `EH40 Workplace Exposure Limits: ${welInfo}` : ''}
+${useContext ? `Intended use context: ${useContext}` : 'No specific use context provided — provide a general lab-scale summary.'}
+
+Your task is to extract a concise, practical safety summary relevant to small-scale research laboratory use${useContext ? `, specifically tailored to the stated use context` : ''}.
+
+STRICT RULES:
+- OMIT all ERG (Emergency Response Guidebook) guide numbers and references
+- OMIT large-scale spill response distances and isolation zones (those are for tanker incidents)
+- OMIT transport/shipping regulations, UN numbers, placards
+- OMIT detailed environmental fate, biodegradation studies, and ecological monitoring data
+- OMIT references to industrial or municipal-scale handling
+- OMIT bibliographic reference numbers like (1), (2), (3) etc.
+- KEEP all first aid information
+- KEEP fire hazard information relevant to lab quantities
+- KEEP PPE and exposure control recommendations — tailor to the containment stated if provided
+- KEEP storage and handling precautions
+- KEEP stability and incompatibility information
+- KEEP acute toxicity information relevant to lab exposure
+- KEEP any carcinogen, mutagen, or reproductive hazard warnings
+${op ? `- The operation is "${op}" — focus safety advice on the specific hazards and controls relevant to this process` : ''}
+${qty ? `- The quantity is "${qty}" — scale your advice appropriately` : ''}
+${contain ? `- The containment is "${contain}" — assess whether this is adequate and flag if not` : ''}
+- Be concise — one to three sentences per section maximum
+- Use plain English appropriate for a trained researcher
+
+Respond ONLY with a JSON object (no markdown, no backticks) with these exact keys:
+{
+  "hazardSummary": "...",
+  "firstAid": {
+    "inhalation": "...",
+    "skinContact": "...",
+    "eyeContact": "...",
+    "ingestion": "..."
+  },
+  "fireFighting": "...",
+  "spillResponse": "...",
+  "handlingStorage": "...",
+  "exposureControls": "...",
+  "stabilityReactivity": "...",
+  "acuteToxicity": "...",
+  "disposal": "...",
+  "keyWarnings": ["...", "..."]
+}
+
+Use null for any section where no relevant information was found. keyWarnings should be 2-5 bullet points of the most critical safety facts for this compound${useContext ? ' given the stated use context' : ' in a lab setting'}.
+
+RAW LCSS DATA:
+${rawText.slice(0, 12000)}`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          contents: [{parts: [{text: prompt}]}],
+          generationConfig: {temperature: 0.1, maxOutputTokens: 1500}
+        })
+      }
+    );
+
+    if(!res.ok){
+      const err = await res.text();
+      throw new Error(`Gemini API error ${res.status}: ${err.slice(0,200)}`);
+    }
+
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+
+    // Cache in session storage so re-clicking the tab doesn't re-query
+    sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
+    el.innerHTML = buildCuratedHTML(parsed, d);
+
+  } catch(e){
+    console.error('Gemini curation error:', e);
+    // Graceful fallback to full LCSS
+    el.innerHTML = `<div style="padding:10px 12px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:6px;font-size:12px;color:var(--warn);margin-bottom:12px">
+      <strong>AI curation unavailable:</strong> ${e.message} — showing full LCSS below.
+    </div>`;
+    renderLCSSFull(d, el, true);
+  }
+}
+
+function buildCuratedHTML(c, d){
+  const SECTIONS = [
+    {key:'hazardSummary',    label:'Hazard summary'},
+    {key:'firstAid',         label:'First aid',        isObj:true,
+     subkeys:[
+       {k:'inhalation',  l:'Inhalation'},
+       {k:'skinContact', l:'Skin contact'},
+       {k:'eyeContact',  l:'Eye contact'},
+       {k:'ingestion',   l:'Ingestion'},
+     ]},
+    {key:'fireFighting',     label:'Fire fighting'},
+    {key:'spillResponse',    label:'Spill response'},
+    {key:'handlingStorage',  label:'Handling & storage'},
+    {key:'exposureControls', label:'Exposure controls / PPE'},
+    {key:'stabilityReactivity', label:'Stability & reactivity'},
+    {key:'acuteToxicity',    label:'Acute toxicity'},
+    {key:'disposal',         label:'Disposal'},
+  ];
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="source-tag src-pubchem">Source: PubChem LCSS</span>
+        <span class="ai-badge">AI curated — Gemini 1.5 Flash</span>
+      </div>
+      <button class="btn-toggle-full" onclick="lcssShowFull=true;renderLCSSTab()">Show full LCSS ↓</button>
+    </div>`;
+
+  // Key warnings box
+  if(c.keyWarnings?.length){
+    html += `<div style="background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:7px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--danger);margin-bottom:8px">Key warnings for lab use</div>`;
+    for(const w of c.keyWarnings){
+      html += `<div style="font-size:12px;color:var(--danger);padding:2px 0 2px 12px;border-left:3px solid var(--danger-border);margin-bottom:4px">${w}</div>`;
+    }
+    html += '</div>';
+  }
+
+  // Main sections
+  for(const sec of SECTIONS){
+    const val = c[sec.key];
+    if(!val) continue;
+
+    html += `<div class="ai-section"><div class="ai-section-label">${sec.label}</div>`;
+
+    if(sec.isObj && typeof val === 'object'){
+      for(const {k,l} of sec.subkeys){
+        if(val[k]) html += `<div class="ai-section-body" style="margin-bottom:4px"><strong style="color:var(--text)">${l}:</strong> ${val[k]}</div>`;
+      }
+    } else if(typeof val === 'string' && val.trim()){
+      html += `<div class="ai-section-body">${val}</div>`;
+    }
+    html += '</div>';
+  }
+
+  // Footer
+  html += `<div style="margin-top:14px;padding:8px 12px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:6px;font-size:11px;color:var(--text3)">
+    AI-curated summary — always verify against current SDS. &nbsp;
+    <a href="https://pubchem.ncbi.nlm.nih.gov/compound/${d.cid}#section=Safety-and-Hazards" target="_blank" style="color:var(--accent2)">Full LCSS on PubChem ↗</a>
+    &nbsp;·&nbsp; <button class="btn-toggle-full" onclick="lcssShowFull=true;renderLCSSTab()">Show full LCSS</button>
+  </div>`;
+
+  return html;
+}
+
+function renderLCSSFull(d, el, append=false){
+  const sections = parseLCSS(d.lcssData);
+
+  const ORDER = [
+    {key:'ghs',          label:'GHS Classification'},
+    {key:'hazard',       label:'Hazard Summary'},
+    {key:'firstaid',     label:'First Aid Measures'},
+    {key:'firefighting', label:'Fire Fighting'},
+    {key:'spill',        label:'Accidental Release / Spill'},
+    {key:'handling',     label:'Handling & Storage'},
+    {key:'exposure',     label:'Exposure Controls / PPE'},
+    {key:'stability',    label:'Stability & Reactivity'},
+    {key:'toxicology',   label:'Toxicological Information'},
+    {key:'ecological',   label:'Ecological Information'},
+    {key:'disposal',     label:'Disposal Considerations'},
+    {key:'transport',    label:'Transport Information'},
+  ];
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <span class="source-tag src-pubchem">Source: PubChem LCSS (full)</span>
+      ${(geminiApiKey && aiEnabled) ? `<button class="btn-toggle-full" onclick="lcssShowFull=false;renderLCSSTab()">Show AI summary ↑</button>` : ''}
+    </div>`;
+
+  let found = 0;
+  for(const {key, label} of ORDER){
+    const sec = sections[key];
+    if(!sec || !sec.items.length) continue;
+    found++;
+
+    const seen = new Set();
+    const items = sec.items.filter(i=>{
+      const k=i.name+i.text; if(seen.has(k)) return false; seen.add(k); return true;
+    });
+
+    html += `<div class="lcss-section"><div class="lcss-section-title">${label}</div>`;
+
+    // Show first 5 items by default, rest hidden behind toggle
+    const PREVIEW = 5;
+    const preview = items.slice(0, PREVIEW);
+    const rest = items.slice(PREVIEW);
+
+    for(const item of preview){
+      html += `<div class="lcss-item">${item.name?`<strong>${item.name}:</strong> `:''}${item.text}</div>`;
+    }
+    if(rest.length){
+      const uid = `lcss_more_${key}`;
+      html += `<div id="${uid}" style="display:none">`;
+      for(const item of rest){
+        html += `<div class="lcss-item">${item.name?`<strong>${item.name}:</strong> `:''}${item.text}</div>`;
+      }
+      html += `</div>
+        <button class="btn-toggle-full" style="margin:4px 0 4px 0" 
+          onclick="const e=document.getElementById('${uid}');const show=e.style.display==='none';e.style.display=show?'block':'none';this.textContent=show?'Show less ↑':'Show ${rest.length} more ↓'">
+          Show ${rest.length} more ↓
+        </button>`;
+    }
+    html += '</div>';
+  }
+
+  if(!found) html += '<p class="no-data">LCSS sections could not be parsed for this compound.</p>';
+
+  html += `<div style="margin-top:10px;padding:8px 12px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:6px;font-size:12px;color:var(--info)">
+    <a href="https://pubchem.ncbi.nlm.nih.gov/compound/${d.cid}#section=Safety-and-Hazards" target="_blank" style="color:var(--accent2);font-weight:500">Full LCSS on PubChem ↗</a>
+  </div>`;
+
+  if(append) el.innerHTML += html;
+  else el.innerHTML = html;
+}
+
+function switchTab(id, el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+// ─── EXPORT FUNCTIONS ────────────────────────────────────────────────────────
+
+function downloadFile(content, filename, mimeType){
+  const blob = new Blob([content], {type: mimeType});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+function safeFilename(){
+  const d = currentData;
+  return (d.query||'hazard_profile').replace(/[^a-zA-Z0-9_-]/g,'_').toLowerCase();
+}
+
+function exportCSV(){
+  const d = currentData;
+  if(!d.cid){ alert('No data loaded — perform a search first.'); return; }
+
+  const rows = [];
+  const q = v => v==null ? '' : String(v).includes(',') ? `"${String(v).replace(/"/g,'""')}"` : String(v);
+
+  // Section: Compound identity
+  rows.push(['HAZARD PROFILE EXPORT — EH40/PubChem/EPA CTX']);
+  rows.push(['Generated', new Date().toISOString()]);
+  rows.push(['Query', d.query]);
+  rows.push(['PubChem CID', d.cid]);
+  rows.push(['CAS', d.cas||'']);
+  rows.push(['IUPAC Name', d.props?.IUPACName||'']);
+  rows.push(['Molecular Formula', d.props?.MolecularFormula||'']);
+  rows.push(['Molecular Weight (g/mol)', d.props?.MolecularWeight||'']);
+  const {op: csvOp, qty: csvQty, contain: csvContain} = getUseContext();
+  rows.push(['Use context', [csvOp, csvQty, csvContain].filter(Boolean).join(' | ') || 'Not specified']);
+  rows.push([]);
+
+  // Section: GHS
+  rows.push(['GHS CLASSIFICATION (PubChem)']);
+  rows.push(['Signal Word', d.ghs?.signal||'']);
+  rows.push(['Pictograms', (d.ghs?.pictograms||[]).map(p=>p.label).join('; ')]);
+  rows.push([]);
+  rows.push(['Hazard Code', 'Hazard Statement']);
+  for(const h of (d.ghs?.hstatements||[])){
+    rows.push([h.code, h.text]);
+  }
+  rows.push([]);
+
+  // Section: EH40 WELs
+  rows.push(['EH40 WORKPLACE EXPOSURE LIMITS (HSE, Fourth Edition 2020)']);
+  rows.push(['Substance', 'CAS', 'TWA (ppm)', 'TWA (mg/m\u207b\u00b3)', 'STEL (ppm)', 'STEL (mg/m\u207b\u00b3)', 'Notations']);
+  for(const r of (d.welMatches||[])){
+    rows.push([r[0], r[1]||'', r[2]??'', r[3]??'', r[4]??'', r[5]??'', r[6]||'']);
+  }
+  if(!(d.welMatches||[]).length) rows.push(['No EH40 WEL found for this substance']);
+  rows.push([]);
+
+  // Section: Physical properties
+  rows.push(['PHYSICOCHEMICAL PROPERTIES (PubChem)']);
+  const propDefs = [
+    ['XLogP', d.props?.XLogP],
+    ['TPSA (Å²)', d.props?.TPSA],
+    ['H-bond donors', d.props?.HBondDonorCount],
+    ['H-bond acceptors', d.props?.HBondAcceptorCount],
+    ['Rotatable bonds', d.props?.RotatableBondCount],
+    ['Exact mass', d.props?.ExactMass],
+    ['Charge', d.props?.Charge],
+  ];
+  for(const [label, val] of propDefs) rows.push([label, val??'n/a']);
+  rows.push([]);
+
+  // Section: EPA CTX
+  if(d.ctxData?.hazard?.length){
+    rows.push(['EPA TOXICITY DATA (CTX / ToxValDB)']);
+    rows.push(['DTXSID', d.ctxData.dtxsid||'']);
+    rows.push(['Type', 'Value', 'Units', 'Study type', 'Species', 'Source']);
+    for(const h of d.ctxData.hazard.slice(0,50)){
+      rows.push([
+        h.toxvalType||h.study_type||'',
+        h.toxval_numeric||h.value||'',
+        h.toxval_units||h.units||'',
+        h.study_type||h.effect||'',
+        h.species_common||h.species||'',
+        h.supercategory||h.source||''
+      ]);
+    }
+  }
+
+  // Section: LCSS
+  if(d.lcssData){
+    const lcss = parseLCSS(d.lcssData);
+    rows.push([]);
+    rows.push(['LABORATORY CHEMICAL SAFETY SUMMARY (PubChem LCSS)']);
+    for(const [key, sec] of Object.entries(lcss)){
+      if(!sec.items.length) continue;
+      rows.push([sec.title.toUpperCase()]);
+      const seen = new Set();
+      for(const item of sec.items){
+        const k = item.name+item.text;
+        if(seen.has(k)) continue; seen.add(k);
+        rows.push([item.name||'', item.text]);
+      }
+      rows.push([]);
+    }
+  }
+
+  const csv = rows.map(r => r.map(q).join(',')).join('\r\n');
+  downloadFile(csv, `${safeFilename()}_hazard_profile.csv`, 'text/csv;charset=utf-8;');
+}
+
+function exportJSON(){
+  const {op, qty, contain} = getUseContext();
+
+  const d = currentData;
+  if(!d.cid){ alert('No data loaded — perform a search first.'); return; }
+
+  const out = {
+    metadata: {
+      tool: 'NFI Hazard Profile Tool',
+      generated: new Date().toISOString(),
+      query: d.query,
+      operation: op || null,
+      quantity: qty || null,
+      containment: contain || null,
+      useContext: [op, qty, contain].filter(Boolean).join(' | ') || 'Not specified',
+    },
+    identity: {
+      pubchemCID: d.cid,
+      cas: d.cas||null,
+      iupacName: d.props?.IUPACName||null,
+      molecularFormula: d.props?.MolecularFormula||null,
+      molecularWeight: d.props?.MolecularWeight||null,
+    },
+    ghs: {
+      source: 'PubChem',
+      signalWord: d.ghs?.signal||null,
+      pictograms: (d.ghs?.pictograms||[]).map(p=>({code:p.code, label:p.label})),
+      hazardStatements: (d.ghs?.hstatements||[]).map(h=>({code:h.code, text:h.text})),
+    },
+    eh40WELs: {
+      source: 'EH40/2005 Fourth Edition 2020 (HSE)',
+      entries: (d.welMatches||[]).map(r=>({
+        name: r[0],
+        cas: r[1]||null,
+        twa_ppm: r[2]??null,
+        twa_mgm3: r[3]??null,
+        stel_ppm: r[4]??null,
+        stel_mgm3: r[5]??null,
+        notations: r[6]||''
+      }))
+    },
+    physicalProperties: {
+      source: 'PubChem',
+      xlogP: d.props?.XLogP??null,
+      tpsa: d.props?.TPSA??null,
+      hBondDonors: d.props?.HBondDonorCount??null,
+      hBondAcceptors: d.props?.HBondAcceptorCount??null,
+      rotatableBonds: d.props?.RotatableBondCount??null,
+      exactMass: d.props?.ExactMass??null,
+      charge: d.props?.Charge??null,
+      physicalDescription: d.physProps||{}
+    },
+    epaCtx: d.ctxData ? {
+      source: 'EPA CTX API / ToxValDB',
+      dtxsid: d.ctxData.dtxsid||null,
+      hazardValues: (d.ctxData.hazard||[]).slice(0,100)
+    } : null,
+    lcss: d.lcssData ? {
+      source: 'PubChem LCSS',
+      pubchemUrl: `https://pubchem.ncbi.nlm.nih.gov/compound/${d.cid}#section=Safety-and-Hazards`,
+      sections: parseLCSS(d.lcssData)
+    } : null
+  };
+
+  downloadFile(JSON.stringify(out, null, 2), `${safeFilename()}_hazard_profile.json`, 'application/json');
+}
+
+function exportPDF(){
+  const d = currentData;
+  if(!d.cid){ alert('No data loaded — perform a search first.'); return; }
+
+  const now = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'});
+  const {op, qty, contain} = getUseContext();
+  const useContextStr = [op, qty, contain].filter(Boolean).join(' | ') || 'Not specified';
+
+  const ghsPics = (d.ghs?.pictograms||[]).map(p=>
+    `<img src="${p.url}" style="width:40px;height:40px;margin:2px" title="${p.label}">`).join('');
+
+  const hStmts = (d.ghs?.hstatements||[]).filter((h,i,a)=>a.findIndex(x=>x.code+x.text===h.code+h.text)===i)
+    .map(h=>`<tr><td style="color:#8b1f1f;font-family:monospace;font-weight:bold;padding:4px 8px;white-space:nowrap">${h.code||'—'}</td><td style="padding:4px 8px;color:#444">${h.text}</td></tr>`).join('');
+
+  const welRows = (d.welMatches||[]).map(r=>{
+    const fv = v => (v !== null && v !== undefined && v !== '') ? v : '&mdash;';
+    const notBadges = (r[6]||'').split(',').filter(n=>n.trim()).map(n=>{
+      const n2=n.trim();
+      const colours = {Carc:['#7a1a7a','#f0e8f8'],Sen:['#8b1f1f','#fdf0f0'],Sk:['#7a4a00','#fdf4e7'],BMGV:['#0f3d6b','#e8f2fb']};
+      const [col,bg] = colours[n2]||['#555','#eee'];
+      return `<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:${bg};color:${col};border:1px solid ${col}60;font-weight:700">${n2}</span>`;
+    }).join(' ');
+    return `<tr>
+      <td style="padding:4px 8px;border-bottom:1px solid #eee">${r[0]}</td>
+      <td style="padding:4px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:10px">${r[1]||'&mdash;'}</td>
+      <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center;font-weight:bold;color:#1a4a6b">${fv(r[2])}</td>
+      <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center;font-weight:bold;color:#1a4a6b">${fv(r[3])}</td>
+      <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center;font-weight:bold;color:#1a4a6b">${fv(r[4])}</td>
+      <td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center;font-weight:bold;color:#1a4a6b">${fv(r[5])}</td>
+      <td style="padding:4px 8px;border-bottom:1px solid #eee">${notBadges||'&mdash;'}</td>
+    </tr>`;
+  }).join('');
+
+  const ctxSection = d.ctxData?.hazard?.length ? `
+    <h2 style="font-size:13px;font-weight:600;color:#1a4a6b;border-bottom:1px solid #ddd;padding-bottom:4px;margin:20px 0 8px">EPA Toxicity Data (CTX / ToxValDB)</h2>
+    <p style="font-size:10px;color:#888;margin-bottom:8px">DTXSID: <code>${d.ctxData.dtxsid||'—'}</code></p>
+    <table style="width:100%;border-collapse:collapse;font-size:10px">
+      <thead><tr style="background:#f0efe9">
+        <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">Type</th>
+        <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">Value</th>
+        <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">Units</th>
+        <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">Study</th>
+        <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">Species</th>
+        <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">Source</th>
+      </tr></thead>
+      <tbody>${d.ctxData.hazard.slice(0,30).map(h=>`<tr style="border-bottom:1px solid #eee">
+        <td style="padding:3px 8px">${h.toxvalType||h.study_type||'—'}</td>
+        <td style="padding:3px 8px;font-weight:bold;color:#1a4a6b">${h.toxval_numeric||h.value||'—'}</td>
+        <td style="padding:3px 8px">${h.toxval_units||h.units||'—'}</td>
+        <td style="padding:3px 8px">${h.study_type||h.effect||'—'}</td>
+        <td style="padding:3px 8px">${h.species_common||h.species||'—'}</td>
+        <td style="padding:3px 8px;font-size:9px;color:#888">${h.supercategory||h.source||'—'}</td>
+      </tr>`).join('')}</tbody>
+    </table>` : (d.ctxData ? '<p style="font-size:11px;color:#888;font-style:italic">No EPA CTX quantitative toxicity values found.</p>' : '<p style="font-size:11px;color:#888;font-style:italic">EPA CTX API key not configured.</p>');
+
+  const propRows = [
+    ['Molecular formula', d.props?.MolecularFormula||'—'],
+    ['Molecular weight (g/mol)', d.props?.MolecularWeight||'—'],
+    ['XLogP', d.props?.XLogP??'—'],
+    ['TPSA (Å²)', d.props?.TPSA??'—'],
+    ['H-bond donors', d.props?.HBondDonorCount??'—'],
+    ['H-bond acceptors', d.props?.HBondAcceptorCount??'—'],
+    ['Rotatable bonds', d.props?.RotatableBondCount??'—'],
+    ['Exact mass', d.props?.ExactMass??'—'],
+  ].map(([l,v])=>`<tr><td style="padding:3px 8px;color:#666;width:40%">${l}</td><td style="padding:3px 8px;font-family:monospace">${v}</td></tr>`).join('');
+
+  const signalHtml = d.ghs?.signal ? `<span style="display:inline-block;padding:3px 12px;border-radius:4px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:${d.ghs.signal.toLowerCase().includes('danger')?'#fdf0f0':'#fdf4e7'};color:${d.ghs.signal.toLowerCase().includes('danger')?'#8b1f1f':'#7a4a00'};border:1px solid ${d.ghs.signal.toLowerCase().includes('danger')?'#e8b4b4':'#f0d090'}">${d.ghs.signal}</span>` : '';
+
+  // LCSS for PDF
+  let lcssHtml = '';
+  if(d.lcssData){
+    const lcss = parseLCSS(d.lcssData);
+    const ORDER = ['ghs','hazard','firstaid','firefighting','spill','handling','exposure','stability','toxicology','disposal'];
+    const LABELS = {ghs:'GHS Classification',hazard:'Hazard Summary',firstaid:'First Aid',firefighting:'Fire Fighting',spill:'Accidental Release / Spill',handling:'Handling & Storage',exposure:'Exposure Controls / PPE',stability:'Stability & Reactivity',toxicology:'Toxicological Information',disposal:'Disposal'};
+    for(const key of ORDER){
+      const sec = lcss[key];
+      if(!sec||!sec.items.length) continue;
+      const seen = new Set();
+      const items = sec.items.filter(i=>{ const k=i.name+i.text; if(seen.has(k)) return false; seen.add(k); return true; });
+      lcssHtml += `<h2 style="font-size:12px;font-weight:600;color:#1a4a6b;border-bottom:1px solid #ddd;padding-bottom:3px;margin:16px 0 6px">${LABELS[key]||sec.title}</h2>`;
+      for(const item of items.slice(0,15)){
+        lcssHtml += `<div style="font-size:10px;padding:2px 0;border-bottom:1px solid #f0f0f0;color:#444">${item.name?`<strong>${item.name}:</strong> `:''}${item.text}</div>`;
+      }
+    }
+  }
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Hazard Profile — ${d.query}</title>
+<style>
+  body{font-family:system-ui,sans-serif;font-size:11px;color:#222;margin:0;padding:24px;line-height:1.5}
+  @media print{body{padding:0}}
+  h1{font-size:20px;font-weight:700;color:#1a4a6b;margin:0 0 2px}
+  h2{font-size:13px;font-weight:600;color:#1a4a6b;border-bottom:1px solid #ddd;padding-bottom:4px;margin:20px 0 8px}
+  table{width:100%;border-collapse:collapse}
+  .meta{color:#888;font-size:10px;margin-bottom:16px}
+  .badge{display:inline-block;font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;margin:1px}
+</style>
+</head><body>
+<div style="border-bottom:2px solid #1a4a6b;padding-bottom:12px;margin-bottom:16px">
+  <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1a4a6b;margin-bottom:4px">Nuclear Futures Institute — Hazard Profile</div>
+  <h1>${escapeHtml(d.query.charAt(0).toUpperCase()+d.query.slice(1))}</h1>
+  <div style="font-family:monospace;font-size:10px;color:#666;margin:2px 0">${escapeHtml(d.props?.IUPACName||'')}</div>
+  <div class="meta" style="margin-top:6px">
+    ${d.cid?`PubChem CID: <strong>${d.cid}</strong> &nbsp;`:''}
+    ${d.cas?`CAS: <strong>${d.cas}</strong> &nbsp;`:''}
+    MW: <strong>${d.props?.MolecularWeight||'—'} g/mol</strong> &nbsp;
+    Formula: <strong>${d.props?.MolecularFormula||'—'}</strong>
+  </div>
+  <div style="font-size:10px;color:#666">Use context: <strong>${useContextStr}</strong></div>
+  <div style="font-size:9px;color:#aaa;margin-top:4px">Generated ${now} &bull; For reference only — always consult current SDS and regulatory guidance</div>
+</div>
+
+<h2>GHS Classification <span style="font-size:9px;font-weight:400;color:#aaa">(Source: PubChem)</span></h2>
+<div style="margin-bottom:8px">${signalHtml} &nbsp; ${ghsPics}</div>
+${hStmts ? `<table><tbody>${hStmts}</tbody></table>` : '<p style="font-size:11px;color:#888;font-style:italic">No GHS hazard statements found.</p>'}
+
+<h2>EH40 Workplace Exposure Limits <span style="font-size:9px;font-weight:400;color:#aaa">(Source: EH40/2005 Fourth Edition 2020, HSE)</span></h2>
+${welRows ? `<table>
+  <thead><tr style="background:#f0efe9;font-size:10px">
+    <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">Substance</th>
+    <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">CAS</th>
+    <th style="padding:4px 8px;text-align:center;border-bottom:1px solid #ccc">TWA (ppm)</th>
+    <th style="padding:4px 8px;text-align:center;border-bottom:1px solid #ccc">TWA (mg/m&#x207b;&#xb3;)</th>
+    <th style="padding:4px 8px;text-align:center;border-bottom:1px solid #ccc">STEL (ppm)</th>
+    <th style="padding:4px 8px;text-align:center;border-bottom:1px solid #ccc">STEL (mg/m&#x207b;&#xb3;)</th>
+    <th style="padding:4px 8px;text-align:left;border-bottom:1px solid #ccc">Notations</th>
+  </tr></thead>
+  <tbody>${welRows}</tbody>
+</table>
+<p style="font-size:9px;color:#888;margin-top:6px">Sk = skin absorption; Sen = respiratory/skin sensitiser; Carc = carcinogen; BMGV = biological monitoring guidance value</p>` 
+: '<p style="font-size:11px;color:#888;font-style:italic">No EH40 WEL found for this substance.</p>'}
+
+<h2>Physicochemical Properties <span style="font-size:9px;font-weight:400;color:#aaa">(Source: PubChem)</span></h2>
+<table><tbody>${propRows}</tbody></table>
+
+${lcssHtml ? `<h2 style="font-size:13px;font-weight:600;color:#1a4a6b;border-bottom:1px solid #ddd;padding-bottom:4px;margin:20px 0 8px">Laboratory Chemical Safety Summary <span style="font-size:9px;font-weight:400;color:#aaa">(Source: PubChem LCSS)</span></h2>${lcssHtml}` : ''}
+
+${ctxSection}
+
+<div style="margin-top:24px;padding-top:8px;border-top:1px solid #eee;font-size:9px;color:#aaa">
+  Data sources: PubChem (NIH/NCBI) &bull; EPA CTX API (CompTox/ToxValDB) &bull; EH40/2005 Fourth Edition 2020 (HSE, Open Government Licence v3.0)<br>
+  For reference only — always verify against current SDS and regulatory guidance before use.
+</div>
+</body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url,'_blank');
+  if(!win) alert('Pop-up blocked — please allow pop-ups for this page to open the PDF-ready report.');
+  setTimeout(()=>URL.revokeObjectURL(url), 5000);
+}
+</script>
+</body>
+</html>
