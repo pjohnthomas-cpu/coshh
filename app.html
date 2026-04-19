@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COSHH Assessment Form</title>
+<title>COSHH Assessment Form App | Browser-Based COSHH Tool</title>
+<meta name="description" content="Browser-based COSHH assessment form app for drafting, checking, saving, and exporting COSHH assessments for research laboratory work.">
+<link rel="canonical" href="https://coshh.uk/app.html">
+<meta name="robots" content="noindex,follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="COSHH Assessment Form App">
+<meta property="og:description" content="Browser-based COSHH assessment form app with EH40 reference support, PubChem lookup, draft saving, and export options.">
+<meta property="og:url" content="https://coshh.uk/app.html">
+<meta property="og:image" content="https://coshh.uk/social-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="COSHH Assessment Form App">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://coshh.uk/social-preview.png">
+<meta name="twitter:title" content="COSHH Assessment Form App">
+<meta name="twitter:description" content="Browser-based COSHH assessment form app with EH40 reference support, PubChem lookup, draft saving, and export options.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -61,62 +76,11 @@
     color: var(--highlight);
     opacity: 0.85;
   }
-  .site-header-logos {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-shrink: 0;
-  }
-  .header-logo {
-    display: block;
-    object-fit: contain;
-  }
-  .header-logo-bangor {
-    height: 44px;
-    width: auto;
-    /* white background pill so the crest shows on dark header */
-    background: #fff;
-    border-radius: 3px;
-    padding: 4px 8px;
-  }
-  .header-logo-nfi {
-    height: 44px;
-    width: auto;
-    background: #fff;
-    border-radius: 3px;
-    padding: 3px 6px;
-  }
-  .header-divider {
-    width: 1px;
-    height: 32px;
-    background: rgba(255,255,255,0.2);
-    flex-shrink: 0;
-  }
   .header-title-block {
     display: flex;
     flex-direction: column;
     gap: 3px;
     text-align: left;
-  }
-
-  /* Title-strip logos (printed form header) */
-  .title-strip-logos {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-  }
-  .strip-logo {
-    display: block;
-    object-fit: contain;
-  }
-  .strip-logo-bangor {
-    height: 52px;
-    width: auto;
-  }
-  .strip-logo-nfi {
-    height: 48px;
-    width: auto;
   }
 
   /* ── main layout ── */
@@ -628,8 +592,6 @@
 
     /* ── Site header ──────────────────────────────────────────────────────── */
     .site-header       { padding: 10px 16px; }
-    .header-logo-bangor,
-    .header-logo-nfi   { height: 34px; }
     .site-header h1    { font-size: 11px; letter-spacing: 0.12em; }
     .site-header .badge { display: none; }         /* subtitle hidden — saves height */
     .header-title-block { text-align: left; }
@@ -717,17 +679,12 @@
 
     /* ── Title strip inside the form ─────────────────────────────────────── */
     .title-strip       { flex-wrap: wrap; gap: 8px; }
-    .strip-logo-bangor,
-    .strip-logo-nfi    { height: 36px; }
   }
 
   /* ── Very small phones (< 480 px) ──────────────────────────────────────── */
   @media (max-width: 480px) {
-    .header-logo-bangor,
-    .header-logo-nfi   { height: 28px; }
     .save-bar-label    { display: none; }          /* "Draft" label dropped at tiny widths */
     .export-options    { grid-template-columns: 1fr 1fr; }
-    .title-strip-logos { display: none; }          /* logos already in header; save space */
   }
 
   /* ── export bar ── */
@@ -1562,7 +1519,7 @@
           <span class="yn-confirm">
             <label>
               <input type="checkbox" id="q5-confirm">
-              Confirm materials are not on the <a href="https://www.bangor.ac.uk/hss/inflink/statutory.php.en" target="_blank">prescribed list</a>
+              Confirm materials are not subject to any local restricted-substances or approval requirements
             </label>
           </span>
         </span>
@@ -2208,7 +2165,7 @@ async function generatePDF() {
       ['2','Can this procedure enhance hazards or create harmful by-products?',radio('q2')],
       ['3','Is the substance a known mutagen, carcinogen, or teratogen?',radio('q3')],
       ['4','Can this procedure cause build-up of pressure or an exothermic reaction?',radio('q4')],
-      ['5','Confirmed materials are not on the prescribed list',checked('q5-confirm')?'☑ Confirmed':'☐ Not confirmed']];
+      ['5','Confirmed materials meet local restricted-substances or approval requirements',checked('q5-confirm')?'☑ Confirmed':'☐ Not confirmed']];
     doc.autoTable({ startY:y, body:qs, margin:{left:ml,right:mr},
       styles:{fontSize:8,cellPadding:2,lineColor:RULE,lineWidth:0.2},
       alternateRowStyles:{fillColor:STRIPE},
@@ -2443,7 +2400,7 @@ ${substBody}
   \\item Can this procedure enhance hazards or create harmful by-products? \\quad ${texRadio('q2')}
   \\item Is the substance a known mutagen, carcinogen, teratogen? \\quad ${texRadio('q3')}
   \\item Can this procedure cause build-up of pressure or exothermic reaction? \\quad ${texRadio('q4')}
-  \\item Confirm materials not on prescribed list. \\quad ${checked('q5-confirm')?'$\\boxtimes$~Confirmed':'$\\square$~Not confirmed'}
+  \\item Confirm materials meet local restricted-substances or approval requirements. \\quad ${checked('q5-confirm')?'$\\boxtimes$~Confirmed':'$\\square$~Not confirmed'}
 \\end{enumerate}
 
 \\medskip
@@ -2676,7 +2633,7 @@ async function generateDOCX() {
         ynRow('2','Can this procedure enhance hazards or create harmful by-products?','q2'),
         ynRow('3','Is the substance a known mutagen, carcinogen, or teratogen?','q3'),
         ynRow('4','Can this procedure cause build-up of pressure or exothermic reaction?','q4'),
-        new Paragraph({spacing:{after:60},children:[new TextRun({text:'5. Confirmed materials not on prescribed list:   ',size:20}),
+        new Paragraph({spacing:{after:60},children:[new TextRun({text:'5. Confirmed materials meet local restricted-substances or approval requirements:   ',size:20}),
           new TextRun({text:checked('q5-confirm')?'[X] Confirmed':'[ ] Not confirmed',bold:true,size:20,color:BLUE})]}),
 
         sectionPara('Engineering Controls'),
@@ -2843,7 +2800,7 @@ async function generateODT() {
   ${odtYN('2','Can this procedure enhance hazards or create harmful by-products?','q2')}
   ${odtYN('3','Is the substance a known mutagen, carcinogen, or teratogen?','q3')}
   ${odtYN('4','Can this procedure cause build-up of pressure or exothermic reaction?','q4')}
-  <text:p text:style-name="TextBody">5. Confirmed materials not on prescribed list: <text:span text:style-name="Bold">${checked('q5-confirm')?'☑ Confirmed':'☐ Not confirmed'}</text:span></text:p>
+  <text:p text:style-name="TextBody">5. Confirmed materials meet local restricted-substances or approval requirements: <text:span text:style-name="Bold">${checked('q5-confirm')?'☑ Confirmed':'☐ Not confirmed'}</text:span></text:p>
 
   ${odtSection('Engineering Controls')}
   ${odtCheckLine([['ec-fume','Fume Cupboard'],['ec-particle','Particle Booth'],['ec-gas','Gas Alarms'],['ec-glove','Glove Box'],['ec-extract','Extraction']])}

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">COSHH Form Builder social preview</title>
+  <desc id="desc">Research lab COSHH assessment tool with EH40 and PubChem references.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#1a4a6b"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1">
+      <stop offset="0%" stop-color="#f5e642" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#f5e642" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1">
+      <stop offset="0%" stop-color="#c8392b" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#c8392b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" rx="28"/>
+  <circle cx="160" cy="120" r="220" fill="url(#glowA)"/>
+  <circle cx="1020" cy="520" r="280" fill="url(#glowB)"/>
+  <rect x="66" y="64" width="1068" height="502" rx="30" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.14)"/>
+  <text x="104" y="132" fill="#f5e642" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" letter-spacing="3">RESEARCH LAB COSHH SUPPORT</text>
+  <text x="104" y="244" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700">COSHH Form Builder</text>
+  <text x="104" y="308" fill="#dbe7ef" font-family="Arial, Helvetica, sans-serif" font-size="33">Create COSHH assessments with practical guidance, EH40 reference support,</text>
+  <text x="104" y="352" fill="#dbe7ef" font-family="Arial, Helvetica, sans-serif" font-size="33">PubChem hazard lookup, and research-lab preparation resources.</text>
+
+  <g transform="translate(104 414)">
+    <rect width="248" height="78" rx="18" fill="#ffffff" fill-opacity="0.10" stroke="#ffffff" stroke-opacity="0.14"/>
+    <text x="24" y="30" fill="#f5e642" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">EH40</text>
+    <text x="24" y="57" fill="#dbe7ef" font-family="Arial, Helvetica, sans-serif" font-size="24">Exposure references</text>
+  </g>
+  <g transform="translate(376 414)">
+    <rect width="290" height="78" rx="18" fill="#ffffff" fill-opacity="0.10" stroke="#ffffff" stroke-opacity="0.14"/>
+    <text x="24" y="30" fill="#f5e642" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">PUBCHEM</text>
+    <text x="24" y="57" fill="#dbe7ef" font-family="Arial, Helvetica, sans-serif" font-size="24">Hazard lookup support</text>
+  </g>
+  <g transform="translate(690 414)">
+    <rect width="332" height="78" rx="18" fill="#ffffff" fill-opacity="0.10" stroke="#ffffff" stroke-opacity="0.14"/>
+    <text x="24" y="30" fill="#f5e642" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">BROWSER-BASED TOOL</text>
+    <text x="24" y="57" fill="#dbe7ef" font-family="Arial, Helvetica, sans-serif" font-size="24">Draft, review, and export</text>
+  </g>
+
+  <text x="104" y="546" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">coshh.uk</text>
+  <text x="946" y="546" fill="#dbe7ef" font-family="Arial, Helvetica, sans-serif" font-size="22">Dr. John Thomas Prabhakar</text>
+</svg>

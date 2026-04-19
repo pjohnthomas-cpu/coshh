@@ -5,7 +5,7 @@ A browser-based COSHH support site with two parts:
 - A landing page with practical guidance and resource links to help users prepare a COSHH assessment
 - A full single-page assessment tool for drafting, saving, and exporting COSHH forms
 
-Developed at **Bangor University**.
+Designed for broader research-laboratory use.
 
 **Live site:** https://pjohnthomas-cpu.github.io/coshh/
 
@@ -57,7 +57,7 @@ It is provided as a documentation aid. Completed assessments should be reviewed 
 ## Author
 
 **Dr. John Thomas Prabhakar**  
-Bangor University
+p.johnthomas@gmail.com
 
 ## Licence
 

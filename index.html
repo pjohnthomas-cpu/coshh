@@ -3,8 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COSHH Form Builder | Guidance, Resources, and Assessment Tool</title>
-<meta name="description" content="Prepare better COSHH assessments with a practical browser-based form builder, EH40 reference support, PubChem hazard lookup, and quick links to the resources you need before you start.">
+<title>COSHH Form Builder for Research Labs | COSHH Assessment Tool, EH40 and PubChem</title>
+<meta name="description" content="Browser-based COSHH form builder for research labs. Create COSHH assessments with practical guidance, EH40 workplace exposure references, PubChem hazard lookup, and research-lab preparation resources.">
+<link rel="canonical" href="https://coshh.uk/">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="COSHH Form Builder for Research Labs">
+<meta property="og:description" content="Create research-lab COSHH assessments with practical guidance, EH40 references, PubChem lookup, and preparation resources.">
+<meta property="og:url" content="https://coshh.uk/">
+<meta property="og:site_name" content="COSHH Form Builder">
+<meta property="og:image" content="https://coshh.uk/social-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="COSHH Form Builder for research laboratories">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://coshh.uk/social-preview.png">
+<meta name="twitter:title" content="COSHH Form Builder for Research Labs">
+<meta name="twitter:description" content="Create research-lab COSHH assessments with practical guidance, EH40 references, PubChem lookup, and preparation resources.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "COSHH Form Builder",
+      "url": "https://coshh.uk/",
+      "description": "Browser-based COSHH assessment support for research laboratories.",
+      "author": {
+        "@type": "Person",
+        "name": "Dr. John Thomas Prabhakar",
+        "email": "mailto:p.johnthomas@gmail.com"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "COSHH Form Builder",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "url": "https://coshh.uk/",
+      "description": "A browser-based COSHH assessment tool for research laboratories with EH40 reference support, PubChem hazard lookup, draft saving, and export options.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "GBP"
+      },
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Research laboratories, technicians, supervisors, postdocs, and PhD students"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a COSHH form?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A COSHH form records the hazards, exposure routes, control measures, and emergency arrangements for work involving substances hazardous to health."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who should complete a COSHH assessment in a research lab?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A COSHH assessment is usually prepared by the researcher planning the work and then checked by a supervisor, principal investigator, technician, lab manager, or another competent person."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should I gather before starting a COSHH form?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Before starting, gather the current safety data sheet, the experimental method or protocol, any relevant local SOPs, waste arrangements, and the emergency or supervision controls that apply in the lab."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -228,20 +307,38 @@ h1 {
 }
 .cards-3,
 .resources-grid,
-.steps {
+.steps,
+.roles-grid,
+.prep-grid {
   display: grid;
   gap: 18px;
 }
 .cards-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.roles-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.prep-grid {
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+}
 .card,
-.resource-card {
+.resource-card,
+.role-card,
+.prep-card {
   border-radius: 24px;
   padding: 24px;
 }
+.role-card,
+.prep-card {
+  background: var(--surface);
+  border: 1px solid rgba(15, 25, 35, 0.08);
+  box-shadow: var(--shadow);
+}
 .card h3,
 .resource-card h3,
+.role-card h3,
+.prep-card h3,
 .step h3,
 .callout h3 {
   margin: 10px 0 12px;
@@ -343,6 +440,8 @@ h1 {
   .hero-grid,
   .section-head,
   .cards-3,
+  .roles-grid,
+  .prep-grid,
   .resources-grid,
   .steps,
   .callout,
@@ -394,6 +493,9 @@ h1 {
         <p>
           This site gives research staff and students a practical starting point for creating COSHH assessments: the form builder itself, quick access to EH40 and PubChem reference data, and a checklist of the information you should gather before work begins in a research laboratory.
         </p>
+        <p>
+          It is designed for research labs that need a clear COSHH assessment tool for chemical handling, exposure control, waste planning, and documented review before experimental work starts.
+        </p>
         <div class="hero-actions">
           <a class="button" href="app.html">Start a COSHH assessment</a>
           <a class="button secondary" href="#resources">View helpful resources</a>
@@ -424,6 +526,77 @@ h1 {
           </div>
         </div>
       </aside>
+    </div>
+  </section>
+
+  <section class="section shell" id="who">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Who it's for</div>
+        <h2>Designed for the people who actually plan, supervise, and carry out research work.</h2>
+      </div>
+      <p>
+        Research lab COSHH assessments often involve several roles. This page is written to help each of them gather the right information before the form is started.
+      </p>
+    </div>
+
+    <div class="roles-grid">
+      <article class="role-card">
+        <div class="kicker">PI / Supervisor</div>
+        <h3>Set the expectations</h3>
+        <p>Confirm the scope of the work, higher-risk steps, available controls, and who is competent to review the final assessment.</p>
+      </article>
+      <article class="role-card">
+        <div class="kicker">Postdoc / Researcher</div>
+        <h3>Describe the experiment clearly</h3>
+        <p>Translate the protocol into a practical COSHH assessment with real substances, exposure routes, control measures, and waste routes.</p>
+      </article>
+      <article class="role-card">
+        <div class="kicker">PhD Student</div>
+        <h3>Use it as a planning tool</h3>
+        <p>Check that the assessment explains the task well enough that a new researcher understands the hazards, controls, and emergency actions.</p>
+      </article>
+      <article class="role-card">
+        <div class="kicker">Technician / Lab Manager</div>
+        <h3>Ground it in local reality</h3>
+        <p>Make sure storage, supervision, disposal, lone-working restrictions, and room-specific controls reflect how the lab actually operates.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section shell" id="before-start">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Before You Start</div>
+        <h2>Collect the documents and local information that usually decide whether a COSHH form is any good.</h2>
+      </div>
+      <p>
+        Most weak assessments fail because they are missing one of the basics: the current SDS, the actual protocol, the waste route, or the lab-specific emergency and supervision context.
+      </p>
+    </div>
+
+    <div class="prep-grid">
+      <article class="prep-card">
+        <div class="kicker">Core materials</div>
+        <h3>Bring these together before drafting</h3>
+        <ul class="checklist">
+          <li>Current Safety Data Sheet for each hazardous substance or mixture</li>
+          <li>Protocol, method, or experimental plan for the activity being assessed</li>
+          <li>Local SOPs for the equipment, room, or hazardous operation involved</li>
+          <li>Storage, segregation, decontamination, and waste disposal route</li>
+          <li>Emergency contacts, spill arrangements, and first-aid expectations</li>
+          <li>Lone or out-of-hours working rules for the lab or facility</li>
+        </ul>
+      </article>
+
+      <article class="prep-card">
+        <div class="kicker">Useful links</div>
+        <h3>Research-lab references worth keeping open</h3>
+        <div class="link-list">
+          <a href="https://www.hse.gov.uk/pubns/books/l5.htm" target="_blank" rel="noreferrer">HSE COSHH Approved Code of Practice and guidance (L5)</a>
+          <a href="https://edu.rsc.org/resources/coshh-resource/1116.article" target="_blank" rel="noreferrer">RSC COSHH resource for laboratory chemists</a>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -509,8 +682,10 @@ h1 {
         <div class="link-list">
           <a href="https://www.hse.gov.uk/coshh/" target="_blank" rel="noreferrer">HSE COSHH overview and guidance</a>
           <a href="https://www.legislation.gov.uk/uksi/2002/2677/contents/made" target="_blank" rel="noreferrer">COSHH Regulations 2002</a>
-          <a href="https://www.hse.gov.uk/pubns/guidance/l5.pdf" target="_blank" rel="noreferrer">Approved Code of Practice and guidance (L5)</a>
+          <a href="https://www.hse.gov.uk/pubns/books/l5.htm" target="_blank" rel="noreferrer">Approved Code of Practice and guidance (L5)</a>
           <a href="https://www.hse.gov.uk/coshh/essentials/" target="_blank" rel="noreferrer">HSE COSHH Essentials control guidance</a>
+          <a href="https://www.hse.gov.uk/chemical-classification/index.htm" target="_blank" rel="noreferrer">HSE chemical classification guidance</a>
+          <a href="https://edu.rsc.org/resources/coshh-resource/1116.article" target="_blank" rel="noreferrer">RSC COSHH resource for laboratory chemists</a>
         </div>
       </article>
 
@@ -522,7 +697,7 @@ h1 {
           <a href="#prepare">Checklist for information to gather before drafting</a>
           <a href="https://www.hse.gov.uk/pubns/indg136.pdf" target="_blank" rel="noreferrer">HSE guide to working safely with substances hazardous to health</a>
           <a href="app.html">Draft directly in the browser and export the result</a>
-          <a href="README.md">Project notes and feature summary</a>
+          <a href="mailto:p.johnthomas@gmail.com">Contact the maintainer</a>
         </div>
       </article>
 
@@ -536,6 +711,41 @@ h1 {
           <li>Could this activity create vapour, mist, dust, fumes, sharps risk, or skin contamination unexpectedly?</li>
           <li>Would a new PhD student, postdoc, or technician know what to do from this assessment alone?</li>
         </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section shell" id="faq">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">FAQ</div>
+        <h2>Common COSHH questions from research labs.</h2>
+      </div>
+      <p>
+        These are the questions people usually ask before opening the form builder or reviewing an assessment for lab work.
+      </p>
+    </div>
+
+    <div class="resources-grid">
+      <article class="resource-card">
+        <div class="resource-tag">FAQ</div>
+        <h3>What is a COSHH form?</h3>
+        <p>A COSHH form records the hazardous substances involved in a task, the exposure routes, the controls required, and the emergency or disposal arrangements that support safe work.</p>
+      </article>
+      <article class="resource-card">
+        <div class="resource-tag">FAQ</div>
+        <h3>Who should complete one in a research lab?</h3>
+        <p>In most research labs, the person planning or carrying out the experiment drafts the assessment and a supervisor, PI, technician, lab manager, or other competent reviewer checks it before work starts.</p>
+      </article>
+      <article class="resource-card">
+        <div class="resource-tag">FAQ</div>
+        <h3>What should I gather before starting?</h3>
+        <p>Start with the current SDS, the protocol or method, any local SOPs, the waste route, and the lab-specific controls or emergency procedures that apply to the work.</p>
+      </article>
+      <article class="resource-card">
+        <div class="resource-tag">FAQ</div>
+        <h3>Why use EH40 and PubChem together?</h3>
+        <p>EH40 helps with workplace exposure references, while PubChem can help identify hazard statements, classifications, and substance information that support completion of the assessment.</p>
       </article>
     </div>
   </section>
@@ -594,6 +804,7 @@ h1 {
     <div>
       <div class="brand-mark">COSHH Form Builder</div>
       <p>A browser-based drafting tool with reference links and practical prompts for completing COSHH assessments in research laboratories.</p>
+      <p>Contact: Dr. John Thomas Prabhakar · <a href="mailto:p.johnthomas@gmail.com">p.johnthomas@gmail.com</a></p>
     </div>
     <a class="small-link" href="app.html">Go to app</a>
   </div>
