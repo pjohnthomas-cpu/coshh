@@ -13,16 +13,19 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hazard Profile Lookup — EH40, PubChem &amp; EPA CTX">
 <meta name="twitter:description" content="Look up EH40 WELs, GHS hazard data, and EPA toxicity values for any substance. Free browser-based tool for research labs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --surface2: #f0efe9;
-    --border: #dddbd3;
-    --border2: #c8c5bc;
-    --text: #1a1917;
-    --text2: #5a5855;
-    --text3: #8a8783;
+    --bg: #f5f2eb;
+    --surface: #fdfaf4;
+    --surface2: #ede8dc;
+    --border: #c4bdb0;
+    --border2: #b0a898;
+    --text: #0f1923;
+    --text2: #4a5560;
+    --text3: #7a8490;
     --accent: #1a4a6b;
     --accent2: #2563a0;
     --accent-bg: #e8f0f7;
@@ -38,9 +41,9 @@
     --info: #0f3d6b;
     --info-bg: #e8f2fb;
     --info-border: #a8ccec;
-    --mono: 'Courier New', monospace;
-    --sans: 'Georgia', serif;
-    --ui: system-ui, -apple-system, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --ui: 'IBM Plex Sans', sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -72,10 +75,10 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--ui); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
   
-  header { background: var(--accent); color: #e8f0f7; padding: 16px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 2px solid #0d3050; }
-  header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.03em; font-family: var(--sans); }
-  header .sub { font-size: 11px; opacity: 0.7; margin-top: 1px; letter-spacing: 0.05em; text-transform: uppercase; }
-  .hdr-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  header { background: #0f1923; color: #e8f0f7; padding: 16px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 3px solid #c8392b; }
+  header h1 { font-size: 13px; font-weight: 600; letter-spacing: 0.18em; font-family: var(--mono); text-transform: uppercase; }
+  header .sub { font-size: 11px; opacity: 0.7; margin-top: 1px; letter-spacing: 0.05em; text-transform: uppercase; font-family: var(--mono); }
+  .hdr-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
 
   .main { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
 
@@ -117,7 +120,7 @@
   #results { display: none; }
   .compound-header { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
   .compound-name { flex: 1; min-width: 200px; }
-  .compound-name h2 { font-size: 20px; font-weight: 600; font-family: var(--sans); color: var(--text); }
+  .compound-name h2 { font-size: 20px; font-weight: 600; font-family: var(--sans); color: var(--text); letter-spacing: 0.01em; }
   .compound-name .iupac { font-size: 12px; color: var(--text3); margin-top: 2px; font-family: var(--mono); word-break: break-all; }
   .compound-ids { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .id-badge { font-size: 11px; padding: 2px 8px; border-radius: 12px; font-family: var(--mono); font-weight: 500; }
@@ -224,6 +227,21 @@
     .search-row { flex-direction: column; }
     .props-grid { grid-template-columns: 1fr 1fr; }
   }
+
+  /* ── Basket ── */
+  .btn-basket { padding: 7px 16px; border-radius: 5px; border: 1px solid var(--ok-border); background: var(--ok-bg); color: var(--ok); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--ui); transition: all 0.15s; white-space: nowrap; }
+  .btn-basket:hover { background: var(--ok); color: #fff; border-color: var(--ok); }
+  .btn-basket:disabled { opacity: 0.45; cursor: not-allowed; }
+  #basket-tray { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 2px solid var(--ok); box-shadow: 0 -4px 16px rgba(0,0,0,0.12); padding: 10px 20px; display: none; z-index: 200; align-items: center; gap: 12px; flex-wrap: wrap; }
+  #basket-tray.visible { display: flex; }
+  .basket-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ok); flex-shrink: 0; }
+  .basket-chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .basket-chip { display: flex; align-items: center; gap: 5px; padding: 3px 8px; background: var(--ok-bg); border: 1px solid var(--ok-border); border-radius: 12px; font-size: 11px; color: var(--ok); font-weight: 500; }
+  .basket-chip button { background: none; border: none; cursor: pointer; color: var(--ok); font-size: 13px; line-height: 1; padding: 0 1px; opacity: 0.7; }
+  .basket-chip button:hover { opacity: 1; }
+  .btn-open-form { padding: 8px 20px; border-radius: 5px; border: none; background: var(--ok); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--ui); white-space: nowrap; flex-shrink: 0; }
+  .btn-open-form:hover { opacity: 0.9; }
+  .btn-clear-basket { background: none; border: none; color: var(--text3); font-size: 11px; cursor: pointer; text-decoration: underline; font-family: var(--ui); flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -357,7 +375,10 @@
           <div class="iupac" id="cmpIupac"></div>
           <div class="compound-ids" id="cmpIds"></div>
         </div>
-        <div id="ghs-pics" class="ghs-grid"></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+          <div id="ghs-pics" class="ghs-grid"></div>
+          <button class="btn-basket" id="btn-add-basket" onclick="addToBasket()">+ Add to COSHH form</button>
+        </div>
       </div>
 
       <!-- Regulatory scope banners — shown/hidden by JS -->
@@ -385,6 +406,14 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Basket tray -->
+<div id="basket-tray">
+  <span class="basket-label">&#9783; COSHH basket</span>
+  <div class="basket-chips" id="basket-chips"></div>
+  <button class="btn-clear-basket" onclick="clearBasket()">Clear</button>
+  <button class="btn-open-form" onclick="openInForm()">Open in COSHH form &#8594;</button>
 </div>
 
 <footer>
@@ -1999,6 +2028,113 @@ ${ctxSection}
   const win = window.open(url,'_blank');
   if(!win) alert('Pop-up blocked — please allow pop-ups for this page to open the PDF-ready report.');
   setTimeout(()=>URL.revokeObjectURL(url), 5000);
+}
+
+// ── COSHH Basket ─────────────────────────────────────────────────────────────
+let basket = []; // array of substance objects for this session
+
+function buildBasketEntry() {
+  const d = currentData;
+  if (!d || !d.cid) return null;
+
+  // Build WEL string from EH40 matches
+  let welText = '';
+  if (d.welMatches && d.welMatches.length) {
+    const w = d.welMatches[0];
+    const parts = [];
+    if (w.twa_ppm)  parts.push(`TWA ${w.twa_ppm} ppm`);
+    if (w.twa_mgm3) parts.push(`TWA ${w.twa_mgm3} mg/m³`);
+    if (w.stel_ppm)  parts.push(`STEL ${w.stel_ppm} ppm`);
+    if (w.stel_mgm3) parts.push(`STEL ${w.stel_mgm3} mg/m³`);
+    welText = parts.join('; ');
+  }
+
+  // Build hazard text from GHS H-statements
+  const ghs = d.ghs || {};
+  const hcodes = (ghs.hstatements || []).map(s => {
+    const m = s.match(/^(H[\d]{3}[A-Z+]*)/);
+    return m ? m[1] : null;
+  }).filter(Boolean);
+  const hstmts = (ghs.hstatements || []).map(s => {
+    const m = s.match(/^(H[\d]{3}[A-Z+]*)[:\s]+(.+)/);
+    return m ? `${m[1]}: ${m[2]}` : s;
+  });
+  const hazardText = hcodes.length
+    ? (hstmts.length ? `${hcodes.join(', ')} — ${hstmts.join('; ')}` : hcodes.join(', '))
+    : '';
+
+  return {
+    name: d.query.charAt(0).toUpperCase() + d.query.slice(1),
+    cas:  d.cas || '',
+    wel:  welText,
+    hazards: hazardText,
+    signal: ghs.signal || '',
+    carcinogen: !!(d.ghs?.hstatements||[]).some(s => /H35[0-9]/.test(s)),
+    mutagen:    !!(d.ghs?.hstatements||[]).some(s => /H34[0-9]/.test(s)),
+    fire_risk:  !!(d.ghs?.hstatements||[]).some(s => /H22[0-9]|H20[0-9]|H21[0-9]/.test(s)),
+    emergency_ingestion_vomit:   false,
+    emergency_ingestion_medical: true,
+    emergency_inhalation_air:    true,
+    emergency_inhalation_medical:true,
+    emergency_skin_rinse:        true,
+    emergency_skin_medical:      false,
+    emergency_eye_rinse:         true,
+    emergency_eye_medical:       true,
+  };
+}
+
+function addToBasket() {
+  const entry = buildBasketEntry();
+  if (!entry) return;
+
+  // Prevent duplicates by CAS or name
+  const already = basket.some(s =>
+    (s.cas && s.cas === entry.cas) ||
+    s.name.toLowerCase() === entry.name.toLowerCase()
+  );
+  if (already) {
+    const btn = document.getElementById('btn-add-basket');
+    btn.textContent = '✓ Already in basket';
+    setTimeout(() => { btn.textContent = '+ Add to COSHH form'; }, 1500);
+    return;
+  }
+
+  basket.push(entry);
+  renderBasket();
+
+  const btn = document.getElementById('btn-add-basket');
+  btn.textContent = '✓ Added';
+  setTimeout(() => { btn.textContent = '+ Add to COSHH form'; }, 1200);
+}
+
+function removeFromBasket(index) {
+  basket.splice(index, 1);
+  renderBasket();
+}
+
+function clearBasket() {
+  basket = [];
+  renderBasket();
+}
+
+function renderBasket() {
+  const tray  = document.getElementById('basket-tray');
+  const chips = document.getElementById('basket-chips');
+  if (!basket.length) {
+    tray.classList.remove('visible');
+    return;
+  }
+  tray.classList.add('visible');
+  chips.innerHTML = basket.map((s, i) =>
+    `<span class="basket-chip">${s.name}${s.cas ? ' <span style="opacity:0.6;font-size:10px">'+s.cas+'</span>' : ''}
+     <button onclick="removeFromBasket(${i})" title="Remove">✕</button></span>`
+  ).join('');
+}
+
+function openInForm() {
+  if (!basket.length) return;
+  sessionStorage.setItem('coshhBasket', JSON.stringify(basket));
+  window.location.href = 'app.html';
 }
 </script>
 </body>

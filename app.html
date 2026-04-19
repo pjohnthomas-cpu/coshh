@@ -1900,7 +1900,67 @@ for (let i=0;i<2;i++) addRetainedRow();
 for (let i=0;i<3;i++) addWasteRow();
 for (let i=0;i<3;i++) addEmergencyRow();
 
-// ── Row removal ──────────────────────────────────────────────────────────────
+// ── COSHH Basket receiver ─────────────────────────────────────────────────────
+(function importBasket() {
+  const raw = sessionStorage.getItem('coshhBasket');
+  if (!raw) return;
+  sessionStorage.removeItem('coshhBasket'); // consume immediately
+  let substances;
+  try { substances = JSON.parse(raw); } catch(e) { return; }
+  if (!Array.isArray(substances) || !substances.length) return;
+
+  // Clear the blank default rows first
+  document.getElementById('substances-body').innerHTML = '';
+  substanceCount = 0;
+
+  substances.forEach(s => {
+    addSubstanceRow();
+    const tbody = document.getElementById('substances-body');
+    const row = tbody.lastElementChild;
+
+    // Fill substance name and CAS
+    const nameInput = row.querySelector('.af-name-input');
+    const casInput  = row.querySelector('.af-cas-input');
+    const welInput  = row.querySelector('.af-wel-input');
+    const hazInput  = row.querySelector('.af-hazards-input');
+
+    if (nameInput && s.name) nameInput.value = s.name;
+    if (casInput  && s.cas)  casInput.value  = s.cas;
+    if (welInput  && s.wel)  welInput.value  = s.wel;
+    if (hazInput  && s.hazards) hazInput.value = s.hazards;
+
+    // Show the autofill button since fields are populated
+    const btn = row.querySelector('.autofill-btn');
+    if (btn) btn.classList.add('visible');
+
+    // Auto-check risk questions
+    if (s.carcinogen || s.mutagen) {
+      const q3yes = document.querySelector('input[name="q3"][value="yes"]');
+      if (q3yes && !document.querySelector('input[name="q3"]:checked')) q3yes.checked = true;
+    }
+    if (s.fire_risk) {
+      const fireYes = document.querySelector('input[name="fire"][value="yes"]');
+      if (fireYes && !document.querySelector('input[name="fire"]:checked')) fireYes.checked = true;
+    }
+
+    // Pre-fill emergency row
+    updateOrCreateEmergencyRow(s, s.name);
+
+    // Pre-fill waste hazards
+    if (s.hazards) populateWasteHazards(s.name, s.hazards);
+  });
+
+  // Ensure at least one blank substance row at the end for manual additions
+  addSubstanceRow();
+
+  // Toast notification
+  setTimeout(() => {
+    toast(`${substances.length} substance${substances.length > 1 ? 's' : ''} imported from Hazard Profile tool`, 'success');
+    markDirty && markDirty();
+  }, 300);
+})();
+
+
 
 // Remove a generic table row (waste, emergency, retained)
 function removeGenericRow(btn) {
