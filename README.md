@@ -1,37 +1,39 @@
 # COSHH Assessment Form
 
-A single-file, browser-based tool for completing **Control of Substances Hazardous to Health (COSHH)** assessments in compliance with the Control of Substances Hazardous to Health Regulations 2002.
+A browser-based COSHH support site with two parts:
+
+- A landing page with practical guidance and resource links to help users prepare a COSHH assessment
+- A full single-page assessment tool for drafting, saving, and exporting COSHH forms
 
 Developed at **Bangor University**.
 
-**Live tool:** https://pjohnthomas-cpu.github.io/coshh/
+**Live site:** https://pjohnthomas-cpu.github.io/coshh/
 
-## Features
+## Site structure
+
+- `index.html` — landing page with preparation guidance, resource links, and entry points into the tool
+- `app.html` — the full COSHH assessment application
+- `eh40_data.json` — bundled EH40 Workplace Exposure Limits dataset used for local lookup
+- `.nojekyll` — prevents GitHub Pages from running Jekyll processing
+
+## Tool features
 
 - **PubChem integration** — look up GHS classification, hazard statements, and pictograms by substance name or CAS number
-- **EH40 Workplace Exposure Limits** — local lookup against the UK EH40 database (bundled as `eh40.json`)
-- **Multiple export formats** — PDF, Word (.docx), and ODT
+- **EH40 Workplace Exposure Limits** — local lookup against the bundled EH40 dataset
+- **Multiple export formats** — PDF, Word (`.docx`), and ODT
 - **Draft management** — save and load drafts as JSON files, or persist drafts in the browser via localStorage
 - **Autosave** — automatic draft saving to browser storage while you work
-- **Chemistry notation toolbar** — insert subscripts, superscripts, Greek letters, and special characters into any text field
+- **Chemistry notation toolbar** — insert subscripts, superscripts, Greek letters, and special characters into compatible text fields
 - **Responsive design** — works on desktop, tablet, and mobile
 
 ## Usage
 
-The tool runs entirely in the browser — no server, no installation, no account required.
-
-1. Open `index.html` in any modern browser, or visit the live deployment
-2. Fill in the assessment details, substances, controls, and emergency procedures
-3. Use the **PubChem lookup** button to retrieve hazard data for each substance
-4. Export the completed assessment using the format of your choice
-
-## Files
-
-| File | Description |
-|------|-------------|
-| `index.html` | The complete COSHH assessment application (self-contained) |
-| `eh40.json` | EH40 Workplace Exposure Limits database (HSE, 4th edition) |
-| `.nojekyll` | Prevents GitHub Pages from running Jekyll processing |
+1. Open the live site or load `index.html` in a browser
+2. Review the preparation checklist and linked reference material
+3. Open the tool from the landing page or go directly to `app.html`
+4. Fill in the assessment details, substances, controls, and emergency procedures
+5. Use the built-in lookup tools to support hazard and exposure-limit checks
+6. Export the completed assessment in the format you need
 
 ## Dependencies
 
@@ -43,12 +45,12 @@ All runtime dependencies are loaded from public CDNs and require an internet con
 - [docx](https://github.com/dolanmiu/docx) — Word document generation
 - [IBM Plex fonts](https://fonts.google.com/specimen/IBM+Plex+Sans) — via Google Fonts
 
-## Regulatory Context
+## Regulatory context
 
-This tool is designed to support compliance with:
+This project is designed to support compliance with:
 
-- Control of Substances Hazardous to Health Regulations 2002 (COSHH)
-- HSE EH40/2005 Workplace Exposure Limits (4th edition, 2020)
+- Control of Substances Hazardous to Health Regulations 2002
+- HSE EH40/2005 Workplace Exposure Limits, including later amendments reflected in the bundled dataset
 
 It is provided as a documentation aid. Completed assessments should be reviewed by a suitably qualified person before work commences.
 
