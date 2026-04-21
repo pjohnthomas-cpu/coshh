@@ -701,6 +701,39 @@ function setStatus(msg, type){
 
 function clearStatus(){ document.getElementById('statusBar').className='status-bar'; }
 
+function normaliseText(s){
+  return (s||'').toLowerCase().replace(/\s+/g,' ').trim();
+}
+
+function getPreferredWelIndex(query, cas, welMatches){
+  if(!Array.isArray(welMatches) || !welMatches.length) return 0;
+  const queryNorm = normaliseText(query);
+  const casNorm = (cas||'').replace(/[-\s]/g,'');
+
+  let index = welMatches.findIndex(r => (r[1]||'').replace(/[-\s]/g,'') === casNorm && casNorm);
+  if(index >= 0) return index;
+
+  index = welMatches.findIndex(r => normaliseText(r[0]) === queryNorm && queryNorm);
+  if(index >= 0) return index;
+
+  index = welMatches.findIndex(r => normaliseText(r[0]).startsWith(queryNorm) && queryNorm.length >= 4);
+  if(index >= 0) return index;
+
+  return 0;
+}
+
+function getSelectedWelMatch(d=currentData){
+  if(!d?.welMatches?.length) return null;
+  const idx = Number.isInteger(d.selectedWelIndex) ? d.selectedWelIndex : 0;
+  return d.welMatches[idx] || d.welMatches[0] || null;
+}
+
+function selectWelMatch(index){
+  if(!currentData?.welMatches?.length) return;
+  currentData.selectedWelIndex = Math.max(0, Math.min(index, currentData.welMatches.length - 1));
+  renderWELsTab();
+}
+
 async function search(){
   const q = document.getElementById('query').value.trim();
   if(!q) return;
@@ -799,7 +832,10 @@ async function fetchAll(q){
   const welMatches = lookupEH40(q, cas, props.IUPACName);
 
   // 5. Render immediately with PubChem data — don't wait for EPA
-  currentData = { cid, props, ghs, cas, welMatches, ctxData: null, physProps, lcssData, query: q };
+  currentData = {
+    cid, props, ghs, cas, welMatches, ctxData: null, physProps, lcssData, query: q,
+    selectedWelIndex: getPreferredWelIndex(q, cas, welMatches)
+  };
   clearStatus();
   renderResults();
 
@@ -1245,10 +1281,17 @@ function renderWELsTab(){
   if(!d.welMatches.length){
     html += `<p class="no-data">No EH40 WEL found matching "${escapeHtml(d.query)}"${d.cas ? ` / CAS ${escapeHtml(d.cas)}` : ''}. Check EH40 Table 1 directly or try a synonym. Absence from this list does not mean the substance is safe.</p>`;
   } else {
+    const selectedMatch = getSelectedWelMatch(d);
+    if (selectedMatch) {
+      html += `<div style="margin:0 0 10px;padding:8px 12px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:5px;font-size:11px;color:var(--info)">
+        <strong>Selected for COSHH transfer:</strong> ${escapeHtml(selectedMatch[0])}${selectedMatch[1] ? ` (CAS ${escapeHtml(selectedMatch[1])})` : ''}. If there are multiple EH40 rows, choose the one that matches your actual substance form before adding to the basket.
+      </div>`;
+    }
     html += `<table class="wels-table"><thead><tr>
-      <th>Substance</th><th>CAS</th><th>TWA (ppm)</th><th>TWA (mg&middot;m<sup>-3</sup>)</th><th>STEL (ppm)</th><th>STEL (mg&middot;m<sup>-3</sup>)</th><th>Notations</th>
+      <th>Use</th><th>Substance</th><th>CAS</th><th>TWA (ppm)</th><th>TWA (mg&middot;m<sup>-3</sup>)</th><th>STEL (ppm)</th><th>STEL (mg&middot;m<sup>-3</sup>)</th><th>Notations</th>
     </tr></thead><tbody>`;
-    for(const r of d.welMatches){
+    for(let i = 0; i < d.welMatches.length; i++){
+      const r = d.welMatches[i];
       // Safe display helper: null/undefined/"" all become em-dash; 0 is a valid value
       const fv = v => (v !== null && v !== undefined && v !== '') ? v : '&#8212;';
       const notations = (r[6]||'').split(',').filter(n=>n.trim()).map(n=>{
@@ -1261,6 +1304,9 @@ function renderWELsTab(){
         return '';
       }).filter(Boolean).join(' ');
       html += `<tr>
+        <td style="text-align:center;vertical-align:middle">
+          <input type="radio" name="welChoice" value="${i}" ${getSelectedWelMatch(d) === r ? 'checked' : ''} onclick="selectWelMatch(${i})" aria-label="Use EH40 row ${i+1}">
+        </td>
         <td>${r[0]}</td>
         <td style="font-family:var(--mono);font-size:11px">${r[1]||'&#8212;'}</td>
         <td class="val">${fv(r[2])}</td>
@@ -1524,9 +1570,10 @@ async function renderLCSSCurated(d, el){
     }
   }
 
-  const welInfo = (d.welMatches||[]).map(r=>
-    `${r[0]}: TWA ${r[2]!=null?r[2]+' ppm':''} ${r[3]!=null?r[3]+' mg/m\u207b\u00b3':''} ${r[6]?'['+r[6]+']':''}`
-  ).join('; ');
+  const selectedWel = getSelectedWelMatch(d);
+  const welInfo = selectedWel
+    ? `${selectedWel[0]}: TWA ${selectedWel[2]!=null?selectedWel[2]+' ppm':''} ${selectedWel[3]!=null?selectedWel[3]+' mg/m\u207b\u00b3':''} ${selectedWel[6]?'['+selectedWel[6]+']':''}`
+    : '';
 
   const {op, qtyUsed, qtyHandled, contain} = getUseContext();
   const useContext = [
@@ -1539,7 +1586,7 @@ async function renderLCSSCurated(d, el){
   const prompt = `You are a COSHH (Control of Substances Hazardous to Health) safety adviser at a UK university research laboratory.
 
 I will give you the raw PubChem LCSS (Laboratory Chemical Safety Summary) data for ${d.query} (CAS: ${d.cas||'unknown'}, MW: ${d.props?.MolecularWeight||'unknown'} g/mol).
-${welInfo ? `EH40 Workplace Exposure Limits: ${welInfo}` : ''}
+${welInfo ? `Selected EH40 Workplace Exposure Limit: ${welInfo}` : ''}
 ${useContext ? `Intended use context: ${useContext}` : 'No specific use context provided — provide a general lab-scale summary.'}
 
 Your task is to extract a concise, practical safety summary relevant to small-scale research laboratory use${useContext ? `, specifically tailored to the stated use context` : ''}.
@@ -1804,6 +1851,8 @@ function exportCSV(){
   rows.push(['Molecular Weight (g/mol)', d.props?.MolecularWeight||'']);
   const {op: csvOp, qtyUsed: csvQtyUsed, qtyHandled: csvQtyHandled, contain: csvContain} = getUseContext();
   rows.push(['Use context', [csvOp, csvQtyUsed ? `Quantity used: ${csvQtyUsed}` : '', csvQtyHandled ? `Quantity handled: ${csvQtyHandled}` : '', csvContain].filter(Boolean).join(' | ') || 'Not specified']);
+  const csvSelectedWel = getSelectedWelMatch(d);
+  if (csvSelectedWel) rows.push(['Selected EH40 row', `${csvSelectedWel[0]}${csvSelectedWel[1] ? ` | CAS ${csvSelectedWel[1]}` : ''}`]);
   rows.push([]);
 
   // Section: GHS
@@ -1895,6 +1944,11 @@ function exportJSON(){
       quantityHandled: qtyHandled || null,
       containment: contain || null,
       useContext: [op, qtyUsed ? `Quantity used: ${qtyUsed}` : '', qtyHandled ? `Quantity handled: ${qtyHandled}` : '', contain].filter(Boolean).join(' | ') || 'Not specified',
+      selectedEH40: getSelectedWelMatch(d) ? {
+        name: getSelectedWelMatch(d)[0],
+        cas: getSelectedWelMatch(d)[1] || null,
+        notations: getSelectedWelMatch(d)[6] || ''
+      } : null,
     },
     identity: {
       pubchemCID: d.cid,
@@ -2115,6 +2169,9 @@ function sanitiseBasketEntry(entry) {
     qty_used: typeof entry.qty_used === 'string' ? entry.qty_used : '',
     qty_handled: typeof entry.qty_handled === 'string' ? entry.qty_handled : '',
     wel: typeof entry.wel === 'string' ? entry.wel : '',
+    wel_name: typeof entry.wel_name === 'string' ? entry.wel_name : '',
+    wel_cas: typeof entry.wel_cas === 'string' ? entry.wel_cas : '',
+    wel_notes: typeof entry.wel_notes === 'string' ? entry.wel_notes : '',
     hazards: typeof entry.hazards === 'string' ? entry.hazards : '',
     signal: typeof entry.signal === 'string' ? entry.signal : '',
     carcinogen: !!entry.carcinogen,
@@ -2154,11 +2211,12 @@ function buildBasketEntry() {
   const d = currentData;
   if (!d || !d.cid) return null;
   const { qtyUsed, qtyHandled } = getUseContext();
+  const selectedWel = getSelectedWelMatch(d);
 
   // Build WEL string from EH40 matches
   let welText = '';
-  if (d.welMatches && d.welMatches.length) {
-    const w = d.welMatches[0];
+  if (selectedWel) {
+    const w = selectedWel;
     const parts = [];
     if (w.twa_ppm)  parts.push(`TWA ${w.twa_ppm} ppm`);
     if (w.twa_mgm3) parts.push(`TWA ${w.twa_mgm3} mg/m³`);
@@ -2200,6 +2258,9 @@ function buildBasketEntry() {
     qty_used: qtyUsed,
     qty_handled: qtyHandled,
     wel:  welText,
+    wel_name: selectedWel?.[0] || '',
+    wel_cas: selectedWel?.[1] || '',
+    wel_notes: selectedWel?.[6] || '',
     hazards: hazardText,
     signal: ghs.signal || '',
     carcinogen: hcodes.some(code => /H35[0-9]/.test(code)),

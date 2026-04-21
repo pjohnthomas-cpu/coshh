@@ -2084,11 +2084,13 @@ function importBasket(showToast = true) {
   let importedCount = 0;
 
   substances.forEach(s => {
+    const importedName = s.name || s.wel_name || '';
+    const importedCas = s.cas || s.wel_cas || '';
     const duplicateRow = Array.from(tbody.querySelectorAll('tr')).find(row => {
       const nameInput = row.querySelector('.af-name-input');
       const casInput = row.querySelector('.af-cas-input');
-      const nameMatches = s.name && nameInput && nameInput.value.trim().toLowerCase() === s.name.toLowerCase();
-      const casMatches = s.cas && casInput && casInput.value.trim() === s.cas;
+      const nameMatches = importedName && nameInput && nameInput.value.trim().toLowerCase() === importedName.toLowerCase();
+      const casMatches = importedCas && casInput && casInput.value.trim() === importedCas;
       return casMatches || nameMatches;
     });
     if (duplicateRow) return;
@@ -2114,8 +2116,8 @@ function importBasket(showToast = true) {
     const welInput  = targetRow.querySelector('.af-wel-input');
     const hazInput  = targetRow.querySelector('.af-hazards-input');
 
-    if (nameInput && s.name) nameInput.value = s.name;
-    if (casInput  && s.cas)  casInput.value  = s.cas;
+    if (nameInput && importedName) nameInput.value = importedName;
+    if (casInput  && importedCas)  casInput.value  = importedCas;
     if (qtyUsedInput && s.qty_used) qtyUsedInput.value = s.qty_used;
     if (qtyHandledInput && s.qty_handled) qtyHandledInput.value = s.qty_handled;
     if (welInput  && s.wel)  welInput.value  = s.wel;
@@ -2133,8 +2135,8 @@ function importBasket(showToast = true) {
       if (fireYes && !document.querySelector('input[name="fire"]:checked')) fireYes.checked = true;
     }
 
-    updateOrCreateEmergencyRow(s, s.name);
-    if (s.hazards) populateWasteHazards(s.name, s.hazards);
+    updateOrCreateEmergencyRow(s, importedName);
+    if (s.hazards) populateWasteHazards(importedName, s.hazards);
     importedCount += 1;
   });
 
