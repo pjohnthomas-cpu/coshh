@@ -162,6 +162,13 @@ img { max-width: 100%; }
 }
 .nav a:hover,
 .nav a:focus-visible { color: var(--ink); }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 .button {
   display: inline-flex;
   align-items: center;
@@ -451,12 +458,22 @@ h1 {
   .nav {
     display: none;
   }
+  .site-header .shell {
+    align-items: flex-start;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 @media (max-width: 640px) {
   .shell { width: min(100% - 20px, 1160px); }
   .site-header { position: static; }
   h1 { font-size: clamp(2.6rem, 15vw, 4rem); }
   .hero { padding-top: 40px; }
+  .header-actions .button {
+    flex: 1 1 220px;
+  }
   .hero-panel,
   .card,
   .resource-card,
@@ -481,7 +498,10 @@ h1 {
       <a href="#start">Start</a>
       <a href="hp.html">Hazard Lookup</a>
     </nav>
-    <a class="button" href="app.html">Open the tool</a>
+    <div class="header-actions">
+      <a class="button secondary" href="hp.html">Open hazard lookup</a>
+      <a class="button" href="app.html">Open the tool</a>
+    </div>
   </div>
 </header>
 
@@ -499,6 +519,7 @@ h1 {
         </p>
         <div class="hero-actions">
           <a class="button" href="app.html">Start a COSHH assessment</a>
+          <a class="button secondary" href="hp.html">Open hazard lookup</a>
           <a class="button secondary" href="#resources">View helpful resources</a>
         </div>
       </div>

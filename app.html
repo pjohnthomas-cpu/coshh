@@ -82,6 +82,39 @@
     gap: 3px;
     text-align: left;
   }
+  .site-header-nav {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .site-header-link {
+    font-size: 11px;
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: 8px 12px;
+    transition: opacity 0.12s, background 0.12s, color 0.12s;
+  }
+  .site-header-link.lookup {
+    color: #f5e642;
+    background: rgba(245, 230, 66, 0.08);
+    border: 1px solid rgba(245, 230, 66, 0.22);
+  }
+  .site-header-link.home {
+    color: #fff;
+    opacity: 0.75;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+  .site-header-link:hover,
+  .site-header-link:focus-visible {
+    opacity: 1;
+  }
 
   /* ── main layout ── */
   .shell {
@@ -595,6 +628,8 @@
     .site-header h1    { font-size: 11px; letter-spacing: 0.12em; }
     .site-header .badge { display: none; }         /* subtitle hidden — saves height */
     .header-title-block { text-align: left; }
+    .site-header-nav { width: 100%; justify-content: flex-start; }
+    .site-header-link { padding: 8px 10px; }
 
     /* ── Save bar ─────────────────────────────────────────────────────────── */
     .save-bar          { padding: 10px 14px; gap: 8px; }
@@ -1360,9 +1395,9 @@
     <h1>COSHH Assessment Form</h1>
     <span class="badge">Control of Substances Hazardous to Health Regulations 2002</span>
   </div>
-  <nav style="display:flex;gap:10px;align-items:center;flex-shrink:0">
-    <a href="hp.html" style="color:#f5e642;font-size:11px;font-family:var(--mono);letter-spacing:0.08em;text-decoration:none;opacity:0.9;white-space:nowrap">&#9763; Hazard Lookup</a>
-    <a href="index.html" style="color:#fff;font-size:11px;font-family:var(--mono);letter-spacing:0.08em;text-decoration:none;opacity:0.6;white-space:nowrap">&#8592; coshh.uk</a>
+  <nav class="site-header-nav" aria-label="App links">
+    <a href="hp.html" class="site-header-link lookup">&#9763; Hazard Lookup</a>
+    <a href="index.html" class="site-header-link home">&#8592; coshh.uk</a>
   </nav>
 </header>
 
