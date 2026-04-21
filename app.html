@@ -137,6 +137,73 @@
     height: 4px;
     background: repeating-linear-gradient(90deg, var(--accent) 0 8px, var(--accent2) 8px 16px);
   }
+  .basket-sync-bar {
+    margin: 18px 0 24px;
+    padding: 12px 14px;
+    border: 1px solid var(--rule);
+    background: #fffdf7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .basket-sync-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .basket-sync-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--accent2);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .basket-sync-text {
+    font-size: 12px;
+    color: #44515d;
+  }
+  .basket-sync-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .basket-sync-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #44515d;
+    cursor: pointer;
+  }
+  .basket-sync-toggle input {
+    accent-color: var(--accent2);
+  }
+  .basket-sync-clear {
+    border: 1px solid var(--rule);
+    background: #fff;
+    color: var(--ink);
+    padding: 7px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .basket-sync-clear:hover {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
 
   /* ── section headers ── */
   .section-label {
@@ -1470,6 +1537,20 @@
     <span style="white-space:nowrap;">Date: <input type="date" id="assessment-date"></span>
   </div>
 
+  <div class="basket-sync-bar" aria-live="polite">
+    <div class="basket-sync-summary">
+      <span class="basket-sync-count" id="basket-count-app">0</span>
+      <div class="basket-sync-text" id="basket-summary-app">No substances waiting in the shared basket.</div>
+    </div>
+    <div class="basket-sync-actions">
+      <label class="basket-sync-toggle" for="basket-clear-on-import">
+        <input type="checkbox" id="basket-clear-on-import">
+        <span>Remove basket after import</span>
+      </label>
+      <button type="button" class="basket-sync-clear" id="basket-clear-btn" onclick="clearBasketFromForm()">Clear basket</button>
+    </div>
+  </div>
+
   <!-- Header fields -->
   <div class="section-block">
     <div class="section-label">Assessment Details</div>
@@ -1936,39 +2017,113 @@ for (let i=0;i<3;i++) addWasteRow();
 for (let i=0;i<3;i++) addEmergencyRow();
 
 // ── COSHH Basket receiver ─────────────────────────────────────────────────────
-(function importBasket() {
-  const raw = sessionStorage.getItem('coshhBasket');
-  if (!raw) return;
-  sessionStorage.removeItem('coshhBasket'); // consume immediately
-  let substances;
-  try { substances = JSON.parse(raw); } catch(e) { return; }
-  if (!Array.isArray(substances) || !substances.length) return;
+const COSHH_BASKET_KEY = 'coshhBasket';
+const COSHH_BASKET_CLEAR_ON_IMPORT_KEY = 'coshhBasketClearOnImport';
+let lastImportedBasketSignature = '';
 
-  // Clear the blank default rows first
-  document.getElementById('substances-body').innerHTML = '';
-  substanceCount = 0;
+function getBasketSubstances() {
+  try {
+    const raw = localStorage.getItem(COSHH_BASKET_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function shouldClearBasketAfterImport() {
+  return localStorage.getItem(COSHH_BASKET_CLEAR_ON_IMPORT_KEY) === 'true';
+}
+
+function setClearBasketAfterImport(enabled) {
+  localStorage.setItem(COSHH_BASKET_CLEAR_ON_IMPORT_KEY, enabled ? 'true' : 'false');
+}
+
+function updateBasketStatus() {
+  const substances = getBasketSubstances();
+  const countEl = document.getElementById('basket-count-app');
+  const summaryEl = document.getElementById('basket-summary-app');
+  const clearBtn = document.getElementById('basket-clear-btn');
+  const count = substances.length;
+  if (countEl) countEl.textContent = count;
+  if (summaryEl) {
+    summaryEl.textContent = count
+      ? `${count} substance${count > 1 ? 's are' : ' is'} waiting from the Hazard Profile tool.`
+      : 'No substances waiting in the shared basket.';
+  }
+  if (clearBtn) clearBtn.disabled = count === 0;
+}
+
+function clearBasketFromForm(showToast = true) {
+  localStorage.removeItem(COSHH_BASKET_KEY);
+  lastImportedBasketSignature = '';
+  updateBasketStatus();
+  if (showToast) toast('Shared basket cleared.', 'success');
+}
+
+function ensureTrailingBlankSubstanceRow() {
+  const tbody = document.getElementById('substances-body');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const hasBlankRow = rows.some(row => {
+    const nameInput = row.querySelector('.af-name-input');
+    const casInput = row.querySelector('.af-cas-input');
+    const welInput = row.querySelector('.af-wel-input');
+    const hazInput = row.querySelector('.af-hazards-input');
+    return [nameInput, casInput, welInput, hazInput].every(input => !input || !input.value.trim());
+  });
+  if (!hasBlankRow) addSubstanceRow();
+}
+
+function importBasket(showToast = true) {
+  const substances = getBasketSubstances();
+  const signature = JSON.stringify(substances);
+  if (!substances.length || signature === lastImportedBasketSignature) return;
+
+  const tbody = document.getElementById('substances-body');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  let importedCount = 0;
 
   substances.forEach(s => {
-    addSubstanceRow();
-    const tbody = document.getElementById('substances-body');
-    const row = tbody.lastElementChild;
+    const duplicateRow = Array.from(tbody.querySelectorAll('tr')).find(row => {
+      const nameInput = row.querySelector('.af-name-input');
+      const casInput = row.querySelector('.af-cas-input');
+      const nameMatches = s.name && nameInput && nameInput.value.trim().toLowerCase() === s.name.toLowerCase();
+      const casMatches = s.cas && casInput && casInput.value.trim() === s.cas;
+      return casMatches || nameMatches;
+    });
+    if (duplicateRow) return;
 
-    // Fill substance name and CAS
-    const nameInput = row.querySelector('.af-name-input');
-    const casInput  = row.querySelector('.af-cas-input');
-    const welInput  = row.querySelector('.af-wel-input');
-    const hazInput  = row.querySelector('.af-hazards-input');
+    let targetRow = rows.find(row => {
+      const nameInput = row.querySelector('.af-name-input');
+      const casInput = row.querySelector('.af-cas-input');
+      const welInput = row.querySelector('.af-wel-input');
+      const hazInput = row.querySelector('.af-hazards-input');
+      return [nameInput, casInput, welInput, hazInput].every(input => !input || !input.value.trim());
+    });
+
+    if (!targetRow) {
+      addSubstanceRow();
+      targetRow = tbody.lastElementChild;
+      rows.push(targetRow);
+    }
+
+    const nameInput = targetRow.querySelector('.af-name-input');
+    const casInput  = targetRow.querySelector('.af-cas-input');
+    const qtyUsedInput = targetRow.querySelector('input[data-col="qty_used"]');
+    const qtyHandledInput = targetRow.querySelector('input[data-col="qty_handled"]');
+    const welInput  = targetRow.querySelector('.af-wel-input');
+    const hazInput  = targetRow.querySelector('.af-hazards-input');
 
     if (nameInput && s.name) nameInput.value = s.name;
     if (casInput  && s.cas)  casInput.value  = s.cas;
+    if (qtyUsedInput && s.qty_used) qtyUsedInput.value = s.qty_used;
+    if (qtyHandledInput && s.qty_handled) qtyHandledInput.value = s.qty_handled;
     if (welInput  && s.wel)  welInput.value  = s.wel;
     if (hazInput  && s.hazards) hazInput.value = s.hazards;
 
-    // Show the autofill button since fields are populated
-    const btn = row.querySelector('.autofill-btn');
+    const btn = targetRow.querySelector('.autofill-btn');
     if (btn) btn.classList.add('visible');
 
-    // Auto-check risk questions
     if (s.carcinogen || s.mutagen) {
       const q3yes = document.querySelector('input[name="q3"][value="yes"]');
       if (q3yes && !document.querySelector('input[name="q3"]:checked')) q3yes.checked = true;
@@ -1978,22 +2133,54 @@ for (let i=0;i<3;i++) addEmergencyRow();
       if (fireYes && !document.querySelector('input[name="fire"]:checked')) fireYes.checked = true;
     }
 
-    // Pre-fill emergency row
     updateOrCreateEmergencyRow(s, s.name);
-
-    // Pre-fill waste hazards
     if (s.hazards) populateWasteHazards(s.name, s.hazards);
+    importedCount += 1;
   });
 
-  // Ensure at least one blank substance row at the end for manual additions
-  addSubstanceRow();
+  ensureTrailingBlankSubstanceRow();
+  lastImportedBasketSignature = signature;
 
-  // Toast notification
-  setTimeout(() => {
-    toast(`${substances.length} substance${substances.length > 1 ? 's' : ''} imported from Hazard Profile tool`, 'success');
+  if (!importedCount) return;
+
+  if (shouldClearBasketAfterImport()) {
+    clearBasketFromForm(false);
+  } else {
+    updateBasketStatus();
+  }
+
+  if (showToast) {
+    setTimeout(() => {
+      const suffix = shouldClearBasketAfterImport() ? ' Basket cleared.' : '';
+      toast(`${importedCount} substance${importedCount > 1 ? 's' : ''} imported from Hazard Profile tool.${suffix}`, 'success');
+      markDirty && markDirty();
+    }, 300);
+  } else {
     markDirty && markDirty();
-  }, 300);
-})();
+  }
+}
+
+const basketClearToggle = document.getElementById('basket-clear-on-import');
+if (basketClearToggle) {
+  basketClearToggle.checked = shouldClearBasketAfterImport();
+  basketClearToggle.addEventListener('change', (event) => {
+    setClearBasketAfterImport(event.target.checked);
+  });
+}
+
+updateBasketStatus();
+importBasket();
+
+window.addEventListener('storage', (event) => {
+  if (event.key === COSHH_BASKET_CLEAR_ON_IMPORT_KEY) {
+    const toggle = document.getElementById('basket-clear-on-import');
+    if (toggle) toggle.checked = shouldClearBasketAfterImport();
+    return;
+  }
+  if (event.key !== COSHH_BASKET_KEY) return;
+  updateBasketStatus();
+  importBasket(false);
+});
 
 
 

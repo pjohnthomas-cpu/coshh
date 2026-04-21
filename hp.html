@@ -271,6 +271,8 @@
   .btn-open-form { padding: 8px 20px; border-radius: 5px; border: none; background: var(--ok); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--ui); white-space: nowrap; flex-shrink: 0; }
   .btn-open-form:hover { opacity: 0.9; }
   .btn-clear-basket { background: none; border: none; color: var(--text3); font-size: 11px; cursor: pointer; text-decoration: underline; font-family: var(--ui); flex-shrink: 0; }
+  .basket-status { margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 999px; background: var(--ok-bg); border: 1px solid var(--ok-border); color: var(--ok); font-size: 11px; font-weight: 600; }
+  .basket-status-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px; background: var(--ok); color: #fff; font-family: var(--mono); font-size: 11px; }
 </style>
 </head>
 <body>
@@ -293,6 +295,11 @@
     <div class="card-title">Hazard lookup</div>
     <div>
       Research a substance before you draft the assessment. This tool brings together EH40 workplace exposure limits, PubChem GHS hazard information, EPA CTX toxicity data, and a basket flow that sends selected substances into the main COSHH form.
+    </div>
+    <div class="basket-status" aria-live="polite">
+      <span>Basket</span>
+      <span class="basket-status-count" id="basket-count">0</span>
+      <span id="basket-summary">No substances queued</span>
     </div>
     <div class="intro-actions">
       <a class="btn" href="app.html">Open COSHH form</a>
@@ -335,8 +342,21 @@
       </div>
 
       <div class="field">
-        <label>Quantity</label>
-        <select id="qtySelect" onchange="invalidateLCSSCache()">
+        <label>Quantity used</label>
+        <select id="qtyUsedSelect" onchange="invalidateLCSSCache()">
+          <option value="">— select —</option>
+          <option value="trace / analytical scale (<1 mg or <1 µl)">Trace / analytical (&lt;1 mg or &lt;1 µl)</option>
+          <option value="small (1 mg – 1 g or 1 µl – 1 ml)">Small (1 mg–1 g / 1–1000 µl)</option>
+          <option value="moderate (1–10 g or 1–10 ml)">Moderate (1–10 g / 1–10 ml)</option>
+          <option value="intermediate (10–100 g or 10–100 ml)">Intermediate (10–100 g / 10–100 ml)</option>
+          <option value="large (100 g – 1 kg or 100 ml – 1 L)">Large (100 g–1 kg / 100 ml–1 L)</option>
+          <option value="bulk (>1 kg or >1 L)">Bulk (&gt;1 kg / &gt;1 L)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Quantity handled</label>
+        <select id="qtyHandledSelect" onchange="invalidateLCSSCache()">
           <option value="">— select —</option>
           <option value="trace / analytical scale (<1 mg or <1 µl)">Trace / analytical (&lt;1 mg or &lt;1 µl)</option>
           <option value="small (1 mg – 1 g or 1 µl – 1 ml)">Small (1 mg–1 g / 1–1000 µl)</option>
@@ -389,7 +409,7 @@
         onchange="toggleAI(this.checked)">
       <div>
         <label for="aiToggle" style="font-size:13px;font-weight:500;color:var(--text);cursor:pointer">Enable optional AI safety summary</label>
-        <div style="font-size:11px;color:var(--text3);margin-top:1px">Uses Gemini 1.5 Flash to shorten long safety text for lab-scale reading. The core lookup tool works without it.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">Uses Gemini 2.5 Flash to shorten long safety text for lab-scale reading. The core lookup tool works without it.</div>
       </div>
     </div>
 
@@ -397,7 +417,7 @@
     <div id="geminiKeyPanel" style="display:none;margin-top:10px">
       <div class="api-key-row">
         <div class="field">
-          <label>Gemini API Key <span style="font-weight:400;text-transform:none;color:var(--text3)">— free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent2)">aistudio.google.com/apikey</a></span></label>
+          <label>Gemini API Key <span style="font-weight:400;text-transform:none;color:var(--text3)">— create one in <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent2)">Google AI Studio</a></span></label>
           <input type="text" id="geminiKey" placeholder="Paste your Gemini API key here (starts with AIzaSy…)" autocomplete="off">
         </div>
         <button class="btn btn-ghost" onclick="saveKey('gemini')">Save</button>
@@ -586,9 +606,10 @@ function getUseContext(){
   const opSel = document.getElementById('opSelect').value;
   const opOther = document.getElementById('opOther').value.trim();
   const op = opSel === 'other' ? (opOther || 'unspecified operation') : (opSel || '');
-  const qty = document.getElementById('qtySelect').value || '';
+  const qtyUsed = document.getElementById('qtyUsedSelect').value || '';
+  const qtyHandled = document.getElementById('qtyHandledSelect').value || '';
   const contain = document.getElementById('containSelect').value || '';
-  return {op, qty, contain};
+  return {op, qtyUsed, qtyHandled, contain};
 }
 
 function renderRegBanners(cas, name){
@@ -1185,7 +1206,7 @@ function renderHazardTab(){
 
 function renderFormHazardNotes(){
   // Now driven by the operation/containment dropdowns rather than form chips
-  const {op, qty, contain} = getUseContext();
+  const {op, qtyUsed, qtyHandled, contain} = getUseContext();
   const notes = [];
   if(op.toLowerCase().includes('grind')||op.toLowerCase().includes('mill')||op.toLowerCase().includes('crush'))
     notes.push('⚠ Grinding/milling generates fine respirable dust — inhalation risk is significantly elevated. RPE required unless fully enclosed.');
@@ -1199,10 +1220,11 @@ function renderFormHazardNotes(){
     notes.push('⚠ Open bench with no LEV — inhalation controls rely entirely on room ventilation. Ensure WEL compliance is achievable for this arrangement.');
   if(contain.toLowerCase().includes('recirculating'))
     notes.push('⚠ Recirculating fume cupboard — verify the filter type is appropriate for this substance. Not suitable for all chemicals.');
-  if(qty.toLowerCase().includes('large')||qty.toLowerCase().includes('bulk'))
+  if((qtyUsed && (qtyUsed.toLowerCase().includes('large')||qtyUsed.toLowerCase().includes('bulk'))) ||
+     (qtyHandled && (qtyHandled.toLowerCase().includes('large')||qtyHandled.toLowerCase().includes('bulk'))))
     notes.push('⚠ Large/bulk quantity — spill risk and vapour generation are substantially elevated compared to small-scale work. Review emergency procedures.');
-  if(!op && !qty && !contain)
-    return '<div style="font-size:12px;color:var(--text3)">Select operation, quantity and containment above for context-specific notes.</div>';
+  if(!op && !qtyUsed && !qtyHandled && !contain)
+    return '<div style="font-size:12px;color:var(--text3)">Select operation, quantities, and containment above for context-specific notes.</div>';
   return notes.map(n=>
     `<div style="font-size:12px;color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border)">${n}</div>`
   ).join('') || '<div style="font-size:12px;color:var(--text3)">No specific concerns identified for the selected operation and containment.</div>';
@@ -1506,10 +1528,11 @@ async function renderLCSSCurated(d, el){
     `${r[0]}: TWA ${r[2]!=null?r[2]+' ppm':''} ${r[3]!=null?r[3]+' mg/m\u207b\u00b3':''} ${r[6]?'['+r[6]+']':''}`
   ).join('; ');
 
-  const {op, qty, contain} = getUseContext();
+  const {op, qtyUsed, qtyHandled, contain} = getUseContext();
   const useContext = [
     op ? `Operation: ${op}` : '',
-    qty ? `Quantity: ${qty}` : '',
+    qtyUsed ? `Quantity used: ${qtyUsed}` : '',
+    qtyHandled ? `Quantity handled: ${qtyHandled}` : '',
     contain ? `Containment: ${contain}` : '',
   ].filter(Boolean).join(' | ');
 
@@ -1536,7 +1559,8 @@ STRICT RULES:
 - KEEP acute toxicity information relevant to lab exposure
 - KEEP any carcinogen, mutagen, or reproductive hazard warnings
 ${op ? `- The operation is "${op}" — focus safety advice on the specific hazards and controls relevant to this process` : ''}
-${qty ? `- The quantity is "${qty}" — scale your advice appropriately` : ''}
+${qtyUsed ? `- The quantity used is "${qtyUsed}" — scale consumption and routine-use advice appropriately` : ''}
+${qtyHandled ? `- The quantity handled is "${qtyHandled}" — assess transfer, exposure, spill, and containment implications accordingly` : ''}
 ${contain ? `- The containment is "${contain}" — assess whether this is adequate and flag if not` : ''}
 - Be concise — one to three sentences per section maximum
 - Use plain English appropriate for a trained researcher
@@ -1567,10 +1591,13 @@ ${rawText.slice(0, 12000)}`;
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
       {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': geminiApiKey
+        },
         body: JSON.stringify({
           contents: [{parts: [{text: prompt}]}],
           generationConfig: {temperature: 0.1, maxOutputTokens: 1500}
@@ -1625,7 +1652,7 @@ function buildCuratedHTML(c, d){
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:8px">
         <span class="source-tag src-pubchem">Source: PubChem LCSS</span>
-        <span class="ai-badge">AI curated — Gemini 1.5 Flash</span>
+        <span class="ai-badge">AI curated — Gemini 2.5 Flash</span>
       </div>
       <button class="btn-toggle-full" onclick="lcssShowFull=true;renderLCSSTab()">Show full LCSS ↓</button>
     </div>`;
@@ -1775,8 +1802,8 @@ function exportCSV(){
   rows.push(['IUPAC Name', d.props?.IUPACName||'']);
   rows.push(['Molecular Formula', d.props?.MolecularFormula||'']);
   rows.push(['Molecular Weight (g/mol)', d.props?.MolecularWeight||'']);
-  const {op: csvOp, qty: csvQty, contain: csvContain} = getUseContext();
-  rows.push(['Use context', [csvOp, csvQty, csvContain].filter(Boolean).join(' | ') || 'Not specified']);
+  const {op: csvOp, qtyUsed: csvQtyUsed, qtyHandled: csvQtyHandled, contain: csvContain} = getUseContext();
+  rows.push(['Use context', [csvOp, csvQtyUsed ? `Quantity used: ${csvQtyUsed}` : '', csvQtyHandled ? `Quantity handled: ${csvQtyHandled}` : '', csvContain].filter(Boolean).join(' | ') || 'Not specified']);
   rows.push([]);
 
   // Section: GHS
@@ -1853,7 +1880,7 @@ function exportCSV(){
 }
 
 function exportJSON(){
-  const {op, qty, contain} = getUseContext();
+  const {op, qtyUsed, qtyHandled, contain} = getUseContext();
 
   const d = currentData;
   if(!d.cid){ alert('No data loaded — perform a search first.'); return; }
@@ -1864,9 +1891,10 @@ function exportJSON(){
       generated: new Date().toISOString(),
       query: d.query,
       operation: op || null,
-      quantity: qty || null,
+      quantityUsed: qtyUsed || null,
+      quantityHandled: qtyHandled || null,
       containment: contain || null,
-      useContext: [op, qty, contain].filter(Boolean).join(' | ') || 'Not specified',
+      useContext: [op, qtyUsed ? `Quantity used: ${qtyUsed}` : '', qtyHandled ? `Quantity handled: ${qtyHandled}` : '', contain].filter(Boolean).join(' | ') || 'Not specified',
     },
     identity: {
       pubchemCID: d.cid,
@@ -1924,8 +1952,8 @@ function exportPDF(){
   if(!d.cid){ alert('No data loaded — perform a search first.'); return; }
 
   const now = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'});
-  const {op, qty, contain} = getUseContext();
-  const useContextStr = [op, qty, contain].filter(Boolean).join(' | ') || 'Not specified';
+  const {op, qtyUsed, qtyHandled, contain} = getUseContext();
+  const useContextStr = [op, qtyUsed ? `Quantity used: ${qtyUsed}` : '', qtyHandled ? `Quantity handled: ${qtyHandled}` : '', contain].filter(Boolean).join(' | ') || 'Not specified';
 
   const ghsPics = (d.ghs?.pictograms||[]).map(p=>
     `<img src="${p.url}" style="width:40px;height:40px;margin:2px" title="${p.label}">`).join('');
@@ -2073,11 +2101,59 @@ ${ctxSection}
 }
 
 // ── COSHH Basket ─────────────────────────────────────────────────────────────
-let basket = []; // array of substance objects for this session
+const COSHH_BASKET_KEY = 'coshhBasket';
+let basket = []; // array of substance objects shared with the COSHH form
+
+function sanitiseBasketEntry(entry) {
+  if (!entry || typeof entry !== 'object') return null;
+  const name = typeof entry.name === 'string' ? entry.name.trim() : '';
+  const cas = typeof entry.cas === 'string' ? entry.cas.trim() : '';
+  if (!name && !cas) return null;
+  return {
+    name,
+    cas,
+    qty_used: typeof entry.qty_used === 'string' ? entry.qty_used : '',
+    qty_handled: typeof entry.qty_handled === 'string' ? entry.qty_handled : '',
+    wel: typeof entry.wel === 'string' ? entry.wel : '',
+    hazards: typeof entry.hazards === 'string' ? entry.hazards : '',
+    signal: typeof entry.signal === 'string' ? entry.signal : '',
+    carcinogen: !!entry.carcinogen,
+    mutagen: !!entry.mutagen,
+    fire_risk: !!entry.fire_risk,
+    emergency_ingestion_vomit: !!entry.emergency_ingestion_vomit,
+    emergency_ingestion_medical: !!entry.emergency_ingestion_medical,
+    emergency_inhalation_air: !!entry.emergency_inhalation_air,
+    emergency_inhalation_medical: !!entry.emergency_inhalation_medical,
+    emergency_skin_rinse: !!entry.emergency_skin_rinse,
+    emergency_skin_medical: !!entry.emergency_skin_medical,
+    emergency_eye_rinse: !!entry.emergency_eye_rinse,
+    emergency_eye_medical: !!entry.emergency_eye_medical,
+  };
+}
+
+function loadBasket() {
+  try {
+    const raw = localStorage.getItem(COSHH_BASKET_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    basket = Array.isArray(parsed) ? parsed.map(sanitiseBasketEntry).filter(Boolean) : [];
+    localStorage.setItem(COSHH_BASKET_KEY, JSON.stringify(basket));
+  } catch (err) {
+    basket = [];
+  }
+}
+
+function saveBasket() {
+  try {
+    localStorage.setItem(COSHH_BASKET_KEY, JSON.stringify(basket));
+  } catch (err) {
+    console.warn('Could not persist COSHH basket:', err);
+  }
+}
 
 function buildBasketEntry() {
   const d = currentData;
   if (!d || !d.cid) return null;
+  const { qtyUsed, qtyHandled } = getUseContext();
 
   // Build WEL string from EH40 matches
   let welText = '';
@@ -2093,27 +2169,42 @@ function buildBasketEntry() {
 
   // Build hazard text from GHS H-statements
   const ghs = d.ghs || {};
-  const hcodes = (ghs.hstatements || []).map(s => {
-    const m = s.match(/^(H[\d]{3}[A-Z+]*)/);
-    return m ? m[1] : null;
+  const hazardStatements = (ghs.hstatements || []).map(statement => {
+    if (!statement) return null;
+    if (typeof statement === 'string') {
+      const match = statement.match(/^(H[\d]{3}[A-Z+]*)[:\s]+(.+)/);
+      return match
+        ? { code: match[1].toUpperCase(), text: match[2].trim() }
+        : { code: '', text: statement.trim() };
+    }
+    if (typeof statement === 'object') {
+      return {
+        code: typeof statement.code === 'string' ? statement.code.toUpperCase().trim() : '',
+        text: typeof statement.text === 'string' ? statement.text.trim() : '',
+      };
+    }
+    return null;
   }).filter(Boolean);
-  const hstmts = (ghs.hstatements || []).map(s => {
-    const m = s.match(/^(H[\d]{3}[A-Z+]*)[:\s]+(.+)/);
-    return m ? `${m[1]}: ${m[2]}` : s;
-  });
+  const hcodes = hazardStatements.map(s => s.code).filter(Boolean);
+  const hstmts = hazardStatements.map(s => {
+    if (s.code && s.text) return `${s.code}: ${s.text}`;
+    return s.code || s.text || '';
+  }).filter(Boolean);
   const hazardText = hcodes.length
     ? (hstmts.length ? `${hcodes.join(', ')} — ${hstmts.join('; ')}` : hcodes.join(', '))
     : '';
 
   return {
-    name: d.query.charAt(0).toUpperCase() + d.query.slice(1),
+    name: ((d.props?.IUPACName || d.query || '').trim() || `CID ${d.cid}`),
     cas:  d.cas || '',
+    qty_used: qtyUsed,
+    qty_handled: qtyHandled,
     wel:  welText,
     hazards: hazardText,
     signal: ghs.signal || '',
-    carcinogen: !!(d.ghs?.hstatements||[]).some(s => /H35[0-9]/.test(s)),
-    mutagen:    !!(d.ghs?.hstatements||[]).some(s => /H34[0-9]/.test(s)),
-    fire_risk:  !!(d.ghs?.hstatements||[]).some(s => /H22[0-9]|H20[0-9]|H21[0-9]/.test(s)),
+    carcinogen: hcodes.some(code => /H35[0-9]/.test(code)),
+    mutagen:    hcodes.some(code => /H34[0-9]/.test(code)),
+    fire_risk:  hcodes.some(code => /H22[0-9]|H20[0-9]|H21[0-9]/.test(code)),
     emergency_ingestion_vomit:   false,
     emergency_ingestion_medical: true,
     emergency_inhalation_air:    true,
@@ -2126,13 +2217,14 @@ function buildBasketEntry() {
 }
 
 function addToBasket() {
-  const entry = buildBasketEntry();
+  loadBasket();
+  const entry = sanitiseBasketEntry(buildBasketEntry());
   if (!entry) return;
 
   // Prevent duplicates by CAS or name
   const already = basket.some(s =>
-    (s.cas && s.cas === entry.cas) ||
-    s.name.toLowerCase() === entry.name.toLowerCase()
+    (s.cas && entry.cas && s.cas === entry.cas) ||
+    ((s.name || '').toLowerCase() === (entry.name || '').toLowerCase())
   );
   if (already) {
     const btn = document.getElementById('btn-add-basket');
@@ -2142,6 +2234,7 @@ function addToBasket() {
   }
 
   basket.push(entry);
+  saveBasket();
   renderBasket();
 
   const btn = document.getElementById('btn-add-basket');
@@ -2151,33 +2244,50 @@ function addToBasket() {
 
 function removeFromBasket(index) {
   basket.splice(index, 1);
+  saveBasket();
   renderBasket();
 }
 
 function clearBasket() {
   basket = [];
+  saveBasket();
   renderBasket();
 }
 
 function renderBasket() {
   const tray  = document.getElementById('basket-tray');
   const chips = document.getElementById('basket-chips');
+  const count = document.getElementById('basket-count');
+  const summary = document.getElementById('basket-summary');
+  if (count) count.textContent = basket.length;
+  if (summary) summary.textContent = basket.length
+    ? `${basket.length} substance${basket.length > 1 ? 's' : ''} ready for COSHH`
+    : 'No substances queued';
   if (!basket.length) {
     tray.classList.remove('visible');
     return;
   }
   tray.classList.add('visible');
   chips.innerHTML = basket.map((s, i) =>
-    `<span class="basket-chip">${s.name}${s.cas ? ' <span style="opacity:0.6;font-size:10px">'+s.cas+'</span>' : ''}
+    `<span class="basket-chip">${s.name || 'Unnamed substance'}${s.cas ? ' <span style="opacity:0.6;font-size:10px">'+s.cas+'</span>' : ''}
      <button onclick="removeFromBasket(${i})" title="Remove">✕</button></span>`
   ).join('');
 }
 
 function openInForm() {
   if (!basket.length) return;
-  sessionStorage.setItem('coshhBasket', JSON.stringify(basket));
+  saveBasket();
   window.location.href = 'app.html';
 }
+
+loadBasket();
+renderBasket();
+
+window.addEventListener('storage', (event) => {
+  if (event.key !== COSHH_BASKET_KEY) return;
+  loadBasket();
+  renderBasket();
+});
 </script>
 </body>
 </html>
