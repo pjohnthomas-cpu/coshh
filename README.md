@@ -1,17 +1,18 @@
 # COSHH Assessment Form
 
-A browser-based COSHH support site with two parts:
+A browser-based COSHH support site with two main tools:
 
-- A landing page with practical guidance and resource links to help users prepare a COSHH assessment
-- A full single-page assessment tool for drafting, saving, and exporting COSHH forms
+- A hazard profile lookup tool for researching substances against EH40, PubChem, and EPA CTX
+- A full single-page COSHH assessment tool for drafting, saving, and exporting COSHH forms
 
 Designed for broader research-laboratory use.
 
-**Live site:** https://pjohnthomas-cpu.github.io/coshh/
+**Live site:** https://coshh.uk/
 
 ## Site structure
 
 - `index.html` — landing page with preparation guidance, resource links, and entry points into the tool
+- `hp.html` — hazard profile lookup tool for EH40, PubChem, and EPA CTX substance research
 - `app.html` — the full COSHH assessment application
 - `eh40_data.json` — bundled EH40 Workplace Exposure Limits dataset used for local lookup
 - `.nojekyll` — prevents GitHub Pages from running Jekyll processing
@@ -57,7 +58,7 @@ It is provided as a documentation aid. Completed assessments should be reviewed 
 ## Author
 
 **Dr. John Thomas Prabhakar**  
-p.johnthomas@gmail.com
+john.thomas@bangor.ac.uk
 
 ## Licence
 

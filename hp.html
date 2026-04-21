@@ -10,7 +10,13 @@
 <meta property="og:description" content="Look up EH40 WELs, GHS hazard data, and EPA toxicity values for any substance. Free browser-based tool for research laboratory COSHH assessment support.">
 <meta property="og:url" content="https://coshh.uk/hp.html">
 <meta property="og:type" content="website">
-<meta name="twitter:card" content="summary">
+<meta name="robots" content="index,follow">
+<meta property="og:image" content="https://coshh.uk/social-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hazard Profile Lookup for research laboratories">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://coshh.uk/social-preview.png">
 <meta name="twitter:title" content="Hazard Profile Lookup — EH40, PubChem &amp; EPA CTX">
 <meta name="twitter:description" content="Look up EH40 WELs, GHS hazard data, and EPA toxicity values for any substance. Free browser-based tool for research labs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -294,47 +300,6 @@
     </div>
   </div>
 
-  <!-- API Config -->
-  <div class="card">
-    <div class="card-title">Data Sources &amp; Configuration</div>
-
-    <!-- CTX key — pre-configured, UI hidden -->
-    <div style="display:none">
-    <div class="api-key-row">
-      <div class="field">
-        <label>EPA CTX API Key <span style="font-weight:400;text-transform:none;color:var(--text3)">(optional — free from <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d3b0b0a7b68cb2a3ba93b6a3b2fdb4bca5">[email&#160;protected]</a>)</span></label>
-        <input type="text" id="ctxKey" placeholder="Paste your CTX API key here" autocomplete="off">
-      </div>
-      <button class="btn btn-ghost" onclick="saveKey('ctx')">Save</button>
-    </div>
-    <div class="key-status unset" id="keyStatus">CTX API key not set — EH40 &amp; PubChem data will still load</div>
-    </div><!-- end hidden CTX key block -->
-
-    <div style="height:12px"></div>
-
-    <!-- AI curation toggle -->
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
-      <input type="checkbox" id="aiToggle" style="width:16px;height:16px;accent-color:var(--accent2);cursor:pointer;flex-shrink:0"
-        onchange="toggleAI(this.checked)">
-      <div>
-        <label for="aiToggle" style="font-size:13px;font-weight:500;color:var(--text);cursor:pointer">Enable AI safety curation</label>
-        <div style="font-size:11px;color:var(--text3);margin-top:1px">Uses Gemini 1.5 Flash (free tier) to distil the LCSS into a concise lab-scale summary, stripping ERG references and large-scale response data</div>
-      </div>
-    </div>
-
-    <!-- Gemini key — hidden until AI toggled on -->
-    <div id="geminiKeyPanel" style="display:none;margin-top:10px">
-      <div class="api-key-row">
-        <div class="field">
-          <label>Gemini API Key <span style="font-weight:400;text-transform:none;color:var(--text3)">— free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent2)">aistudio.google.com/apikey</a></span></label>
-          <input type="text" id="geminiKey" placeholder="Paste your Gemini API key here (starts with AIzaSy…)" autocomplete="off">
-        </div>
-        <button class="btn btn-ghost" onclick="saveKey('gemini')">Save</button>
-      </div>
-      <div class="key-status unset" id="geminiStatus">Gemini key not set — enter key above to enable AI curation</div>
-    </div>
-  </div>
-
   <!-- Search -->
   <div class="card">
     <div class="card-title">Substance Search</div>
@@ -395,6 +360,49 @@
           <option value="enclosed system (closed vessel, no exposure expected)">Enclosed system</option>
         </select>
       </div>
+    </div>
+  </div>
+
+  <!-- Data and optional AI -->
+  <div class="card">
+    <div class="card-title">Data Sources &amp; Optional AI Summary</div>
+
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
+      Core lookup data comes from EH40, PubChem, and EPA CTX. AI safety curation is optional and only used to condense long safety text into a shorter lab-scale summary.
+    </div>
+
+    <!-- CTX key — pre-configured, UI hidden -->
+    <div style="display:none">
+    <div class="api-key-row">
+      <div class="field">
+        <label>EPA CTX API Key <span style="font-weight:400;text-transform:none;color:var(--text3)">(optional — free from <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d3b0b0a7b68cb2a3ba93b6a3b2fdb4bca5">[email&#160;protected]</a>)</span></label>
+        <input type="text" id="ctxKey" placeholder="Paste your CTX API key here" autocomplete="off">
+      </div>
+      <button class="btn btn-ghost" onclick="saveKey('ctx')">Save</button>
+    </div>
+    <div class="key-status unset" id="keyStatus">CTX API key not set — EH40 &amp; PubChem data will still load</div>
+    </div><!-- end hidden CTX key block -->
+
+    <!-- AI curation toggle -->
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+      <input type="checkbox" id="aiToggle" style="width:16px;height:16px;accent-color:var(--accent2);cursor:pointer;flex-shrink:0"
+        onchange="toggleAI(this.checked)">
+      <div>
+        <label for="aiToggle" style="font-size:13px;font-weight:500;color:var(--text);cursor:pointer">Enable optional AI safety summary</label>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">Uses Gemini 1.5 Flash to shorten long safety text for lab-scale reading. The core lookup tool works without it.</div>
+      </div>
+    </div>
+
+    <!-- Gemini key — hidden until AI toggled on -->
+    <div id="geminiKeyPanel" style="display:none;margin-top:10px">
+      <div class="api-key-row">
+        <div class="field">
+          <label>Gemini API Key <span style="font-weight:400;text-transform:none;color:var(--text3)">— free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent2)">aistudio.google.com/apikey</a></span></label>
+          <input type="text" id="geminiKey" placeholder="Paste your Gemini API key here (starts with AIzaSy…)" autocomplete="off">
+        </div>
+        <button class="btn btn-ghost" onclick="saveKey('gemini')">Save</button>
+      </div>
+      <div class="key-status unset" id="geminiStatus">Gemini key not set — AI summary unavailable, full safety text will be shown</div>
     </div>
   </div>
 
